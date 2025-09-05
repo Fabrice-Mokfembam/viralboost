@@ -46,7 +46,7 @@ const EmailVerification: React.FC = () => {
   const handleVerify = () => {
     const fullCode = code.join('');
     console.log('Verifying code:', fullCode);
-    navigate('/');
+    navigate('/dashboard');
   };
 
   const handleResendCode = () => {

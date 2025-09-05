@@ -6,8 +6,10 @@ const Signup: React.FC = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [isPhoneLogin,setIsPhoneLogin]= useState(true);
   const [formData, setFormData] = useState({
     name: '',
+    phonenumber: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -156,9 +158,9 @@ const Signup: React.FC = () => {
           </h3>
         </div>
         <div className="bg-gray-900 p-8 rounded-lg shadow-lg">
-           <div className="flex justify-center mb-6">
-            <button className="w-1/2 cursor-pointer py-2 rounded-l-lg bg-cyan-500 text-white font-semibold">Phone</button>
-            <button className="w-1/2 cursor-pointer py-2 rounded-r-lg bg-gray-700 text-gray-400 font-semibold">Email</button>
+            <div className="flex justify-center mb-6">
+            <button className={`w-1/2 cursor-pointer py-2 rounded-l-lg  text-white font-semibold ${isPhoneLogin ? 'bg-cyan-500' : 'bg-gray-700'}`} onClick={()=>setIsPhoneLogin(true)}>Phone</button>
+            <button className={`w-1/2 cursor-pointer py-2 rounded-r ${isPhoneLogin ? 'bg-gray-700' : 'bg-cyan-500'} text-white font-semibold`} onClick={()=>setIsPhoneLogin(false)}>Email</button>
           </div>
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="rounded-md shadow-sm -space-y-px">
@@ -183,7 +185,20 @@ const Signup: React.FC = () => {
                 )}
               </div>
               
-              <div className="mt-4">
+     {isPhoneLogin?  <div className="mt-4">
+                <input
+                  id="phonenumber"
+                  name="phonenumber"
+                  type="number"
+                  autoComplete="phonenumber"
+                  required
+                  value={formData.phonenumber}
+                  onChange={handleInputChange}
+                  className="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-700 placeholder-gray-500 text-white focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm bg-gray-700"
+                  placeholder="Phone Number"
+                />
+              </div>  : (
+                <div className="mt-4">
                 <input
                   id="email-address"
                   name="email"
@@ -195,7 +210,7 @@ const Signup: React.FC = () => {
                   className="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-700 placeholder-gray-500 text-white focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm bg-gray-700"
                   placeholder="Email address"
                 />
-              </div>
+              </div>)}
               
               <div className="relative mt-4">
                 <div className={`rounded-none bg-gray-700 ${getPasswordInputClass()} ${errors.password ? 'border-2' : 'border'}`}>

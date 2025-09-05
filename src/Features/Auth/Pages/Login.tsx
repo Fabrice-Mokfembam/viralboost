@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loginData, setLoginData] = useState({
-    phoneNumber: '',
+    LoginValue: '',
     password: ''
   });
+  const navigate = useNavigate()
+  const [isPhoneLogin,setIsPhoneLogin]= useState(true);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -20,6 +22,7 @@ const Login: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Login data:', loginData);
+    navigate('/dashboard')
     // Handle login logic here
   };
 
@@ -41,22 +44,22 @@ const Login: React.FC = () => {
         </div>
         <div className="bg-gray-900 p-8 rounded-lg shadow-lg">
           <div className="flex justify-center mb-6">
-            <button className="w-1/2 cursor-pointer py-2 rounded-l-lg bg-cyan-500 text-white font-semibold">Phone</button>
-            <button className="w-1/2 cursor-pointer py-2 rounded-r-lg bg-gray-700 text-gray-400 font-semibold">Email</button>
+            <button className={`w-1/2 cursor-pointer py-2 rounded-l-lg  text-white font-semibold ${isPhoneLogin ? 'bg-cyan-500' : 'bg-gray-700'}`} onClick={()=>setIsPhoneLogin(true)}>Phone</button>
+            <button className={`w-1/2 cursor-pointer py-2 rounded-r ${isPhoneLogin ? 'bg-gray-700' : 'bg-cyan-500'} text-white font-semibold`} onClick={()=>setIsPhoneLogin(false)}>Email</button>
           </div>
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="rounded-md shadow-sm -space-y-px">
               <div>
                 <input
-                  id="phone-number"
-                  name="phoneNumber"
-                  type="text"
+                  id="login-value"
+                  name="LoginValue"
+                  type={isPhoneLogin ? "number" : "email"}
                   autoComplete="tel"
                   required
-                  value={loginData.phoneNumber}
+                  value={loginData.LoginValue}
                   onChange={handleInputChange}
                   className="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-700 placeholder-gray-500 text-white rounded-t-md focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm bg-gray-700"
-                  placeholder="Phone Number"
+                  placeholder={isPhoneLogin ? "Phone Number" : "Email"}
                 />
               </div>
               <div className="relative mt-4">

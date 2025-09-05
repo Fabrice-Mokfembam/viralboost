@@ -5,6 +5,8 @@ import Signup from './Features/Auth/Pages/Signup.tsx';
 import EmailVerification from './Features/Auth/Pages/EmailVerification.tsx';
 import ForgotPassword from './Features/Auth/Pages/ForgotPassword.tsx';
 import ResetPassword from './Features/Auth/Pages/ResetPassword.tsx';
+import DashboardLayout from './Features/dashboard/Components/DashboardLayout.tsx';
+import Home from './Features/dashboard/Pages/Home.tsx';
 
 
 const router = createBrowserRouter([
@@ -27,6 +29,16 @@ const router = createBrowserRouter([
   {
     path: "/reset-password/:token",
     element: <ResetPassword />,
+  },
+  {
+    path: "/dashboard",
+    element: <DashboardLayout />,
+    children: [
+      {
+        index: true,
+        element: <Home />,
+      },
+    ],
   },
 ]);
 
