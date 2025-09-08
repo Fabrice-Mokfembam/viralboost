@@ -9,7 +9,7 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col items-center py-8 ">
       {/* User Info Card */}
-      <div className="w-full max-w-md rounded-lg mb-6 shadow-lg text-gray-300 px-6 py-4">
+      <div className="w-full max-w-md rounded-lg mb-6 shadow-lg text-gray-300  py-4">
         <div className="flex items-center space-x-4 mb-4">
           <div className="w-16 h-16 rounded-full bg-gray-700 flex items-center justify-center text-gray-500 text-3xl font-bold">
             U
