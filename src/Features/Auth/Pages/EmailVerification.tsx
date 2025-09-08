@@ -87,19 +87,19 @@ const EmailVerification: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-800 flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-bg-secondary flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-text-primary">
             Viral Boost
           </h2>
-          <h3 className="mt-2 text-center text-2xl font-bold text-white">
+          <h3 className="mt-2 text-center text-2xl font-bold text-text-primary">
             Verify Your Email
           </h3>
         </div>
         
-        <div className="bg-gray-900 p-8 rounded-lg shadow-lg">
-          <p className="text-gray-400 text-center mb-6">
+        <div className="bg-bg-main p-8 rounded-lg shadow-lg">
+          <p className="text-text-muted text-center mb-6">
             We've sent a 6-digit verification code to your email address
           </p>
 
@@ -114,7 +114,7 @@ const EmailVerification: React.FC = () => {
                 onKeyDown={(e) => handleKeyDown(e, index)}
                 onPaste={handlePaste}
                 ref={(el: HTMLInputElement | null) => { inputRefs.current[index] = el as HTMLInputElement; }}
-                className="w-12 h-14 text-center text-2xl font-bold border-2 border-gray-700 rounded-md focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 bg-gray-800 text-white"
+                className="w-12 h-14 text-center text-2xl font-bold border-2 border-gray-700 rounded-md focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 bg-bg-secondary text-text-primary"
               />
             ))}
           </div>
@@ -123,14 +123,14 @@ const EmailVerification: React.FC = () => {
             type="button"
             onClick={handleVerify}
             disabled={code.join('').length !== 6}
-            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-cyan-500 hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-text-primary bg-cyan-500 hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Verify Email
           </button>
 
           {/* Countdown timer */}
           <div className="text-center mt-4">
-            <p className="text-gray-400 text-sm">
+            <p className="text-text-muted text-sm">
               {timeLeft > 0 ? `Resend code in ${formatTime(timeLeft)}` : 'Code expired'}
             </p>
           </div>
@@ -141,7 +141,7 @@ const EmailVerification: React.FC = () => {
               disabled={!canResend}
               className={`text-sm ${
                 canResend 
-                  ? 'text-cyan-500 hover:text-cyan-400 cursor-pointer' 
+                  ? 'text-cyan-500 hover:text-accent-cyan cursor-pointer' 
                   : 'text-gray-500 cursor-not-allowed'
               }`}
             >
@@ -150,9 +150,9 @@ const EmailVerification: React.FC = () => {
           </div>
         </div>
 
-        <div className="text-center text-sm text-gray-400">
+        <div className="text-center text-sm text-text-muted">
           Need help?{' '}
-          <Link to="/support" className="font-medium text-cyan-500 hover:text-cyan-400">
+          <Link to="/support" className="font-medium text-cyan-500 hover:text-accent-cyan">
             Contact Support
           </Link>
         </div>

@@ -35,11 +35,11 @@ const ResetPassword: React.FC = () => {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-gray-800 flex items-center justify-center">
-        <div className="bg-gray-900 p-8 rounded-lg shadow-lg text-center">
+      <div className="min-h-screen bg-bg-secondary flex items-center justify-center">
+        <div className="bg-bg-main p-8 rounded-lg shadow-lg text-center">
           <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-2">Password Updated!</h2>
-          <p className="text-gray-400">Your password has been successfully reset.</p>
+          <h2 className="text-2xl font-bold text-text-primary mb-2">Password Updated!</h2>
+          <p className="text-text-muted">Your password has been successfully reset.</p>
         </div>
       </div>
     );
@@ -47,8 +47,8 @@ const ResetPassword: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-800 flex items-center justify-center">
-      <div className="bg-gray-900 p-8 rounded-lg shadow-lg max-w-md w-full">
-        <h2 className="text-2xl font-bold text-white mb-6 text-center">Create New Password</h2>
+      <div className="bg-bg-main p-8 rounded-lg shadow-lg max-w-md w-full">
+        <h2 className="text-2xl font-bold text-text-primary mb-6 text-center">Create New Password</h2>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           
@@ -58,13 +58,13 @@ const ResetPassword: React.FC = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="New password"
-              className="w-full px-3 py-3 pr-10 border border-gray-700 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              className="w-full px-3 py-3 pr-10 border border-gray-700 rounded-md bg-bg-secondary text-text-primary focus:outline-none focus:ring-2 focus:ring-cyan-500"
               required
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted"
             >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
@@ -77,13 +77,13 @@ const ResetPassword: React.FC = () => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Confirm new password"
-              className="w-full px-3 py-3 pr-10 border border-gray-700 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              className="w-full px-3 py-3 pr-10 border border-gray-700 rounded-md bg-gray-800 text-text-primary focus:outline-none focus:ring-2 focus:ring-cyan-500"
               required
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted"
             >
               {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
@@ -93,7 +93,7 @@ const ResetPassword: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full py-3 bg-cyan-500 text-white rounded-md hover:bg-cyan-600 transition-colors"
+            className="w-full py-3 bg-cyan-500 text-text-primary rounded-md hover:bg-cyan-600 transition-colors"
           >
             Reset Password
           </button>

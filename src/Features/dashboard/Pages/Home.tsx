@@ -28,25 +28,25 @@ const Home = () => {
   
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white md:px-6 py-8 md:max-w-xl mx-auto">
+    <div className="min-h-screen bg-bg-main text-text-primary md:px-6 py-8 md:max-w-xl mx-auto">
       {/* Header */}
       <header className="mb-8 space-y-5">
         <h1 className="text-3xl font-extrabold text-cyan-400 text-center">
           Welcome Back!
         </h1>
-        <p className="text-gray-400 text-center">
+        <p className="text-text-muted text-center">
           Your Dashboard to Track Earnings and Manage Account Effortlessly
         </p>
 
         {/* Balance & Top-up */}
-        <div className="bg-gray-800 rounded-lg p-4 flex justify-between items-center shadow-lg">
+        <div className="bg-bg-secondary rounded-lg p-4 flex justify-between items-center shadow-lg">
           <div>
-            <p className="text-gray-400 text-sm">Current Balance</p>
-            <p className="text-white font-bold text-xl">$350.00</p>
+            <p className="text-text-muted text-sm">Current Balance</p>
+            <p className="text-text-primary font-bold text-xl">$350.00</p>
           </div>
           <button
             onClick={() => navigate('/v/recharge')}
-            className="flex items-center bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg py-2 px-4 font-semibold shadow"
+            className="flex items-center bg-cyan-500 hover:bg-cyan-600 text-text-primary rounded-lg py-2 px-4 font-semibold shadow"
           >
             <PlusCircle size={20} className="mr-2" />
             Top Up
@@ -88,7 +88,7 @@ const Home = () => {
             style={{ width: `${(tasksCompleted / dailyGoal) * 100}%` }}
           />
         </div>
-        <p className="text-gray-400 text-sm">
+        <p className="text-text-muted text-sm">
           {tasksCompleted} / {dailyGoal} Tasks Completed
         </p>
       </section>
@@ -100,14 +100,14 @@ const Home = () => {
           {activities.map(({ id, title, description, icon, reward }) => (
             <div
               key={id}
-              className="flex items-center bg-gray-800 rounded-xl shadow-lg p-4 hover:bg-gray-700 transition cursor-pointer"
+              className="flex items-center bg-gray-800 rounded-xl shadow-lg p-4 hover:bg-bg-tertiary transition cursor-pointer"
             >
               <div>{icon}</div>
               <div className="ml-4 flex-1">
                 <h3 className="text-lg font-semibold">{title}</h3>
-                <p className="text-sm text-gray-400">{description}</p>
+                <p className="text-sm text-text-muted">{description}</p>
               </div>
-              <div className="text-cyan-400 font-bold text-lg">{reward}</div>
+              <div className="text-accent-cyan font-bold text-lg">{reward}</div>
             </div>
           ))}
         </div>
@@ -119,19 +119,19 @@ const Home = () => {
           <Gift size={28} className="text-cyan-400" />
           <h3 className="text-cyan-400 font-semibold">Invite Friends</h3>
         </div>
-        <p className="text-gray-400 text-sm mb-3">
+        <p className="text-text-muted text-sm mb-3">
           Earn bonus rewards when your friends join and complete tasks!
         </p>
         <button
           onClick={() => navigate('/v/invitefriends')}
-          className="bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg py-2 px-4 font-semibold w-full"
+          className="bg-cyan-500 hover:bg-cyan-600 text-text-primary rounded-lg py-2 px-4 font-semibold w-full"
         >
           Invite Now
         </button>
       </section>
 
       {/* About & Support Links */}
-      <section className="bg-gray-800 rounded-lg p-4 shadow-lg text-gray-300 text-sm space-y-3">
+      <section className="bg-gray-800 rounded-lg p-4 shadow-lg text-text-secondary text-sm space-y-3">
         <h3 className="font-semibold text-cyan-400 mb-2">About Company & Support</h3>
         <p>
           This app helps you earn rewards by completing simple online tasks like

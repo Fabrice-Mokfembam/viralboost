@@ -147,20 +147,20 @@ const Signup: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-800 flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-bg-secondary flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-text-primary">
             Viral Boost
           </h2>
-          <h3 className="mt-2 text-center text-2xl font-bold text-white">
+          <h3 className="mt-2 text-center text-2xl font-bold text-text-primary">
             Join the Tribe
           </h3>
         </div>
-        <div className="bg-gray-900 p-8 rounded-lg shadow-lg">
+        <div className="bg-bg-main p-8 rounded-lg shadow-lg">
             <div className="flex justify-center mb-6">
-            <button className={`w-1/2 cursor-pointer py-2 rounded-l-lg  text-white font-semibold ${isPhoneLogin ? 'bg-cyan-500' : 'bg-gray-700'}`} onClick={()=>setIsPhoneLogin(true)}>Phone</button>
-            <button className={`w-1/2 cursor-pointer py-2 rounded-r ${isPhoneLogin ? 'bg-gray-700' : 'bg-cyan-500'} text-white font-semibold`} onClick={()=>setIsPhoneLogin(false)}>Email</button>
+            <button className={`w-1/2 cursor-pointer py-2 rounded-l-lg  text-text-primary font-semibold ${isPhoneLogin ? 'bg-cyan-500' : 'bg-bg-tertiary'}`} onClick={()=>setIsPhoneLogin(true)}>Phone</button>
+            <button className={`w-1/2 cursor-pointer py-2 rounded-r ${isPhoneLogin ? 'bg-bg-tertiary' : 'bg-cyan-500'} text-text-primary font-semibold`} onClick={()=>setIsPhoneLogin(false)}>Email</button>
           </div>
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="rounded-md shadow-sm -space-y-px">
@@ -174,7 +174,7 @@ const Signup: React.FC = () => {
                   value={formData.name}
                   onChange={handleInputChange}
                   onBlur={() => handleBlur('name')}
-                  className="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-700 placeholder-gray-500 text-white rounded-t-md focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm bg-gray-700"
+                  className="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-700 placeholder-gray-500 text-text-primary rounded-t-md focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm bg-bg-tertiary"
                   placeholder="Full Name"
                 />
                 {touched.name && errors.name && (
@@ -194,7 +194,7 @@ const Signup: React.FC = () => {
                   required
                   value={formData.phonenumber}
                   onChange={handleInputChange}
-                  className="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-700 placeholder-gray-500 text-white focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm bg-gray-700"
+                  className="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-700 placeholder-gray-500 text-text-primary focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm bg-bg-tertiary"
                   placeholder="Phone Number"
                 />
               </div>  : (
@@ -207,13 +207,13 @@ const Signup: React.FC = () => {
                   required
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-700 placeholder-gray-500 text-white focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm bg-gray-700"
+                  className="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-700 placeholder-gray-500 text-text-primary focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm bg-bg-tertiary"
                   placeholder="Email address"
                 />
               </div>)}
               
               <div className="relative mt-4">
-                <div className={`rounded-none bg-gray-700 ${getPasswordInputClass()} ${errors.password ? 'border-2' : 'border'}`}>
+                <div className={`rounded-none bg-bg-tertiary ${getPasswordInputClass()} ${errors.password ? 'border-2' : 'border'}`}>
                   <input
                     id="password"
                     name="password"
@@ -223,13 +223,13 @@ const Signup: React.FC = () => {
                     value={formData.password}
                     onChange={handleInputChange}
                     onBlur={() => handleBlur('password')}
-                    className="w-full py-3 pr-10 bg-transparent text-white leading-tight focus:outline-none focus:shadow-outline pl-3"
+                    className="w-full py-3 pr-10 bg-transparent text-text-primary leading-tight focus:outline-none focus:shadow-outline pl-3"
                     placeholder="Password"
                   />
                   <button
                     type="button"
                     onClick={togglePasswordVisibility}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary"
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
@@ -243,7 +243,7 @@ const Signup: React.FC = () => {
               </div>
               
               <div className="relative mt-4">
-                <div className={`rounded-none bg-gray-700 ${getConfirmPasswordInputClass()} ${errors.confirmPassword ? 'border-2' : 'border'} rounded-b-md`}>
+                <div className={`rounded-none bg-bg-tertiary ${getConfirmPasswordInputClass()} ${errors.confirmPassword ? 'border-2' : 'border'} rounded-b-md`}>
                   <input
                     id="confirm-password"
                     name="confirmPassword"
@@ -253,13 +253,13 @@ const Signup: React.FC = () => {
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
                     onBlur={() => handleBlur('confirmPassword')}
-                    className="w-full py-3 pr-10 bg-transparent text-white leading-tight focus:outline-none focus:shadow-outline pl-3"
+                    className="w-full py-3 pr-10 bg-transparent text-text-primary leading-tight focus:outline-none focus:shadow-outline pl-3"
                     placeholder="Confirm Password"
                   />
                   <button
                     type="button"
                     onClick={toggleConfirmPasswordVisibility}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary"
                   >
                     {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
@@ -280,7 +280,7 @@ const Signup: React.FC = () => {
                   autoComplete="off"
                   value={formData.referralCode}
                   onChange={handleInputChange}
-                  className="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-700 placeholder-gray-500 text-white rounded-b-md focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm bg-gray-700"
+                  className="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-700 placeholder-gray-500 text-text-primary rounded-b-md focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm bg-bg-tertiary"
                   placeholder="Referral Code (Optional)"
                 />
               </div>
@@ -289,7 +289,7 @@ const Signup: React.FC = () => {
             <div>
               <button
                 type="submit"
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-cyan-500 hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-text-primary bg-cyan-500 hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={!!errors.name || !!errors.password || !!errors.confirmPassword}
               >
                 Sign Up
@@ -297,9 +297,9 @@ const Signup: React.FC = () => {
             </div>
           </form>
         </div>
-        <div className="text-center text-sm text-gray-400">
+        <div className="text-center text-sm text-text-muted">
           Already have an account?{' '}
-          <Link to="/" className="font-medium text-cyan-500 hover:text-cyan-400">
+          <Link to="/" className="font-medium text-cyan-500 hover:text-accent-cyan">
             Sign In
           </Link>
         </div>

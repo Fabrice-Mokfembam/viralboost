@@ -38,22 +38,22 @@ const TaskDetail: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white max-w-3xl mx-auto md:px-6">
+    <div className="min-h-screen bg-bg-main text-text-primary max-w-3xl mx-auto md:px-6">
       <header className="mb-6">
-        <h1 className="text-3xl font-extrabold text-cyan-400 mb-1">Task Detail</h1>
-        <p className="text-gray-400 text-sm">Task ID: {id}</p>
+        <h1 className="text-3xl font-extrabold text-accent-cyan mb-1">Task Detail</h1>
+        <p className="text-text-muted text-sm">Task ID: {id}</p>
       </header>
 
       {/* Task Info Box */}
-      <section className="bg-gray-800 rounded-2xl p-6 shadow-xl border border-cyan-600 mb-8">
-        <h2 className="text-2xl font-bold text-white mb-2">{task.title}</h2>
+      <section className="bg-bg-secondary rounded-2xl p-6 shadow-xl border border-cyan-600 mb-8">
+        <h2 className="text-2xl font-bold text-text-primary mb-2">{task.title}</h2>
         <p className="text-cyan-400 font-semibold mb-2">Reward: {task.benefit}</p>
-        <p className="text-gray-300 mb-4">{task.description}</p>
+        <p className="text-text-secondary mb-4">{task.description}</p>
 
         {/* Additional info */}
-        <div className="bg-gray-700 p-4 rounded-lg mb-4 border-l-4 border-cyan-500">
+        <div className="bg-bg-tertiary p-4 rounded-lg mb-4 border-l-4 border-cyan-500">
           <h3 className="font-semibold text-cyan-300 mb-2">Important Notes:</h3>
-          <ul className="list-disc list-inside text-gray-400 text-sm space-y-1">
+          <ul className="list-disc list-inside text-text-muted text-sm space-y-1">
             <li>Please ensure screenshots are clear and unedited.</li>
             <li>Submitting incomplete proof may lead to rejection.</li>
             <li>Tasks must be completed within 24 hours to be valid.</li>
@@ -64,7 +64,7 @@ const TaskDetail: React.FC = () => {
       {/* Instructions */}
       <section className="mb-8">
         <h3 className="text-xl font-semibold text-cyan-400 mb-4">How to Complete the Task</h3>
-        <ol className="list-decimal list-inside space-y-3 text-gray-400 text-lg">
+        <ol className="list-decimal list-inside space-y-3 text-text-muted text-lg">
           {task.instructions.map((step, index) => (
             <li key={index} className="pl-2 border-l-4 border-cyan-500">
               {step}
@@ -86,7 +86,7 @@ const TaskDetail: React.FC = () => {
         />
         <label
           htmlFor="uploadImages"
-          className="inline-block cursor-pointer bg-cyan-600 hover:bg-cyan-700 text-white font-semibold px-6 py-3  shadow transition"
+          className="inline-block cursor-pointer bg-cyan-600 hover:bg-cyan-700 text-text-primary font-semibold px-6 py-3  shadow transition"
         >
           Select Images
         </label>
@@ -108,7 +108,7 @@ const TaskDetail: React.FC = () => {
                     type="button"
                     aria-label="Remove Image"
                     onClick={() => removeImage(index)}
-                    className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full p-1 shadow-lg opacity-90 hover:opacity-100 transition"
+                    className="absolute -top-2 -right-2 bg-red-600 text-text-primary rounded-full p-1 shadow-lg opacity-90 hover:opacity-100 transition"
                   >
                     <X size={20} />
                   </button>
@@ -125,8 +125,8 @@ const TaskDetail: React.FC = () => {
         disabled={selectedImages.length === 0}
         className={`w-full py-4  font-bold text-lg transition ${
           selectedImages.length === 0
-            ? 'bg-gray-700 cursor-not-allowed text-gray-400'
-            : 'bg-cyan-500 hover:bg-cyan-600 text-white shadow-xl'
+            ? 'bg-bg-tertiary cursor-not-allowed text-text-muted'
+            : 'bg-cyan-500 hover:bg-cyan-600 text-text-primary shadow-xl'
         }`}
       >
         Submit Proof

@@ -41,15 +41,16 @@
 @layer base {
   [data-theme='dark'] {
     /* Dark Theme Colors */
-    --color-bg-main: #111827;        /* bg-gray-900 */
-    --color-bg-secondary: #1f2937;   /* bg-gray-800 */
-    --color-bg-tertiary: #374151;    /* bg-gray-700 */
+    --color-bg-main: #1a202c; /* Dark blue-gray */
+    --color-bg-secondary: #2d3748; /* Slightly lighter dark blue-gray */
+    --color-bg-tertiary: #4a5568; /* Even lighter dark blue-gray */
+    --color-bg-gray-800: #2d3748; /* Mapping for bg-gray-800 */
 
     --color-text-primary: #ffffff;
-    --color-text-secondary: #d1d5db;  /* text-gray-300 */
+    --color-text-secondary: #d1d5db;  /* text-text-secondary */
     --color-text-muted: #9ca3af;      /* text-gray-400 */
 
-    --color-accent-cyan: #22d3ee;     /* text-cyan-400 */
+    --color-accent-cyan: #22d3ee;     /* text-accent-cyan */
     --color-accent-cyan-bg: #06b6d4;  /* bg-cyan-500 */
     --color-accent-cyan-hover: #0891b2; /* hover:bg-cyan-600 */
 

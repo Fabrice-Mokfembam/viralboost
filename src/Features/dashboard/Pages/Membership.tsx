@@ -37,10 +37,10 @@ const memberships = [
 
 const Membership: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gray-900 pt-4 md:p-6 flex flex-col items-center space-y-3 text-gray-300">
+    <div className="min-h-screen bg-bg-secondary pt-4 md:p-6 flex flex-col items-center space-y-3 text-text-secondary">
       <div className="border border-cyan-500 rounded-lg py-4 px-6 w-full max-w-md text-center">
-        <h2 className="text-cyan-400 font-semibold text-lg mb-1">Become a Member</h2>
-        <p className="text-gray-400 text-sm">
+        <h2 className="text-accent-cyan font-semibold text-lg mb-1">Become a Member</h2>
+        <p className="text-text-muted text-sm">
           Invite friends to join and get chances to upgrade your membership level!
         </p>
       </div>
@@ -51,14 +51,14 @@ const Membership: React.FC = () => {
             key={level}
             className={`${bgColor} rounded-3xl p-6 flex-1 shadow-xl border border-cyan-500 hover:scale-105 transform transition cursor-pointer`}
           >
-            <h3 className="text-white font-bold text-2xl mb-3">{level}</h3>
+            <h3 className="text-text-primary font-bold text-2xl mb-3">{level}</h3>
             <p className="text-cyan-300 font-semibold text-lg mb-6">{price}</p>
             <ul className="text-gray-200 mb-6 space-y-2 list-disc list-inside">
               {benefits.map((benefit, i) => (
                 <li key={i}>{benefit}</li>
               ))}
             </ul>
-            <button className="w-full bg-cyan-500 hover:bg-cyan-600 text-white py-3 rounded-xl font-semibold shadow-lg transition">
+            <button className="w-full bg-cyan-500 hover:bg-cyan-600 text-text-primary py-3 rounded-xl font-semibold shadow-lg transition">
               {level === 'Basic' ? 'Current Plan' : 'Upgrade'}
             </button>
           </div>

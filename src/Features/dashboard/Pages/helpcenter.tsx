@@ -18,13 +18,13 @@ const faqs = [
 
 const HelpCenter = () => {
   return (
-    <div className="min-h-screen bg-gray-900 max-w-4xl mx-auto text-gray-300">
-      <h1 className="text-3xl font-bold text-cyan-400 mb-8 text-center">Help Center</h1>
+    <div className="min-h-screen bg-bg-main max-w-4xl mx-auto text-text-secondary">
+      <h1 className="text-3xl font-bold text-accent-cyan mb-8 text-center">Help Center</h1>
       <div className="space-y-6">
         {faqs.map(({ question, answer }, i) => (
-          <div key={i} className="bg-gray-800 rounded-xl p-6 shadow-md border border-cyan-500">
-            <h2 className="text-xl font-semibold text-white mb-2">{question}</h2>
-            <p className="text-gray-400">{answer}</p>
+          <div key={i} className="bg-bg-secondary rounded-xl p-6 shadow-md border border-cyan-500">
+            <h2 className="text-xl font-semibold text-text-primary mb-2">{question}</h2>
+            <p className="text-text-muted">{answer}</p>
           </div>
         ))}
       </div>

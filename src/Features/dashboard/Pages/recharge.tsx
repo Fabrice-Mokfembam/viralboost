@@ -17,15 +17,15 @@ const Recharge = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 p-6 max-w-xl mx-auto text-gray-300">
-      <h1 className="text-3xl font-bold text-cyan-400 mb-6">Recharge Account</h1>
+    <div className="min-h-screen bg-bg-main p-6 max-w-xl mx-auto text-text-secondary">
+      <h1 className="text-3xl font-bold text-accent-cyan mb-6">Recharge Account</h1>
 
       <div className="mb-6">
-        <label className="block mb-2 font-semibold text-white">Amount to Recharge</label>
+        <label className="block mb-2 font-semibold text-text-primary">Amount to Recharge</label>
         <input
           type="number"
           min="1"
-          className="w-full p-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          className="w-full p-3 rounded-lg bg-bg-tertiary text-text-primary focus:outline-none focus:ring-2 focus:ring-cyan-500"
           placeholder="Enter amount"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
@@ -33,7 +33,7 @@ const Recharge = () => {
       </div>
 
       <div>
-        <p className="mb-4 font-semibold text-white">Select Payment Method</p>
+        <p className="mb-4 font-semibold text-text-primary">Select Payment Method</p>
         <div className="flex space-x-4">
           {rechargeMethods.map(({ id, name, icon }) => (
             <button
@@ -41,7 +41,7 @@ const Recharge = () => {
               onClick={() => setSelectedMethod(id)}
               className={`flex-1 rounded-lg p-4 border-2 flex flex-col items-center space-y-2 focus:outline-none transition ${
                 selectedMethod === id
-                  ? 'border-cyan-500 bg-cyan-700 text-white'
+                  ? 'border-cyan-500 bg-cyan-700 text-text-primary'
                   : 'border-gray-700 text-gray-400 hover:border-cyan-500'
               }`}
             >
@@ -57,8 +57,8 @@ const Recharge = () => {
         onClick={handleRecharge}
         className={`mt-8 w-full py-3 rounded-xl font-semibold transition ${
           amount && selectedMethod
-            ? 'bg-cyan-500 hover:bg-cyan-600 text-white shadow-lg'
-            : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+            ? 'bg-cyan-500 hover:bg-cyan-600 text-text-primary shadow-lg'
+            : 'bg-bg-tertiary text-gray-500 cursor-not-allowed'
         }`}
       >
         Recharge Now

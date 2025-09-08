@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { Home, CheckSquare, Users, User, Globe2, Menu, SunMoon, Flag, LogOut } from 'lucide-react';
+import { useTheme } from '../../../Hooks/useTheme';
 
 const DashboardLayout = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const {toggleTheme}= useTheme()
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -21,11 +23,7 @@ const DashboardLayout = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [menuOpen]);
 
-  // Example toggle theme handler (you can connect to actual theme state)
-  const toggleTheme = () => {
-    alert('Theme toggled! (Implement your theme toggle logic here)');
-    setMenuOpen(false);
-  };
+
 
   const reportProblem = () => {
     alert('Report problem clicked! (Connect this to your reporting workflow)');
@@ -38,13 +36,13 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-800 flex flex-col">
+    <div className="min-h-screen bg-bg-secondary flex flex-col">
       {/* Main content */}
-      <main className="flex-grow relative w-full max-w-3xl md:mx-auto bg-gray-900 pt-6 pb-20 px-4">
-        <header className="w-full h-[70px] bg-gray-900 sticky top-0 z-50 flex items-center justify-between  py-3">
+      <main className="flex-grow relative w-full max-w-3xl md:mx-auto bg-bg-main pt-6 pb-20 px-4">
+        <header className="w-full h-[70px] bg-bg-main sticky top-0 z-50 flex items-center justify-between  py-3">
           <div className="text-cyan-500 font-bold text-xl">Viral Boost</div>
 
-          <div className="flex items-center gap-2 text-gray-400 relative">
+          <div className="flex items-center gap-2 text-text-muted relative">
             <Globe2 size={24} className="cursor-pointer hover:text-cyan-500" />
 
             {/* Hamburger menu button */}
@@ -59,27 +57,27 @@ const DashboardLayout = () => {
             {/* Dropdown Menu */}
             <div
               ref={menuRef}
-              className={`absolute right-0 top-full mt-1 w-48 rounded-lg bg-gray-700 border border-gray-600 shadow-lg
+              className={`absolute right-0 top-full mt-1 w-48 rounded-lg bg-bg-tertiary border border-gray-600 shadow-lg
                 transform origin-top-right transition-all ease-in-out duration-200
                 ${menuOpen ? 'scale-100 opacity-100 visible' : 'scale-95 opacity-0 invisible'}
               `}
             >
               <button
                 onClick={toggleTheme}
-                className="flex items-center w-full px-2 py-3 text-gray-300 hover:bg-cyan-600 hover:text-white rounded-t-lg"
+                className="flex items-center w-full px-2 py-3 text-text-secondary hover:bg-cyan-600 hover:text-text-primary rounded-t-lg"
               >
                 <SunMoon size={20} className="mr-3" /> Toggle Theme
               </button>
               <button
                 onClick={reportProblem}
-                className="flex items-center w-full px-2 py-3 text-gray-300 hover:bg-cyan-600 hover:text-white"
+                className="flex items-center w-full px-2 py-3 text-text-secondary hover:bg-cyan-600 hover:text-text-primary"
               >
                 <Flag size={20} className="mr-3" /> Report a Problem
               </button>
             
               <button
                 onClick={logout}
-                className="flex items-center w-full px-2 py-3 text-red-500 hover:bg-red-600 hover:text-white rounded-b-lg"
+                className="flex items-center w-full px-2 py-3 text-red-500 hover:bg-red-600 hover:text-text-primary rounded-b-lg"
               >
                 <LogOut size={20} className="mr-3" /> Logout
               </button>
@@ -92,7 +90,7 @@ const DashboardLayout = () => {
 
         {/* Bottom Navigation */}
         <div className="fixed bottom-0 left-0 right-0 w-full">
-          <nav className="max-w-3xl mx-auto px-4 bg-gray-900 border-t border-gray-700 flex justify-around text-gray-400">
+          <nav className="max-w-3xl mx-auto px-4 bg-bg-main border-t border-gray-700 flex justify-around text-text-muted">
             <NavLink
               to="/dashboard"
               className={({ isActive }) =>
