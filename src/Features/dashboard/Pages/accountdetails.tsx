@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { CreditCard, Gift, Repeat, UserPlus } from 'lucide-react';
 
 const AccountDetails = () => {
@@ -12,7 +12,7 @@ const AccountDetails = () => {
   const totalWithdrawals = 5;
 
   return (
-    <div className="min-h-screen bg-gray-900 p-6 max-w-3xl mx-auto text-gray-300">
+    <div className="min-h-screen bg-gray-900 max-w-3xl mx-auto text-gray-300">
       <h1 className="text-3xl font-bold text-cyan-400 mb-6">Account Details</h1>
 
       <div className="bg-gray-800 p-6 rounded-2xl border border-cyan-500 shadow-xl mb-8">

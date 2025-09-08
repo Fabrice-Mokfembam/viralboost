@@ -1,14 +1,17 @@
-import React from 'react';
 import { CreditCard, Repeat, Settings } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
+  const navigate = useNavigate();
+
+  const profileOptions = ['Invite Friends', 'Change password', 'Help Center'];
+
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col items-center py-8 ">
       {/* User Info Card */}
-      <div className="w-full max-w-md  rounded-lg  mb-6 shadow-lg text-gray-300">
+      <div className="w-full max-w-md rounded-lg mb-6 shadow-lg text-gray-300 px-6 py-4">
         <div className="flex items-center space-x-4 mb-4">
           <div className="w-16 h-16 rounded-full bg-gray-700 flex items-center justify-center text-gray-500 text-3xl font-bold">
-            {/* User Avatar Placeholder */}
             U
           </div>
           <div>
@@ -26,15 +29,24 @@ const Profile = () => {
 
         {/* Action Icons */}
         <div className="flex justify-around mb-6">
-          <button className="flex flex-col items-center space-y-1 bg-cyan-500 rounded-md p-4 shadow-lg text-white">
+          <button
+            onClick={() => navigate('/v/recharge')}
+            className="flex flex-col items-center space-y-1 bg-cyan-500 rounded-md p-4 shadow-lg text-white"
+          >
             <Repeat size={24} />
             <span className="text-xs font-semibold">Recharge</span>
           </button>
-          <button className="flex flex-col items-center space-y-1 bg-cyan-500 rounded-md p-4 shadow-lg text-white">
+          <button
+            onClick={() => navigate('/v/withdraw')}
+            className="flex flex-col items-center space-y-1 bg-cyan-500 rounded-md p-4 shadow-lg text-white"
+          >
             <CreditCard size={24} />
             <span className="text-xs font-semibold">Withdraw</span>
           </button>
-          <button className="flex flex-col items-center space-y-1 bg-gray-700 rounded-md p-4 shadow-lg text-gray-400">
+          <button
+            onClick={() => navigate('/v/accountdetails')}
+            className="flex flex-col items-center space-y-1 bg-gray-700 rounded-md p-4 shadow-lg text-gray-400"
+          >
             <Settings size={24} />
             <span className="text-xs font-semibold">Account details</span>
           </button>
@@ -42,9 +54,19 @@ const Profile = () => {
 
         {/* Profile Options */}
         <div className="space-y-3">
-          {['Invite Friends', 'Change password', 'Help Center'].map((item) => (
+          {profileOptions.map((item) => (
             <button
               key={item}
+              onClick={() => {
+                if (item === 'Invite Friends') {
+                  navigate('/v/invitefriends');
+                } else if (item === 'Change password') {
+                  // Link to change password page or fallback
+                  navigate('/v/accountdetails');
+                } else if (item === 'Help Center') {
+                  navigate('/v/helpcenter');
+                }
+              }}
               className="w-full flex justify-between items-center bg-gray-700 text-gray-300 py-3 px-4 rounded-md shadow hover:bg-gray-600 focus:outline-none"
             >
               <span>{item}</span>

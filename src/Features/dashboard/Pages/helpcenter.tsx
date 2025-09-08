@@ -1,4 +1,4 @@
-import React from 'react';
+
 
 const faqs = [
   {
@@ -18,7 +18,7 @@ const faqs = [
 
 const HelpCenter = () => {
   return (
-    <div className="min-h-screen bg-gray-900 p-6 max-w-4xl mx-auto text-gray-300">
+    <div className="min-h-screen bg-gray-900 max-w-4xl mx-auto text-gray-300">
       <h1 className="text-3xl font-bold text-cyan-400 mb-8 text-center">Help Center</h1>
       <div className="space-y-6">
         {faqs.map(({ question, answer }, i) => (

@@ -18,6 +18,7 @@ import Recharge from './Features/dashboard/Pages/recharge.tsx';
 import InviteFriends from './Features/dashboard/Pages/invitefriends.tsx';
 import HelpCenter from './Features/dashboard/Pages/helpcenter.tsx';
 import PrivacyPolicy from './Features/dashboard/Pages/privacypolicy.tsx';
+import CompanyAbout from './Features/dashboard/Pages/AboutCompany.tsx';
 
 
 const router = createBrowserRouter([
@@ -72,7 +73,7 @@ const router = createBrowserRouter([
         element: <TaskDetail />,
       },
       { path: "aboutcompany",
-        element: <TaskDetail />,
+        element: <CompanyAbout />,
       },
       {
         path: "accountdetails",

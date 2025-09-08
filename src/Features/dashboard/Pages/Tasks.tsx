@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { ThumbsUp, UserPlus, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 

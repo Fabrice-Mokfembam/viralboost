@@ -1,5 +1,6 @@
-import  { useState } from 'react';
+
 import { UserCheck, CreditCard, Info, PlusCircle, Gift } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const activities = [
   {
@@ -19,9 +20,12 @@ const activities = [
 ];
 
 const Home = () => {
+  const navigate = useNavigate();
   // Example state for completed tasks
-  const [tasksCompleted, setTasksCompleted] = useState(3);
+  const tasksCompleted = 3;
   const dailyGoal = 15;
+
+  
 
   return (
     <div className="min-h-screen bg-gray-900 text-white md:px-6 py-8 md:max-w-xl mx-auto">
@@ -40,7 +44,10 @@ const Home = () => {
             <p className="text-gray-400 text-sm">Current Balance</p>
             <p className="text-white font-bold text-xl">$350.00</p>
           </div>
-          <button className="flex items-center bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg py-2 px-4 font-semibold shadow">
+          <button
+            onClick={() => navigate('/v/recharge')}
+            className="flex items-center bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg py-2 px-4 font-semibold shadow"
+          >
             <PlusCircle size={20} className="mr-2" />
             Top Up
           </button>
@@ -48,15 +55,24 @@ const Home = () => {
 
         {/* Main Buttons */}
         <div className="flex justify-around space-x-4">
-          <button className="flex-1 bg-cyan-500 hover:bg-cyan-600 rounded-lg py-3 flex flex-col items-center shadow-lg font-semibold">
+          <button
+            onClick={() => navigate('/dashboard/membership')}
+            className="flex-1 bg-cyan-500 hover:bg-cyan-600 rounded-lg py-3 flex flex-col items-center shadow-lg font-semibold"
+          >
             <UserCheck size={28} />
             <span className="mt-1">Membership</span>
           </button>
-          <button className="flex-1 bg-cyan-500 hover:bg-cyan-600 rounded-lg py-3 flex flex-col items-center shadow-lg font-semibold">
+          <button
+            onClick={() => navigate('/v/withdraw')}
+            className="flex-1 bg-cyan-500 hover:bg-cyan-600 rounded-lg py-3 flex flex-col items-center shadow-lg font-semibold"
+          >
             <CreditCard size={28} />
             <span className="mt-1">Withdraw</span>
           </button>
-          <button className="flex-1 bg-cyan-500 hover:bg-cyan-600 rounded-lg py-3 flex flex-col items-center shadow-lg font-semibold">
+          <button
+            onClick={() => navigate('/v/aboutcompany')}
+            className="flex-1 bg-cyan-500 hover:bg-cyan-600 rounded-lg py-3 flex flex-col items-center shadow-lg font-semibold"
+          >
             <Info size={28} />
             <span className="mt-1">About Company</span>
           </button>
@@ -106,7 +122,10 @@ const Home = () => {
         <p className="text-gray-400 text-sm mb-3">
           Earn bonus rewards when your friends join and complete tasks!
         </p>
-        <button className="bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg py-2 px-4 font-semibold w-full">
+        <button
+          onClick={() => navigate('/v/invitefriends')}
+          className="bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg py-2 px-4 font-semibold w-full"
+        >
           Invite Now
         </button>
       </section>
@@ -121,17 +140,26 @@ const Home = () => {
         </p>
         <ul className="list-disc pl-5 space-y-1">
           <li>
-            <a href="/support" className="text-cyan-400 hover:underline">
+            <a
+              onClick={() => navigate('/v/helpcenter')}
+              className="text-cyan-400 hover:underline cursor-pointer"
+            >
               Support Center
             </a>
           </li>
           <li>
-            <a href="/faq" className="text-cyan-400 hover:underline">
+            <a
+              onClick={() => navigate('/v/helpcenter')}
+              className="text-cyan-400 hover:underline cursor-pointer"
+            >
               FAQs
             </a>
           </li>
           <li>
-            <a href="/privacy" className="text-cyan-400 hover:underline">
+            <a
+              onClick={() => navigate('/v/privacypolicy')}
+              className="text-cyan-400 hover:underline cursor-pointer"
+            >
               Privacy Policy
             </a>
           </li>

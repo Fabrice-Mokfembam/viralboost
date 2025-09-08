@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { CreditCard,  Wallet, Banknote } from 'lucide-react';
 
 const rechargeMethods = [
