@@ -19,6 +19,8 @@ import InviteFriends from './Features/dashboard/Pages/invitefriends.tsx';
 import HelpCenter from './Features/dashboard/Pages/helpcenter.tsx';
 import PrivacyPolicy from './Features/dashboard/Pages/privacypolicy.tsx';
 import CompanyAbout from './Features/dashboard/Pages/AboutCompany.tsx';
+import { Bounce, ToastContainer } from 'react-toastify';
+import { useTheme } from './Hooks/useTheme.tsx';
 
 
 const router = createBrowserRouter([
@@ -104,8 +106,24 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return (
-    <RouterProvider router={router} />
+
+  const {theme} = useTheme();
+  return ( <>
+  <RouterProvider router={router} />
+     <ToastContainer
+        position="top-right" 
+        autoClose={5000} 
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false} 
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme={theme}
+        transition={Bounce} 
+      /></>
+    
   );
 }
 

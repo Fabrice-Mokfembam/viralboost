@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
+import { useRegister } from '../Hooks/useAuth';
+import { toast } from 'react-toastify';
 
 const Signup: React.FC = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [isPhoneLogin,setIsPhoneLogin]= useState(true);
+  const [isPhoneLogin, setIsPhoneLogin] = useState(true);
+  const { mutate: register, isPending, error } = useRegister();
+
   const [formData, setFormData] = useState({
     name: '',
     phonenumber: '',
@@ -15,15 +19,21 @@ const Signup: React.FC = () => {
     confirmPassword: '',
     referralCode: ''
   });
+
   const [errors, setErrors] = useState({
     name: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    phonenumber: '',
+    email: ''
   });
+
   const [touched, setTouched] = useState({
     name: false,
     password: false,
-    confirmPassword: false
+    confirmPassword: false,
+    phonenumber: false,
+    email: false
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,6 +55,15 @@ const Signup: React.FC = () => {
     if (touched.confirmPassword && name === 'confirmPassword') {
       validateConfirmPassword(value);
     }
+    if (touched.name && name === 'name') {
+      validateName(value);
+    }
+    if (touched.phonenumber && name === 'phonenumber') {
+      validatePhoneNumber(value);
+    }
+    if (touched.email && name === 'email') {
+      validateEmail(value);
+    }
   };
 
   const handleBlur = (field: string) => {
@@ -56,6 +75,10 @@ const Signup: React.FC = () => {
       validatePassword(formData.password);
     } else if (field === 'confirmPassword') {
       validateConfirmPassword(formData.confirmPassword);
+    } else if (field === 'phonenumber') {
+      validatePhoneNumber(formData.phonenumber);
+    } else if (field === 'email') {
+      validateEmail(formData.email);
     }
   };
 
@@ -72,6 +95,38 @@ const Signup: React.FC = () => {
     
     setErrors(newErrors);
     return newErrors.name === '';
+  };
+
+  const validatePhoneNumber = (phone: string) => {
+    const newErrors = { ...errors };
+    const phoneRegex = /^\+?[1-9]\d{1,14}$/; // Basic international phone format validation
+    
+    if (!phone.trim()) {
+      newErrors.phonenumber = 'Phone number is required';
+    } else if (!phoneRegex.test(phone)) {
+      newErrors.phonenumber = 'Please enter a valid phone number';
+    } else {
+      newErrors.phonenumber = '';
+    }
+    
+    setErrors(newErrors);
+    return newErrors.phonenumber === '';
+  };
+
+  const validateEmail = (email: string) => {
+    const newErrors = { ...errors };
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    if (!email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!emailRegex.test(email)) {
+      newErrors.email = 'Please enter a valid email address';
+    } else {
+      newErrors.email = '';
+    }
+    
+    setErrors(newErrors);
+    return newErrors.email === '';
   };
 
   const validatePassword = (password: string) => {
@@ -112,19 +167,56 @@ const Signup: React.FC = () => {
     e.preventDefault();
     
     // Mark all fields as touched to show errors
-    setTouched({
+    const allTouched = {
       name: true,
       password: true,
-      confirmPassword: true
-    });
+      confirmPassword: true,
+      phonenumber: isPhoneLogin,
+      email: !isPhoneLogin
+    };
+    setTouched(allTouched);
     
     const isNameValid = validateName(formData.name);
     const isPasswordValid = validatePassword(formData.password);
     const isConfirmPasswordValid = validateConfirmPassword(formData.confirmPassword);
+    const isPhoneValid = isPhoneLogin ? validatePhoneNumber(formData.phonenumber) : true;
+    const isEmailValid = !isPhoneLogin ? validateEmail(formData.email) : true;
     
-    if (isNameValid && isPasswordValid && isConfirmPasswordValid) {
-      console.log('Signup data:', formData);
-      navigate('/code-verification');
+    if (isNameValid && isPasswordValid && isConfirmPasswordValid && isPhoneValid && isEmailValid) {
+      // Prepare registration data
+      const registrationData: any = {
+        name: formData.name,
+        password: formData.password,
+      };
+
+      // Add phone or email based on selection
+      if (isPhoneLogin) {
+        registrationData.phone = formData.phonenumber;
+      } else {
+        registrationData.email = formData.email;
+      }
+
+      // Add referral code if provided
+      if (formData.referralCode.trim()) {
+        registrationData.referralCode = formData.referralCode;
+      }
+
+      // Call the register mutation
+      register(registrationData, {
+        onSuccess: (data) => {
+          toast.success(data.message || 'Registration successful! Please check your email/phone to verify your account.');
+          // Navigate to verification page with the contact info
+          navigate('/code-verification', { 
+            state: { 
+              contact: isPhoneLogin ? formData.phonenumber : formData.email,
+              isPhone: isPhoneLogin
+            } 
+          });
+        },
+        onError: (error: any) => {
+          toast.error(error.response?.data?.message || 'Registration failed. Please try again.');
+        }
+      });
     }
   };
 
@@ -146,6 +238,16 @@ const Signup: React.FC = () => {
     return errors.confirmPassword ? 'border-red-500' : 'border-green-500';
   };
 
+  const getPhoneInputClass = () => {
+    if (!touched.phonenumber) return 'border-gray-700';
+    return errors.phonenumber ? 'border-red-500' : 'border-green-500';
+  };
+
+  const getEmailInputClass = () => {
+    if (!touched.email) return 'border-gray-700';
+    return errors.email ? 'border-red-500' : 'border-green-500';
+  };
+
   return (
     <div className="min-h-screen bg-bg-secondary flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -158,10 +260,21 @@ const Signup: React.FC = () => {
           </h3>
         </div>
         <div className="bg-bg-main p-8 rounded-lg shadow-lg">
-            <div className="flex justify-center mb-6">
-            <button className={`w-1/2 cursor-pointer py-2 rounded-l-lg  text-text-primary font-semibold ${isPhoneLogin ? 'bg-cyan-500' : 'bg-bg-tertiary'}`} onClick={()=>setIsPhoneLogin(true)}>Phone</button>
-            <button className={`w-1/2 cursor-pointer py-2 rounded-r ${isPhoneLogin ? 'bg-bg-tertiary' : 'bg-cyan-500'} text-text-primary font-semibold`} onClick={()=>setIsPhoneLogin(false)}>Email</button>
+          <div className="flex justify-center mb-6">
+            <button 
+              className={`w-1/2 cursor-pointer py-2 rounded-l-lg text-text-primary font-semibold ${isPhoneLogin ? 'bg-cyan-500' : 'bg-bg-tertiary'}`} 
+              onClick={() => setIsPhoneLogin(true)}
+            >
+              Phone
+            </button>
+            <button 
+              className={`w-1/2 cursor-pointer py-2 rounded-r text-text-primary font-semibold ${isPhoneLogin ? 'bg-bg-tertiary' : 'bg-cyan-500'}`} 
+              onClick={() => setIsPhoneLogin(false)}
+            >
+              Email
+            </button>
           </div>
+          
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="rounded-md shadow-sm -space-y-px">
               <div>
@@ -185,32 +298,49 @@ const Signup: React.FC = () => {
                 )}
               </div>
               
-     {isPhoneLogin?  <div className="mt-4">
-                <input
-                  id="phonenumber"
-                  name="phonenumber"
-                  type="number"
-                  autoComplete="phonenumber"
-                  required
-                  value={formData.phonenumber}
-                  onChange={handleInputChange}
-                  className="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-700 placeholder-gray-500 text-text-primary focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm bg-bg-tertiary"
-                  placeholder="Phone Number"
-                />
-              </div>  : (
+              {isPhoneLogin ? (
                 <div className="mt-4">
-                <input
-                  id="email-address"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-700 placeholder-gray-500 text-text-primary focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm bg-bg-tertiary"
-                  placeholder="Email address"
-                />
-              </div>)}
+                  <input
+                    id="phonenumber"
+                    name="phonenumber"
+                    type="tel"
+                    autoComplete="tel"
+                    required
+                    value={formData.phonenumber}
+                    onChange={handleInputChange}
+                    onBlur={() => handleBlur('phonenumber')}
+                    className={`appearance-none rounded-none relative block w-full px-3 py-3 border placeholder-gray-500 text-text-primary focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm bg-bg-tertiary ${getPhoneInputClass()}`}
+                    placeholder="Phone Number (e.g., +1234567890)"
+                  />
+                  {touched.phonenumber && errors.phonenumber && (
+                    <div className="mt-1 flex items-center text-red-500 text-xs">
+                      <AlertCircle size={14} className="mr-1" />
+                      {errors.phonenumber}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="mt-4">
+                  <input
+                    id="email-address"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    onBlur={() => handleBlur('email')}
+                    className={`appearance-none rounded-none relative block w-full px-3 py-3 border placeholder-gray-500 text-text-primary focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm bg-bg-tertiary ${getEmailInputClass()}`}
+                    placeholder="Email address"
+                  />
+                  {touched.email && errors.email && (
+                    <div className="mt-1 flex items-center text-red-500 text-xs">
+                      <AlertCircle size={14} className="mr-1" />
+                      {errors.email}
+                    </div>
+                  )}
+                </div>
+              )}
               
               <div className="relative mt-4">
                 <div className={`rounded-none bg-bg-tertiary ${getPasswordInputClass()} ${errors.password ? 'border-2' : 'border'}`}>
@@ -286,13 +416,38 @@ const Signup: React.FC = () => {
               </div>
             </div>
 
+            {error && (
+              <div className="rounded-md bg-red-50 p-4">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <AlertCircle className="h-5 w-5 text-red-400" aria-hidden="true" />
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-red-800">
+                      Registration failed
+                    </h3>
+                    <div className="mt-2 text-sm text-red-700">
+                      {error.message || 'An error occurred during registration. Please try again.'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div>
               <button
                 type="submit"
                 className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-text-primary bg-cyan-500 hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={!!errors.name || !!errors.password || !!errors.confirmPassword}
+                disabled={isPending || !!errors.name || !!errors.password || !!errors.confirmPassword || (isPhoneLogin && !!errors.phonenumber) || (!isPhoneLogin && !!errors.email)}
               >
-                Sign Up
+                {isPending ? (
+                  <>
+                    <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
+                    Registering...
+                  </>
+                ) : (
+                  'Sign Up'
+                )}
               </button>
             </div>
           </form>
