@@ -14,12 +14,8 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
       return savedTheme;
     }
     
-    // If no saved preference, check system preference
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark';
-    }
-    
-    return 'light';
+    // Default to dark theme if no saved preference
+    return 'dark';
   });
 
   useEffect(() => {

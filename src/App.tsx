@@ -19,6 +19,8 @@ import InviteFriends from './Features/dashboard/Pages/invitefriends.tsx';
 import HelpCenter from './Features/dashboard/Pages/helpcenter.tsx';
 import PrivacyPolicy from './Features/dashboard/Pages/privacypolicy.tsx';
 import CompanyAbout from './Features/dashboard/Pages/AboutCompany.tsx';
+import ProtectedRoute from './Components/ProtectedRoute.tsx';
+import AuthRoute from './Components/AuthRoute.tsx';
 import { Bounce, ToastContainer } from 'react-toastify';
 import { useTheme } from './Hooks/useTheme.tsx';
 
@@ -26,27 +28,51 @@ import { useTheme } from './Hooks/useTheme.tsx';
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Login />,
+    element: (
+      <AuthRoute>
+        <Login />
+      </AuthRoute>
+    ),
   },
   {
     path: "/signup",
-    element: <Signup />,
+    element: (
+      <AuthRoute>
+        <Signup />
+      </AuthRoute>
+    ),
   },
   {
     path: "/code-verification",
-    element: <EmailVerification />,
+    element: (
+      <AuthRoute>
+        <EmailVerification />
+      </AuthRoute>
+    ),
   },
   {
     path: "/forgot-password",
-    element: <ForgotPassword />,
+    element: (
+      <AuthRoute>
+        <ForgotPassword />
+      </AuthRoute>
+    ),
   },
   {
     path: "/reset-password/:token",
-    element: <ResetPassword />,
+    element: (
+      <AuthRoute>
+        <ResetPassword />
+      </AuthRoute>
+    ),
   },
   {
     path: "/dashboard",
-    element: <DashboardLayout />,
+    element: (
+      <ProtectedRoute>
+        <DashboardLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         index: true,
@@ -68,7 +94,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/v",
-    element: <SinglePageLayout/>,
+    element: (
+      <ProtectedRoute>
+        <SinglePageLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
        path: "task/:id",
