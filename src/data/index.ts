@@ -1,5 +1,5 @@
 export interface User {
-  id: string;
+  id: number;
   name: string;
   email: string;
   phone: string;
@@ -28,8 +28,7 @@ export interface LoginRequest {
 }
 
 export interface VerifyRequest {
-  email?: string;
-  phone?: string;
+  email: string;
   code: string;
 }
 
@@ -60,14 +59,16 @@ export interface AuthResponse {
   token?: string;
   user?: User;
   data?: {
-    userId?: string;
+    userId?: number;
     email?: string;
     referralCode?: string;
+    verified_at?: string;
+    user_id?: number;
   };
 }
 
 export interface ProfileResponse {
-  id: string;
+  id: number;
   name: string;
   email: string;
   phone: string;

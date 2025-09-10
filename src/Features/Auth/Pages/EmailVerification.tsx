@@ -1,7 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { ChangeEvent, KeyboardEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import { useVerify, useResendVerification } from '../Hooks/useAuth';
+import { toast } from 'react-toastify';
+import { Loader2 } from 'lucide-react';
 
 const EmailVerification: React.FC = () => {
   const [code, setCode] = useState<string[]>(new Array(6).fill(''));
@@ -9,6 +12,14 @@ const EmailVerification: React.FC = () => {
   const [canResend, setCanResend] = useState(false);
   const inputRefs = useRef<HTMLInputElement[]>([]);
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Get email from navigation state
+  const email = location.state?.email || '';
+  
+  // Auth hooks
+  const { mutate: verify, isPending: isVerifying } = useVerify();
+  const { mutate: resendCode, isPending: isResending } = useResendVerification();
 
   useEffect(() => {
     if (timeLeft <= 0) {
@@ -45,18 +56,48 @@ const EmailVerification: React.FC = () => {
 
   const handleVerify = () => {
     const fullCode = code.join('');
-    console.log('Verifying code:', fullCode);
-    navigate('/dashboard');
+    
+    if (fullCode.length !== 6) {
+      toast.error('Please enter the complete 6-digit code');
+      return;
+    }
+
+    if (!email) {
+      toast.error('Email not found. Please try registering again.');
+      navigate('/signup');
+      return;
+    }
+
+    verify(
+      { email, code: fullCode },
+      {
+        onSuccess: (data) => {
+          toast.success(data.message || 'Email verified successfully!');
+          navigate('/');
+        },
+        onError: (error: any) => {
+          toast.error(error.response?.data?.message || 'Verification failed. Please try again.');
+        }
+      }
+    );
   };
 
   const handleResendCode = () => {
-    if (!canResend) return;
+    if (!canResend || !email) return;
     
-    console.log('Resending code...');
-    // Reset the timer
-    setTimeLeft(120);
-    setCanResend(false);
-    // Logic to resend the code
+    resendCode(
+      { email },
+      {
+        onSuccess: (data) => {
+          toast.success(data.message || 'Verification code resent successfully!');
+          setTimeLeft(120);
+          setCanResend(false);
+        },
+        onError: (error: any) => {
+          toast.error(error.response?.data?.message || 'Failed to resend code. Please try again.');
+        }
+      }
+    );
   };
 
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
@@ -100,7 +141,7 @@ const EmailVerification: React.FC = () => {
         
         <div className="bg-bg-main p-8 rounded-lg shadow-lg">
           <p className="text-text-muted text-center mb-6">
-            We've sent a 6-digit verification code to your email address
+            We've sent a 6-digit verification code to <strong>{email}</strong>
           </p>
 
           <div className="flex justify-center gap-2 mb-8">
@@ -122,10 +163,17 @@ const EmailVerification: React.FC = () => {
           <button
             type="button"
             onClick={handleVerify}
-            disabled={code.join('').length !== 6}
+            disabled={code.join('').length !== 6 || isVerifying}
             className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-text-primary bg-cyan-500 hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Verify Email
+            {isVerifying ? (
+              <>
+                <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
+                Verifying...
+              </>
+            ) : (
+              'Verify Email'
+            )}
           </button>
 
           {/* Countdown timer */}
@@ -138,14 +186,14 @@ const EmailVerification: React.FC = () => {
           <div className="text-center mt-4">
             <button
               onClick={handleResendCode}
-              disabled={!canResend}
+              disabled={!canResend || isResending}
               className={`text-sm ${
-                canResend 
+                canResend && !isResending
                   ? 'text-cyan-500 hover:text-accent-cyan cursor-pointer' 
                   : 'text-gray-500 cursor-not-allowed'
               }`}
             >
-              Didn't receive the code? Resend
+              {isResending ? 'Resending...' : "Didn't receive the code? Resend"}
             </button>
           </div>
         </div>

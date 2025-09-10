@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { authApi } from '../API';
+import { storeAuthData, clearAuthData } from '../Utils/authUtils';
 import type { ForgotPasswordRequest, LoginRequest, RegisterRequest, ResendVerificationRequest, ResetPasswordRequest, ValidateResetTokenRequest, VerifyRequest } from '../../../data';
 
 
@@ -15,9 +16,9 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: (data: LoginRequest) => authApi.login(data),
     onSuccess: (data) => {
-      if (data.token) {
-        // Store token (you might want to use a context or state management)
-        localStorage.setItem('authToken', data.token);
+      if (data.token && data.user) {
+        // Store authentication data using utility function
+        storeAuthData(data);
         queryClient.setQueryData(['user'], data.user);
       }
     },
@@ -60,8 +61,8 @@ export const useLogout = () => {
   return useMutation({
     mutationFn: () => authApi.logout(),
     onSuccess: () => {
-      // Clear token and user data
-      localStorage.removeItem('authToken');
+      // Clear authentication data using utility function
+      clearAuthData();
       queryClient.setQueryData(['user'], null);
       queryClient.clear();
     },

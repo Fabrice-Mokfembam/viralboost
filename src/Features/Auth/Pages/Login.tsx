@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { useLogin } from '../Hooks/useAuth';
+import { toast } from 'react-toastify';
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -8,8 +10,11 @@ const Login: React.FC = () => {
     LoginValue: '',
     password: ''
   });
-  const navigate = useNavigate()
-  const [isPhoneLogin,setIsPhoneLogin]= useState(true);
+  const navigate = useNavigate();
+  const [isPhoneLogin, setIsPhoneLogin] = useState(true);
+  
+  // Auth hook
+  const { mutate: login, isPending, error } = useLogin();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -21,9 +26,35 @@ const Login: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login data:', loginData);
-    navigate('/dashboard')
-    // Handle login logic here
+    
+    if (!loginData.LoginValue.trim() || !loginData.password.trim()) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+
+    // Prepare login data based on login type
+    const loginPayload: { password: string; phone?: string; email?: string } = {
+      password: loginData.password
+    };
+
+    if (isPhoneLogin) {
+      loginPayload.phone = loginData.LoginValue;
+    } else {
+      loginPayload.email = loginData.LoginValue;
+    }
+
+    login(loginPayload, {
+      onSuccess: (data) => {
+        toast.success(data.message || 'Login successful!');
+        navigate('/dashboard');
+      },
+      onError: (error: unknown) => {
+        const errorMessage = error && typeof error === 'object' && 'response' in error 
+          ? (error as { response?: { data?: { message?: string } } }).response?.data?.message 
+          : 'Login failed. Please check your credentials.';
+        toast.error(errorMessage || 'Login failed. Please check your credentials.');
+      }
+    });
   };
 
   const togglePasswordVisibility = () => {
@@ -94,12 +125,39 @@ const Login: React.FC = () => {
               </div>
             </div>
 
+            {error && (
+              <div className="rounded-md bg-red-50 p-4">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-red-800">
+                      Login failed
+                    </h3>
+                    <div className="mt-2 text-sm text-red-700">
+                      {error.message || 'An error occurred during login. Please try again.'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
             <div>
               <button
                 type="submit"
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-text-primary bg-cyan-500 hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                disabled={isPending}
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-text-primary bg-cyan-500 hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Sign In
+                {isPending ? (
+                  <>
+                    <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
+                    Signing In...
+                  </>
+                ) : (
+                  'Sign In'
+                )}
               </button>
             </div>
           </form>

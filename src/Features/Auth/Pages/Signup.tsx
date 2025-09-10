@@ -204,11 +204,11 @@ const Signup: React.FC = () => {
       // Call the register mutation
       register(registrationData, {
         onSuccess: (data) => {
-          toast.success(data.message || 'Registration successful! Please check your email/phone to verify your account.');
-          // Navigate to verification page with the contact info
+          toast.success(data.message || 'Registration successful! Please check your email to verify your account.');
+          // Navigate to verification page with the email
           navigate('/code-verification', { 
             state: { 
-              contact: isPhoneLogin ? formData.phonenumber : formData.email,
+              email: isPhoneLogin ? formData.email : formData.email,
               isPhone: isPhoneLogin
             } 
           });
