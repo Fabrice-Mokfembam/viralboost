@@ -24,6 +24,17 @@ import AuthRoute from './Components/AuthRoute.tsx';
 import { Bounce, ToastContainer } from 'react-toastify';
 import { useTheme } from './Hooks/useTheme.tsx';
 
+// Admin imports
+import AdminLogin from './Features/Admin/Pages/AdminLogin.tsx';
+import AdminLayout from './Features/Admin/Components/AdminLayout.tsx';
+import AdminDashboard from './Features/Admin/Pages/AdminDashboard.tsx';
+import UsersManagement from './Features/Admin/Pages/UsersManagement.tsx';
+import TasksManagement from './Features/Admin/Pages/TasksManagement.tsx';
+import TaskCreation from './Features/Admin/Pages/TaskCreation.tsx';
+import AdminProtectedRoute from './Features/Admin/Components/AdminProtectedRoute.tsx';
+import { AdminAuthProvider } from './Context/adminConext/AdminProvider';
+
+
 
 const router = createBrowserRouter([
   {
@@ -132,6 +143,44 @@ const router = createBrowserRouter([
         element: <PrivacyPolicy />,
       }
     ]
+  },
+  // Admin Routes
+  {
+    path: "/admin",
+    element: (
+      <AdminAuthProvider>
+        <AdminLogin />
+      </AdminAuthProvider>
+    ),
+  },
+  {
+    path: "/admin/dashboard",
+    element: (
+      <AdminAuthProvider>
+        <AdminProtectedRoute>
+          <AdminLayout />
+        </AdminProtectedRoute>
+      </AdminAuthProvider>
+    ),
+    children: [
+      {
+        index: true,
+        element: <AdminDashboard />,
+      },
+      {
+        path: "users",
+        element: <UsersManagement />,
+      },
+      {
+        path: "tasks",
+        element: <TasksManagement />,
+      },
+      {
+        path: "create-task",
+        element: <TaskCreation />,
+      },
+      // Additional admin routes will be added here
+    ],
   }
 ]);
 

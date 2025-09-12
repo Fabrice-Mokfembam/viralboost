@@ -1,4 +1,4 @@
-import { CreditCard, Repeat, Settings } from 'lucide-react';
+import { CreditCard, Repeat, Settings, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
@@ -49,6 +49,13 @@ const Profile = () => {
           >
             <Settings size={24} />
             <span className="text-xs font-semibold">Account details</span>
+          </button>
+          <button
+            onClick={() => navigate('/admin')}
+            className="flex flex-col items-center space-y-1 bg-bg-tertiary rounded-md p-4 shadow-lg text-text-muted"
+          >
+            <User size={24} />
+            <span className="text-xs font-semibold">Admin</span>
           </button>
         </div>
 

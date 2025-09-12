@@ -1,5 +1,5 @@
 import axios, {type AxiosInstance } from 'axios';
-import { getAuthToken } from '../Features/Auth/Utils/authUtils';
+import { getAuthToken, clearAuthData } from '../Features/Auth/Utils/authUtils';
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: 'https://viral-boast-smm.pocket-gems.com/api/v1',
@@ -26,12 +26,17 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid, clear auth data
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('userData');
-      // Optionally redirect to login
-      window.location.href = '/';
+    if (error?.response?.status === 401) {
+      const hadAuthHeader = Boolean(error?.config?.headers?.Authorization) || Boolean(getAuthToken());
+      const isAuthEndpoint = typeof error?.config?.url === 'string' && error.config.url.includes('/auth/');
+
+      // Only force logout/redirect for authenticated requests to non-auth endpoints
+      if (hadAuthHeader && !isAuthEndpoint) {
+        clearAuthData();
+        window.location.href = '/';
+        return; // stop further processing
+      }
+      // For auth endpoints (e.g., login with bad credentials), don't redirect
     }
     return Promise.reject(error);
   }
