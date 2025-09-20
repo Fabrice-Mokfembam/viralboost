@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import type { AdminLoginCredentials, AdminUser } from '../../Features/Admin/Types';
+import type { AdminUser } from '../../Features/Admin/Types';
 
 
 
@@ -7,7 +7,7 @@ interface AdminAuthContextType {
   admin: AdminUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (credentials: AdminLoginCredentials, options?: { onSuccess?: () => void; onError?: (error: Error) => void }) => void;
+  login: () => void;
   isLoginPending: boolean;
   loginError: Error | null;
   logout: () => void;

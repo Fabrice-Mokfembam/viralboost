@@ -1,9 +1,9 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import type { TaskFilters } from '../../Types';
 import { staticTasks } from '../../data/staticData';
-import { useGetAllTasks, useDeleteTask } from '../../Hooks/useTasks';
+// import { useGetAllTasks, useDeleteTask } from '../../Hooks/useTasks'; // Commented out for offline mode
 
 interface ApiTask {
   id: number;
@@ -59,25 +59,32 @@ const TasksManagement: React.FC = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<TaskData | null>(null);
 
-  const { data: taskData, isLoading, error } = useGetAllTasks(filters, currentPage, 20);
-  const { mutate: deleteTask, isPending: isDeletingTask } = useDeleteTask();
+  // Commented out for offline mode - using static data instead
+  // const { data: taskData, isLoading, error } = useGetAllTasks(filters, currentPage, 20);
+  // const { mutate: deleteTask, isPending: isDeletingTask } = useDeleteTask();
+  
+  // Mock states for offline mode
+  const isLoading = false;
+  const error = null;
+  const isDeletingTask = false;
 
-  useEffect(() => {
-    console.log(taskData);
-    if (error) {
-      console.error('Error fetching tasks:', error);
-    }
-  }, [error, taskData]);
+  // Commented out for offline mode
+  // useEffect(() => {
+  //   console.log(taskData);
+  //   if (error) {
+  //     console.error('Error fetching tasks:', error);
+  //   }
+  // }, [error, taskData]);
 
   
   
-  // Get tasks from API data or fallback to static data
-  const apiTasks = useMemo(() => taskData?.data?.tasks || [], [taskData]);
-  const totalTasks = taskData?.data?.total_tasks || 0;
+  // Using static data for offline mode
+  // const apiTasks = useMemo(() => taskData?.data?.tasks || [], [taskData]);
+  // const totalTasks = taskData?.data?.total_tasks || 0;
   
-  // Filter and paginate tasks
+  // Filter and paginate tasks using static data
   const filteredTasks = useMemo(() => {
-    let filtered = apiTasks.length > 0 ? apiTasks : staticTasks;
+    let filtered = staticTasks; // Always use static data in offline mode
     
     // Apply search filter
     if (filters.search) {
@@ -107,18 +114,10 @@ const TasksManagement: React.FC = () => {
     }
     
     return filtered;
-  }, [filters, apiTasks]);
+  }, [filters]); // Removed apiTasks dependency for offline mode
   
-  // Use API data if available, otherwise use filtered static data
-  const tasks = apiTasks.length > 0 ? {
-    data: apiTasks,
-    pagination: {
-      page: currentPage,
-      limit: 20,
-      total: totalTasks,
-      totalPages: Math.ceil(totalTasks / 20)
-    }
-  } : {
+  // Use filtered static data for offline mode
+  const tasks = {
     data: filteredTasks,
     pagination: {
       page: currentPage,
@@ -147,17 +146,24 @@ const TasksManagement: React.FC = () => {
   const handleDeleteConfirm = () => {
     if (!taskToDelete) return;
 
-    deleteTask(taskToDelete.id.toString(), {
-      onSuccess: () => {
-        toast.success('Task deleted successfully!');
-        setDeleteModalOpen(false);
-        setTaskToDelete(null);
-      },
-      onError: (error: Error) => {
-        console.error('Error deleting task:', error);
-        toast.error('Failed to delete task. Please try again.');
-      }
-    });
+    // Mock delete for offline mode - just show success message
+    // In real implementation, this would remove from static data or call API
+    toast.success('Task deleted successfully (offline mode)');
+    setDeleteModalOpen(false);
+    setTaskToDelete(null);
+    
+    // Commented out for offline mode
+    // deleteTask(taskToDelete.id.toString(), {
+    //   onSuccess: () => {
+    //     toast.success('Task deleted successfully!');
+    //     setDeleteModalOpen(false);
+    //     setTaskToDelete(null);
+    //   },
+    //   onError: (error: Error) => {
+    //     console.error('Error deleting task:', error);
+    //     toast.error('Failed to delete task. Please try again.');
+    //   }
+    // });
   };
 
   const handleDeleteCancel = () => {

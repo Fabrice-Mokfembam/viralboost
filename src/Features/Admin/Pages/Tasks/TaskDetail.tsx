@@ -1,14 +1,21 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useGetTaskById } from '../../Hooks/useTasks';
+// import { useGetTaskById } from '../../Hooks/useTasks'; // Commented out for offline mode
+import { staticTasks } from '../../data/staticData';
 import { ArrowLeft, Clock, Target, Award, Settings, ExternalLink } from 'lucide-react';
 
 const TaskAdminDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data: taskData, isLoading, error } = useGetTaskById(id || '');
+  // Commented out for offline mode - using static data instead
+  // const { data: taskData, isLoading, error } = useGetTaskById(id || '');
 
-  const task = taskData?.data;
+  // Mock states for offline mode
+  const isLoading = false;
+  const error = null;
+  
+  // Get task from static data
+  const task = staticTasks.find(t => t.id === id);
 
   console.log(task);
 
@@ -141,9 +148,9 @@ const TaskAdminDetail: React.FC = () => {
               <h2 className="text-2xl font-bold text-text-primary mb-2">{task.title}</h2>
               <p className="text-text-secondary text-lg mb-4">{task.description}</p>
               <div className="flex items-center space-x-4">
-                {getStatusBadge(task.task_status)}
+                {getStatusBadge(task.status)}
                 <span className="text-sm text-text-muted">
-                  Created: {formatDate(task.created_at)}
+                  Created: {formatDate(task.createdAt)}
                 </span>
               </div>
             </div>
@@ -167,7 +174,7 @@ const TaskAdminDetail: React.FC = () => {
               <Clock className="h-8 w-8 text-accent-cyan mr-3" />
               <div>
                 <p className="text-sm text-text-secondary">Duration</p>
-                <p className="text-2xl font-bold text-text-primary">{task.estimated_duration_minutes} min</p>
+                <p className="text-2xl font-bold text-text-primary">{task.estimatedDurationMinutes} min</p>
               </div>
             </div>
           </div>
@@ -177,7 +184,7 @@ const TaskAdminDetail: React.FC = () => {
               <Target className="h-8 w-8 text-accent-cyan mr-3" />
               <div>
                 <p className="text-sm text-text-secondary">Threshold</p>
-                <p className="text-2xl font-bold text-text-primary">{task.threshold_value}</p>
+                <p className="text-2xl font-bold text-text-primary">{task.thresholdValue}</p>
               </div>
             </div>
           </div>
@@ -187,7 +194,7 @@ const TaskAdminDetail: React.FC = () => {
               <Settings className="h-8 w-8 text-accent-cyan mr-3" />
               <div>
                 <p className="text-sm text-text-secondary">Sort Order</p>
-                <p className="text-2xl font-bold text-text-primary">{task.sort_order}</p>
+                <p className="text-2xl font-bold text-text-primary">5</p>
               </div>
             </div>
           </div>
@@ -197,7 +204,7 @@ const TaskAdminDetail: React.FC = () => {
               <Award className="h-8 w-8 text-accent-cyan mr-3" />
               <div>
                 <p className="text-sm text-text-secondary">Completions</p>
-                <p className="text-2xl font-bold text-text-primary">{task.task_completion_count || 0}</p>
+                <p className="text-2xl font-bold text-text-primary">{task.totalCompletions || 0}</p>
               </div>
             </div>
           </div>
@@ -228,7 +235,7 @@ const TaskAdminDetail: React.FC = () => {
           <div className="space-y-4">
             <div className="flex justify-between items-center py-2 border-b border-border">
               <span className="text-text-secondary">Task Type</span>
-              <span className="text-text-primary font-medium capitalize">{task.task_type}</span>
+              <span className="text-text-primary font-medium capitalize">like</span>
             </div>
             <div className="flex justify-between items-center py-2 border-b border-border">
               <span className="text-text-secondary">Platform</span>
@@ -240,28 +247,28 @@ const TaskAdminDetail: React.FC = () => {
             </div>
             <div className="flex justify-between items-center py-2 border-b border-border">
               <span className="text-text-secondary">Category ID</span>
-              <span className="text-text-primary font-medium">{task.category_id}</span>
+              <span className="text-text-primary font-medium">1</span>
             </div>
             <div className="flex justify-between items-center py-2 border-b border-border">
               <span className="text-text-secondary">Requires Photo</span>
               <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                task.requires_photo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                task.requiresPhoto ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
               }`}>
-                {task.requires_photo ? 'Yes' : 'No'}
+                {task.requiresPhoto ? 'Yes' : 'No'}
               </span>
             </div>
             <div className="flex justify-between items-center py-2 border-b border-border">
               <span className="text-text-secondary">Is Active</span>
               <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                task.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                task.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
               }`}>
-                {task.is_active ? 'Yes' : 'No'}
+                {task.status === 'active' ? 'Yes' : 'No'}
               </span>
             </div>
             <div className="flex justify-between items-center py-2">
               <span className="text-text-secondary">Last Updated</span>
               <span className="text-text-primary font-medium text-sm">
-                {formatDate(task.updated_at)}
+                {formatDate(task.createdAt)}
               </span>
             </div>
           </div>
@@ -276,15 +283,15 @@ const TaskAdminDetail: React.FC = () => {
         </h3>
         <div className="flex items-center space-x-3">
           <a
-            href={task.target_url}
+            href={task.targetUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="text-accent-cyan hover:text-accent-cyan-hover underline break-all"
           >
-            {task.target_url}
+            {task.targetUrl}
           </a>
           <button
-            onClick={() => window.open(task.target_url, '_blank')}
+            onClick={() => window.open(task.targetUrl, '_blank')}
             className="p-1 text-text-secondary hover:text-text-primary transition-colors duration-200"
           >
             <ExternalLink className="h-4 w-4" />
@@ -293,15 +300,15 @@ const TaskAdminDetail: React.FC = () => {
       </div>
 
       {/* Requirements */}
-      {task.requirements && task.requirements.length > 0 && (
+      {task.instructions && task.instructions.length > 0 && (
         <div className="bg-bg-secondary rounded-lg p-6">
           <h3 className="text-lg font-semibold text-text-primary mb-4">Requirements</h3>
           <div className="space-y-2">
-            {task.requirements.map((requirement: string, index: number) => (
+            {task.instructions.map((instruction: string, index: number) => (
               <div key={index} className="flex items-center space-x-2">
                 <div className="w-2 h-2 bg-accent-cyan rounded-full"></div>
                 <span className="text-text-secondary capitalize">
-                  {requirement.replace(/_/g, ' ')}
+                  {instruction.replace(/_/g, ' ')}
                 </span>
               </div>
             ))}

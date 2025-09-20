@@ -1,7 +1,20 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { loginAdmin, logoutAdmin, refreshAdminToken } from "../API";
+// import { loginAdmin, logoutAdmin, refreshAdminToken } from "../API"; // Commented out for offline mode
 import { storeAdminData, clearAdminData } from "../Utils/adminUtils";
-import type { AdminUser, AdminLoginCredentials, AdminAuthResponse } from "../Types";
+import type { AdminUser,  AdminAuthResponse } from "../Types";
+
+// Mock admin user for when backend is down
+const mockAdminUser: AdminUser = {
+  uuid: "mock-admin-uuid",
+  name: "Admin User",
+  email: "admin@viralboost.com",
+  phone: "+1234567890",
+  is_admin: true,
+  is_active: true,
+  email_verified_at: "2025-01-01T00:00:00.000000Z",
+  phone_verified_at: "2025-01-01T00:00:00.000000Z",
+  created_at: "2025-01-01T00:00:00.000000Z"
+};
 
 // Helper function to get admin data from localStorage
 const getStoredAdminData = (): AdminUser | null => {
@@ -29,60 +42,67 @@ export const useAdminAuth = () => {
     gcTime: Infinity, // Keep in cache indefinitely
   });
 
-  // Login mutation
-  const loginMutation = useMutation({
-    mutationFn: async (credentials: AdminLoginCredentials): Promise<AdminUser> => {
-      const response: AdminAuthResponse = await loginAdmin(credentials);
-      
-      if (response.success && response.data.user) {
-        // Store in localStorage
-        storeAdminData(response);
-        
-        return response.data.user;
+  // Simple login function - works without backend
+  const login = () => {
+    // Mock login - just set the admin data
+    const mockResponse: AdminAuthResponse = {
+      success: true,
+      message: "Login successful",
+      data: {
+        user: mockAdminUser,
+        token: "mock-admin-token",
+        token_type: "Bearer"
       }
-      throw new Error(response.message || 'Login failed');
-    },
-    onSuccess: (adminData) => {
-      // Update the query cache with the new admin data
-      queryClient.setQueryData(['admin'], adminData);
-    },
-    onError: (error) => {
-      console.error('Login failed:', error);
-    },
-  });
+    };
+    
+    // Store mock data in localStorage
+    storeAdminData(mockResponse);
+    
+    // Update the query cache with the new admin data
+    queryClient.setQueryData(['admin'], mockAdminUser);
+  };
 
-  // Logout mutation
+  // Logout mutation - works without backend
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      // Call logout API if needed
-      try {
-        await logoutAdmin();
-      } catch (error) {
-        console.error('Logout API call failed:', error);
-        // Continue with logout even if API call fails
-      }
+      // For now, just clear local data without backend call
+      // You can uncomment the backend code when it's back up
+      
+      // try {
+      //   await logoutAdmin();
+      // } catch (error) {
+      //   console.error('Logout API call failed:', error);
+      //   // Continue with logout even if API call fails
+      // }
+      
+      // Mock logout - just clear local data
+      clearAdminData();
     },
     onSuccess: () => {
-      // Clear localStorage
-      clearAdminData();
       // Clear query cache
       queryClient.setQueryData(['admin'], null);
       queryClient.clear(); // Clear all queries
     },
     onError: (error) => {
       console.error('Logout failed:', error);
-      // Still clear local data even if API call fails
+      // Still clear local data even if something fails
       clearAdminData();
       queryClient.setQueryData(['admin'], null);
       queryClient.clear();
     },
   });
 
-  // Refresh token mutation
+  // Refresh token mutation - works without backend
   const refreshTokenMutation = useMutation({
     mutationFn: async () => {
-      const response = await refreshAdminToken();
-      return response.token;
+      // For now, just return mock token without backend call
+      // You can uncomment the backend code when it's back up
+      
+      // const response = await refreshAdminToken();
+      // return response.token;
+      
+      // Mock refresh - return new mock token
+      return "mock-admin-token-refreshed";
     },
     onSuccess: (newToken) => {
       // Update token in localStorage
@@ -102,9 +122,9 @@ export const useAdminAuth = () => {
     isLoading,
     
     // Login
-    login: loginMutation.mutate,
-    isLoginPending: loginMutation.isPending,
-    loginError: loginMutation.error,
+    login,
+    isLoginPending: false,
+    loginError: null,
     
     // Logout
     logout: logoutMutation.mutate,

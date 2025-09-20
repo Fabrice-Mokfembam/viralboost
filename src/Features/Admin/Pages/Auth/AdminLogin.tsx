@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Loader2, Eye, EyeOff } from 'lucide-react';
-import { useAdminAuth } from '../../Hooks/useAdminAuth';
+import { Eye, EyeOff } from 'lucide-react';
+// import { useAdminAuth } from '../../Hooks/useAdminAuth';
 
 const AdminLogin: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -10,7 +10,7 @@ const AdminLogin: React.FC = () => {
     password: '',
   });
   const [showPassword, setShowPassword] = useState(false);
-  const { login, isLoginPending } = useAdminAuth();
+  // const { login, isLoginPending } = useAdminAuth();
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,17 +29,19 @@ const AdminLogin: React.FC = () => {
 
     // Basic validation - just check if fields are not empty
     if (formData.email.trim() && formData.password.trim()) {
-      login(formData, {
-        onSuccess: () => {
-          console.log('Admin login successful');
-          toast.success('Login successful!');
-          navigate('/admin/dashboard');
-        },
-        onError: (error) => {
-          console.log(error);
-          toast.error(error.message || 'Login failed');
-        }
-      });
+      // login(formData, {
+      //   onSuccess: () => {
+      //     console.log('Admin login successful');
+      //     toast.success('Login successful!');
+     
+      //   },
+      //   onError: (error) => {
+      //     console.log(error);
+      //     toast.error(error.message || 'Login failed');
+      //   }
+      // });
+           navigate('/admin/dashboard');
+               toast.success('Login successful!');
     } else {
       toast.error('Please enter both email and password');
     }
@@ -134,17 +136,18 @@ const AdminLogin: React.FC = () => {
           <div>
             <button
               type="submit"
-              disabled={isLoginPending}
+              disabled={false}
               className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-accent-cyan hover:bg-accent-cyan-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-cyan disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
             >
-              {isLoginPending ? (
+              {/* {isLoginPending ? (
                 <>
                   <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
                   Signing In...
                 </>
               ) : (
                 'Sign in'
-              )}
+              )} */}
+              sign in
             </button>
           </div>
         </form>

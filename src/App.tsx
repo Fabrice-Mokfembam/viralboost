@@ -21,8 +21,8 @@ import PrivacyPolicy from './Features/dashboard/Pages/privacypolicy.tsx';
 import CompanyAbout from './Features/dashboard/Pages/AboutCompany.tsx';
 import ReportProblem from './Features/dashboard/Pages/ReportProblem.tsx';
 import NewComplaint from './Features/dashboard/Pages/NewComplaint.tsx';
-import ProtectedRoute from './Components/ProtectedRoute.tsx';
-import AuthRoute from './Components/AuthRoute.tsx';
+// import ProtectedRoute from './Components/ProtectedRoute.tsx';
+// import AuthRoute from './Components/AuthRoute.tsx';
 import { Bounce, ToastContainer } from 'react-toastify';
 import { useTheme } from './Hooks/useTheme.tsx';
 
@@ -33,7 +33,7 @@ import AdminDashboard from './Features/Admin/Pages/AdminDashboard.tsx';
 import UsersManagement from './Features/Admin/Pages/Users/UsersManagement.tsx';
 import TasksManagement from './Features/Admin/Pages/Tasks/TasksManagement.tsx';
 import TaskCreation from './Features/Admin/Pages/Tasks/TaskCreation.tsx';
-import AdminProtectedRoute from './Features/Admin/Components/AdminProtectedRoute.tsx';
+// import AdminProtectedRoute from './Features/Admin/Components/AdminProtectedRoute.tsx';
 
 import TaskEdit from './Features/Admin/Pages/Tasks/TaskEdit.tsx';
 import TaskAdminDetail from './Features/Admin/Pages/Tasks/TaskDetail.tsx';
@@ -53,9 +53,9 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: (
-      <AuthRoute>
+ 
         <Login />
-      </AuthRoute>
+    
         
       
     ),
@@ -64,43 +64,43 @@ const router = createBrowserRouter([
     path: "/signup",
     element: (
       
-        <AuthRoute>
+       
           <Signup />
-        </AuthRoute>
+     
     
     ),
   },
   {
     path: "/code-verification",
     element: (
-      <AuthRoute>
+     
         <EmailVerification />
-      </AuthRoute>
+      
     ),
   },
   {
     path: "/forgot-password",
     element: (
-      <AuthRoute>
+     
         <ForgotPassword />
-      </AuthRoute>
+      
     ),
   },
   {
     path: "/reset-password/:token",
     element: (
-      <AuthRoute>
+     
         <ResetPassword />
-      </AuthRoute>
+      
     ),
   },
   {
     path: "/dashboard",
     element: (
     
-        <ProtectedRoute>
+       
           <DashboardLayout />
-        </ProtectedRoute>
+        
       
     ),
     children: [
@@ -126,9 +126,9 @@ const router = createBrowserRouter([
     path: "/v",
     element: (
       
-        <ProtectedRoute>
+       
           <SinglePageLayout />
-        </ProtectedRoute>
+        
     
     ),
     children: [
@@ -186,9 +186,9 @@ const router = createBrowserRouter([
   {
     path: "/admin/dashboard",
     element: (
-      <AdminProtectedRoute>
+     
         <AdminLayout />
-      </AdminProtectedRoute>
+      
     ),
     children: [
       {
