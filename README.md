@@ -62,3 +62,61 @@ To set up and run this project locally, please follow these detailed steps:
    ```
 
 Upon successful execution, the application will be available in your browser, usually at `http://localhost:5173`, allowing you to interact with its features and functionalities.
+@theme {
+
+  /* Light Theme Colors */
+  --color-bg-main: #f9fafb;          /* Light background, equivalent to bg-gray-50 */
+  --color-bg-secondary: #f3f4f6;     /* Light card bg, equivalent to bg-gray-100 */
+  --color-bg-tertiary: #e5e7eb;      /* Light subtle bg, equivalent to bg-gray-200 */
+
+  --color-text-primary: #111827;     /* Dark text, equivalent to text-gray-900 */
+  --color-text-secondary: #4b5563;   /* Secondary text, equivalent to text-gray-600 */
+  --color-text-muted: #9ca3af;       /* Muted text */
+
+  --color-accent-cyan: #0891b2;      /* Cyan for light text / accents */
+  --color-accent-cyan-bg: #22d3ee;   /* Cyan button backgrounds */
+  --color-accent-cyan-hover: #06b6d4;/* Cyan hover */
+
+  --color-border: #22d3ee;            /* Borders in light mode */
+
+  --color-error-text: #dc2626;       /* Error color text */
+  --color-error-bg: #ef4444;         /* Error backgrounds */
+
+  --color-gradient-vip-start: #c4b5fd;
+  --color-gradient-vip-via: #f472b6;
+  --color-gradient-vip-end: #fb7185;
+
+
+}
+
+@layer base {
+  /* Default dark theme */
+  html {
+    data-theme: dark;
+  }
+  
+  [data-theme='dark'] {
+    /* Dark Theme Colors */
+    --color-bg-main: #1a202c; /* Dark blue-gray */
+    --color-bg-secondary: #2d3748; /* Slightly lighter dark blue-gray */
+    --color-bg-tertiary: #4a5568; /* Even lighter dark blue-gray */
+    --color-bg-gray-800: #2d3748; /* Mapping for bg-gray-800 */
+
+    --color-text-primary: #ffffff;
+    --color-text-secondary: #d1d5db;  /* text-text-secondary */
+    --color-text-muted: #9ca3af;      /* text-gray-400 */
+
+    --color-accent-cyan: #22d3ee;     /* text-accent-cyan */
+    --color-accent-cyan-bg: #06b6d4;  /* bg-cyan-500 */
+    --color-accent-cyan-hover: #0891b2; /* hover:bg-cyan-600 */
+
+    --color-border: #06b6d4;          /* border-cyan-500 */
+
+    --color-error-text: #ef4444;      /* text-red-500 */
+    --color-error-bg: #dc2626;        /* bg-red-600 */
+
+    --color-gradient-vip-start: #7c3aed;
+    --color-gradient-vip-via: #db2777;
+    --color-gradient-vip-end: #dc2626;
+  }
+}
