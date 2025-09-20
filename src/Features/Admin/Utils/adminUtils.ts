@@ -7,9 +7,13 @@ const ADMIN_USER_KEY = 'admin_user';
  * Store admin authentication data in localStorage
  */
 export const storeAdminData = (authResponse: AdminAuthResponse): void => {
-  if (authResponse.data.token && authResponse.data.user) {
-    localStorage.setItem(ADMIN_TOKEN_KEY, authResponse.data.token);
-    localStorage.setItem(ADMIN_USER_KEY, JSON.stringify(authResponse.data.user));
+  try {
+    if (typeof window !== 'undefined' && authResponse.data.token && authResponse.data.user) {
+      localStorage.setItem(ADMIN_TOKEN_KEY, authResponse.data.token);
+      localStorage.setItem(ADMIN_USER_KEY, JSON.stringify(authResponse.data.user));
+    }
+  } catch (error) {
+    console.error('Error storing admin data:', error);
   }
 };
 
@@ -17,7 +21,15 @@ export const storeAdminData = (authResponse: AdminAuthResponse): void => {
  * Retrieve admin token from localStorage
  */
 export const getAdminToken = (): string | null => {
-  return localStorage.getItem(ADMIN_TOKEN_KEY);
+  try {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(ADMIN_TOKEN_KEY);
+    }
+    return null;
+  } catch (error) {
+    console.error('Error getting admin token:', error);
+    return null;
+  }
 };
 
 /**
@@ -25,8 +37,11 @@ export const getAdminToken = (): string | null => {
  */
 export const getAdminUser = (): AdminUser | null => {
   try {
-    const storedData = localStorage.getItem(ADMIN_USER_KEY);
-    return storedData ? JSON.parse(storedData) : null;
+    if (typeof window !== 'undefined') {
+      const storedData = localStorage.getItem(ADMIN_USER_KEY);
+      return storedData ? JSON.parse(storedData) : null;
+    }
+    return null;
   } catch (error) {
     console.error('Error parsing stored admin data:', error);
     return null;
@@ -46,8 +61,14 @@ export const isAdminAuthenticated = (): boolean => {
  * Clear all admin authentication data from localStorage
  */
 export const clearAdminData = (): void => {
-  localStorage.removeItem(ADMIN_TOKEN_KEY);
-  localStorage.removeItem(ADMIN_USER_KEY);
+  try {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(ADMIN_TOKEN_KEY);
+      localStorage.removeItem(ADMIN_USER_KEY);
+    }
+  } catch (error) {
+    console.error('Error clearing admin data:', error);
+  }
 };
 
 /**

@@ -19,6 +19,11 @@ const mockAdminUser: AdminUser = {
 // Helper function to get admin data from localStorage
 const getStoredAdminData = (): AdminUser | null => {
   try {
+    // Check if we're in a browser environment
+    if (typeof window === 'undefined') {
+      return null;
+    }
+    
     const adminData = localStorage.getItem('admin_user');
     const adminToken = localStorage.getItem('admin_token');
     if (adminData && adminToken) {
@@ -37,29 +42,48 @@ export const useAdminAuth = () => {
   // Query to get admin data from localStorage
   const { data: admin, isLoading } = useQuery({
     queryKey: ['admin'],
-    queryFn: getStoredAdminData,
+    queryFn: () => {
+      console.log('Fetching admin data from localStorage...');
+      const adminData = getStoredAdminData();
+      console.log('Admin data found:', adminData);
+      return adminData;
+    },
     staleTime: Infinity, // Admin data doesn't change often
     gcTime: Infinity, // Keep in cache indefinitely
   });
 
   // Simple login function - works without backend
   const login = () => {
-    // Mock login - just set the admin data
-    const mockResponse: AdminAuthResponse = {
-      success: true,
-      message: "Login successful",
-      data: {
-        user: mockAdminUser,
-        token: "mock-admin-token",
-        token_type: "Bearer"
-      }
-    };
-    
-    // Store mock data in localStorage
-    storeAdminData(mockResponse);
-    
-    // Update the query cache with the new admin data
-    queryClient.setQueryData(['admin'], mockAdminUser);
+    try {
+      console.log('Starting admin login process...');
+      
+      // Mock login - just set the admin data
+      const mockResponse: AdminAuthResponse = {
+        success: true,
+        message: "Login successful",
+        data: {
+          user: mockAdminUser,
+          token: "mock-admin-token",
+          token_type: "Bearer"
+        }
+      };
+      
+      console.log('Storing admin data in localStorage...');
+      // Store mock data in localStorage
+      storeAdminData(mockResponse);
+      
+      console.log('Updating query cache...');
+      // Update the query cache with the new admin data
+      queryClient.setQueryData(['admin'], mockAdminUser);
+      
+      console.log('Invalidating queries...');
+      // Force a refetch to ensure the UI updates
+      queryClient.invalidateQueries({ queryKey: ['admin'] });
+      
+      console.log('Admin login process completed successfully');
+    } catch (error) {
+      console.error('Login failed:', error);
+    }
   };
 
   // Logout mutation - works without backend
