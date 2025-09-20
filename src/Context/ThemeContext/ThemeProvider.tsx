@@ -19,22 +19,10 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   });
 
   useEffect(() => {
-    // Listen for system theme changes
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
-    const handleChange = (e: MediaQueryListEvent) => {
-      const newTheme = e.matches ? 'dark' : 'light';
-      setTheme(newTheme);
-    };
-
-    mediaQuery.addEventListener('change', handleChange);
-
     // Update data-theme attribute when theme changes
     document.documentElement.setAttribute('data-theme', theme);
     // Save theme preference to localStorage
     localStorage.setItem('theme', theme);
-
-    return () => mediaQuery.removeEventListener('change', handleChange);
   }, [theme]);
 
   const toggleTheme = () => {

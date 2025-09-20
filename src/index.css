@@ -39,6 +39,11 @@
 }
 
 @layer base {
+  /* Default dark theme */
+  html {
+    data-theme: dark;
+  }
+  
   [data-theme='dark'] {
     /* Dark Theme Colors */
     --color-bg-main: #1a202c; /* Dark blue-gray */
