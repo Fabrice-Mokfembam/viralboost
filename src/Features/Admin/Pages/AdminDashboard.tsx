@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { staticDashboardStats, staticRecentActivities } from '../data/staticData';
 import RecentActivityList from '../Components/RecentActivityList';
 import StatsCard from '../Components/StatsCard';
+import { useAdminAuth } from '../Hooks/useAdminAuth';
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { admin } = useAdminAuth();
   const stats = staticDashboardStats;
   const activities = staticRecentActivities.slice(0, 5);
 
@@ -15,9 +17,54 @@ const AdminDashboard: React.FC = () => {
       <div>
         <h1 className="text-2xl font-bold text-text-primary">Dashboard Overview</h1>
         <p className="text-text-secondary mt-1">
-          Welcome to the ViralBoost admin panel. Here's what's happening on your platform.
+          Welcome to the ViralBoost admin panel, {admin?.name || 'Admin'}. Here's what's happening on your platform.
         </p>
       </div>
+
+      {/* Admin Profile Card */}
+      {admin && (
+        <div className="bg-bg-secondary rounded-lg p-6">
+          <h3 className="text-lg font-medium text-text-primary mb-4">Admin Profile</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <label className="text-sm font-medium text-text-secondary">Name</label>
+              <p className="text-text-primary">{admin.name}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-text-secondary">Email</label>
+              <p className="text-text-primary">{admin.email}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-text-secondary">Phone</label>
+              <p className="text-text-primary">{admin.phone}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-text-secondary">Status</label>
+              <p className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                admin.is_active 
+                  ? 'bg-green-100 text-green-800' 
+                  : 'bg-red-100 text-red-800'
+              }`}>
+                {admin.is_active ? 'Active' : 'Inactive'}
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium text-text-secondary">Email Verified</label>
+              <p className="text-text-primary">
+                {admin.email_verified_at ? new Date(admin.email_verified_at).toLocaleDateString() : 'Not verified'}
+              </p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-text-secondary">Phone Verified</label>
+              <p className="text-text-primary">
+                {admin.phone_verified_at ? new Date(admin.phone_verified_at).toLocaleDateString() : 'Not verified'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

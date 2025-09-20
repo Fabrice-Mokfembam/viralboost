@@ -1,18 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect, useCallback } from 'react';
+import { 
+  getUsers, 
+  getTasks, 
+  getComplaints, 
+  getTransactions 
+} from '../API';
 import type { 
   DashboardStats, 
   RecentActivity, 
-  User, 
-  Task, 
-  Complaint, 
-  Transaction, 
-  TaskSubmission,
   UserFilters,
   TaskFilters,
-  ComplaintFilters,
-  PaginatedResponse
+  ComplaintFilters
 } from '../Types';
-import { adminAPI } from '../API';
+
 
 // Dashboard Stats Hook
 export const useDashboardStats = () => {
@@ -60,7 +61,7 @@ export const useRecentActivity = (limit = 10) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchActivities = async () => {
+  const fetchActivities = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -113,141 +114,55 @@ export const useRecentActivity = (limit = 10) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [limit]);
 
   useEffect(() => {
     fetchActivities();
-  }, [limit]);
+  }, [fetchActivities]);
 
   return { activities, loading, error, refetch: fetchActivities };
 };
 
 // Users Hook
 export const useUsers = (filters: UserFilters = {}, page = 1, limit = 20) => {
-  const [users, setUsers] = useState<PaginatedResponse<User> | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await adminAPI.getUsers(filters, page, limit);
-      setUsers(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch users');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchUsers();
-  }, [filters, page, limit]);
-
-  return { users, loading, error, refetch: fetchUsers };
+  return useQuery({
+    queryKey: ['admin-users', filters, page, limit],
+    queryFn: () => getUsers(page, limit, filters.search || ''),
+  });
 };
 
 // Tasks Hook
 export const useTasks = (filters: TaskFilters = {}, page = 1, limit = 20) => {
-  const [tasks, setTasks] = useState<PaginatedResponse<Task> | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchTasks = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await adminAPI.getTasks(filters, page, limit);
-      setTasks(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch tasks');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchTasks();
-  }, [filters, page, limit]);
-
-  return { tasks, loading, error, refetch: fetchTasks };
+  return useQuery({
+    queryKey: ['admin-tasks', filters, page, limit],
+    queryFn: () => getTasks(filters, page, limit),
+  });
 };
 
 // Complaints Hook
 export const useComplaints = (filters: ComplaintFilters = {}, page = 1, limit = 20) => {
-  const [complaints, setComplaints] = useState<PaginatedResponse<Complaint> | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchComplaints = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await adminAPI.getComplaints(filters, page, limit);
-      setComplaints(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch complaints');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchComplaints();
-  }, [filters, page, limit]);
-
-  return { complaints, loading, error, refetch: fetchComplaints };
+  return useQuery({
+    queryKey: ['admin-complaints', filters, page, limit],
+    queryFn: () => getComplaints(page, limit, filters.status),
+  });
 };
 
-// Task Submissions Hook
+// Task Submissions Hook - Note: This endpoint doesn't exist in the API yet
 export const useTaskSubmissions = (page = 1, limit = 20) => {
-  const [submissions, setSubmissions] = useState<PaginatedResponse<TaskSubmission> | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchSubmissions = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await adminAPI.getTaskSubmissions(page, limit);
-      setSubmissions(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch submissions');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchSubmissions();
-  }, [page, limit]);
-
-  return { submissions, loading, error, refetch: fetchSubmissions };
+  return useQuery({
+    queryKey: ['admin-task-submissions', page, limit],
+    queryFn: async () => {
+      // This would need to be implemented in the API
+      throw new Error('Task submissions endpoint not implemented yet');
+    },
+    enabled: false, // Disable until API is implemented
+  });
 };
 
 // Transactions Hook
 export const useTransactions = (page = 1, limit = 20) => {
-  const [transactions, setTransactions] = useState<PaginatedResponse<Transaction> | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchTransactions = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await adminAPI.getTransactions(page, limit);
-      setTransactions(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch transactions');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchTransactions();
-  }, [page, limit]);
-
-  return { transactions, loading, error, refetch: fetchTransactions };
+  return useQuery({
+    queryKey: ['admin-transactions', page, limit],
+    queryFn: () => getTransactions(page, limit),
+  });
 };

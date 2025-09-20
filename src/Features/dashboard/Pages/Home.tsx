@@ -1,6 +1,8 @@
 
 import { UserCheck, CreditCard, Info, PlusCircle, Gift } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { getUserData } from '../../Auth/Utils/authUtils';
+import { useGetProfile } from '../../Auth/Hooks/useAuth';
 
 const activities = [
   {
@@ -21,6 +23,15 @@ const activities = [
 
 const Home = () => {
   const navigate = useNavigate();
+  const { data: userProfile } = useGetProfile();
+  const storedUser = getUserData();
+  
+  // Use profile data if available, otherwise fall back to stored user data
+  const user = userProfile || storedUser;
+  
+  // Get first name from user name
+  const firstName = user?.name ? user.name.split(' ')[0] : 'User';
+  
   // Example state for completed tasks
   const tasksCompleted = 3;
   const dailyGoal = 15;
@@ -32,7 +43,7 @@ const Home = () => {
       {/* Header */}
       <header className="mb-8 space-y-5">
         <h1 className="text-3xl font-extrabold text-cyan-400 text-center">
-          Welcome Back!
+          Welcome Back! {firstName}
         </h1>
         <p className="text-text-muted text-center">
           Your Dashboard to Track Earnings and Manage Account Effortlessly

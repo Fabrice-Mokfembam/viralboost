@@ -19,20 +19,33 @@ import InviteFriends from './Features/dashboard/Pages/invitefriends.tsx';
 import HelpCenter from './Features/dashboard/Pages/helpcenter.tsx';
 import PrivacyPolicy from './Features/dashboard/Pages/privacypolicy.tsx';
 import CompanyAbout from './Features/dashboard/Pages/AboutCompany.tsx';
+import ReportProblem from './Features/dashboard/Pages/ReportProblem.tsx';
+import NewComplaint from './Features/dashboard/Pages/NewComplaint.tsx';
 import ProtectedRoute from './Components/ProtectedRoute.tsx';
 import AuthRoute from './Components/AuthRoute.tsx';
 import { Bounce, ToastContainer } from 'react-toastify';
 import { useTheme } from './Hooks/useTheme.tsx';
 
 // Admin imports
-import AdminLogin from './Features/Admin/Pages/AdminLogin.tsx';
+import AdminLogin from './Features/Admin/Pages/Auth/AdminLogin.tsx';
 import AdminLayout from './Features/Admin/Components/AdminLayout.tsx';
 import AdminDashboard from './Features/Admin/Pages/AdminDashboard.tsx';
-import UsersManagement from './Features/Admin/Pages/UsersManagement.tsx';
-import TasksManagement from './Features/Admin/Pages/TasksManagement.tsx';
-import TaskCreation from './Features/Admin/Pages/TaskCreation.tsx';
+import UsersManagement from './Features/Admin/Pages/Users/UsersManagement.tsx';
+import TasksManagement from './Features/Admin/Pages/Tasks/TasksManagement.tsx';
+import TaskCreation from './Features/Admin/Pages/Tasks/TaskCreation.tsx';
 import AdminProtectedRoute from './Features/Admin/Components/AdminProtectedRoute.tsx';
-import { AdminAuthProvider } from './Context/adminConext/AdminProvider';
+
+import TaskEdit from './Features/Admin/Pages/Tasks/TaskEdit.tsx';
+import TaskAdminDetail from './Features/Admin/Pages/Tasks/TaskDetail.tsx';
+import ComplaintsManagement from './Features/Admin/Pages/Complaints/ComplaintsManagement.tsx';
+import NotificationsManagement from './Features/Admin/Pages/Notifications/NotificationsManagement.tsx';
+import TransactionsManagement from './Features/Admin/Pages/Transactions/TransactionsManagement.tsx';
+import ReportsManagement from './Features/Admin/Pages/Reports/ReportsManagement.tsx';
+import SettingsManagement from './Features/Admin/Pages/Settings/SettingsManagement.tsx';
+import MembershipManagement from './Features/Admin/Pages/Membership/MembershipManagement.tsx';
+import CreateMembership from './Features/Admin/Pages/Membership/CreateMembership.tsx';
+import MembershipDetail from './Features/Admin/Pages/Membership/MembershipDetail.tsx';
+import EditMembership from './Features/Admin/Pages/Membership/EditMembership.tsx';
 
 
 
@@ -43,14 +56,18 @@ const router = createBrowserRouter([
       <AuthRoute>
         <Login />
       </AuthRoute>
+        
+      
     ),
   },
   {
     path: "/signup",
     element: (
-      <AuthRoute>
-        <Signup />
-      </AuthRoute>
+      
+        <AuthRoute>
+          <Signup />
+        </AuthRoute>
+    
     ),
   },
   {
@@ -80,9 +97,11 @@ const router = createBrowserRouter([
   {
     path: "/dashboard",
     element: (
-      <ProtectedRoute>
-        <DashboardLayout />
-      </ProtectedRoute>
+    
+        <ProtectedRoute>
+          <DashboardLayout />
+        </ProtectedRoute>
+      
     ),
     children: [
       {
@@ -106,9 +125,11 @@ const router = createBrowserRouter([
   {
     path: "/v",
     element: (
-      <ProtectedRoute>
-        <SinglePageLayout />
-      </ProtectedRoute>
+      
+        <ProtectedRoute>
+          <SinglePageLayout />
+        </ProtectedRoute>
+    
     ),
     children: [
       {
@@ -141,6 +162,14 @@ const router = createBrowserRouter([
       {
         path: "privacypolicy",
         element: <PrivacyPolicy />,
+      },
+      {
+        path: "report-problem",
+        element: <ReportProblem />,
+      },
+      {
+        path: "new-complaint",
+        element: <NewComplaint />,
       }
     ]
   },
@@ -148,19 +177,18 @@ const router = createBrowserRouter([
   {
     path: "/admin",
     element: (
-      <AdminAuthProvider>
-        <AdminLogin />
-      </AdminAuthProvider>
+    
+      
+          <AdminLogin/>
+    
     ),
   },
   {
     path: "/admin/dashboard",
     element: (
-      <AdminAuthProvider>
-        <AdminProtectedRoute>
-          <AdminLayout />
-        </AdminProtectedRoute>
-      </AdminAuthProvider>
+      <AdminProtectedRoute>
+        <AdminLayout />
+      </AdminProtectedRoute>
     ),
     children: [
       {
@@ -179,7 +207,50 @@ const router = createBrowserRouter([
         path: "create-task",
         element: <TaskCreation />,
       },
-      // Additional admin routes will be added here
+      {
+        path: "membership",
+        element: <MembershipManagement />,
+      },
+      {
+        path: "create-membership",
+        element: <CreateMembership />,
+      },
+      {
+        path: "membership/details/:id",
+        element: <MembershipDetail />,
+      },
+      {
+        path: "membership/edit/:id",
+        element: <EditMembership />,
+      },
+      {
+        path: "task/edit/:id",
+        element: <TaskEdit />,
+      },
+      {
+        path: "task/details/:id",
+        element: <TaskAdminDetail />,
+      },
+      {
+        path: "complaints",
+        element: <ComplaintsManagement />,
+      },
+      {
+        path: "notifications",
+        element: <NotificationsManagement />,
+      },
+      {
+        path: "transactions",
+        element: <TransactionsManagement />,
+      },
+      {
+        path: "reports",
+        element: <ReportsManagement />,
+      },
+      {
+        path: "settings",
+        element: <SettingsManagement />,
+      },
     ],
   }
 ]);

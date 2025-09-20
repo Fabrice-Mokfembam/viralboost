@@ -91,7 +91,7 @@ export const isTokenExpired = (): boolean => {
 /**
  * Get authorization header for API requests
  */
-export const getAuthHeader = (): { Authorization: string } | {} => {
+export const getAuthHeader = (): { Authorization: string } => {
   const token = getAuthToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  return token ? { Authorization: `Bearer ${token}` } : { Authorization: '' };
 };

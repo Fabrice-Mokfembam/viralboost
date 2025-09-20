@@ -7,9 +7,15 @@ interface AdminAuthContextType {
   admin: AdminUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (credentials: AdminLoginCredentials) => Promise<void>;
+  login: (credentials: AdminLoginCredentials, options?: { onSuccess?: () => void; onError?: (error: Error) => void }) => void;
+  isLoginPending: boolean;
+  loginError: Error | null;
   logout: () => void;
-  refreshToken: () => Promise<void>;
+  isLogoutPending: boolean;
+  logoutError: Error | null;
+  refreshToken: () => void;
+  isRefreshPending: boolean;
+  refreshError: Error | null;
 }
 
-export const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefined);
+export const AdminAuthContext = createContext<AdminAuthContextType | null>(null);

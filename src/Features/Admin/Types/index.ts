@@ -1,12 +1,14 @@
 // Admin Types
 export interface AdminUser {
-  id: string;
-  email: string;
-  role: 'super_admin' | 'support_moderator' | 'content_moderator';
+  uuid: string;
   name: string;
-  createdAt: string;
-  lastLogin: string;
-  isActive: boolean;
+  email: string;
+  phone: string;
+  is_admin: boolean;
+  is_active: boolean;
+  email_verified_at: string;
+  phone_verified_at: string;
+  created_at: string;
 }
 
 export interface User {
@@ -40,41 +42,44 @@ export interface Task {
   status: 'pending' | 'active' | 'paused' | 'expired';
   membershipTiers: string[];
   totalCompletions: number;
+  task_completion_count: number;
+  category: string;
+  reward: number; // Changed to decimal
   createdAt: string;
   createdBy: string;
 }
 
 export interface MembershipTier {
   id: string;
-  name: string;
+  membership_name: string;
   description: string;
-  price: number; // monthly
-  rewardMultiplier: number;
-  dailyTaskLimit: number;
-  maxTasks: number;
-  priorityLevel: number;
-  icon?: string;
-  color?: string;
-  isActive: boolean;
-  createdAt: string;
+  tasks_per_day: number;
+  max_tasks: number;
+  benefits: string;
+  price: number;
+  duration_days: number;
+  reward_multiplier: number;
+  priority_level: number;
+  is_active: boolean;
+  task_link: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Complaint {
   id: string;
   userId: string;
   user: User;
-  taskId?: string;
-  task?: Task;
-  subject: string;
+  userEmail: string;
+  title: string;
   description: string;
-  status: 'open' | 'in_progress' | 'resolved' | 'closed';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  assignedTo?: string;
-  assignedAdmin?: AdminUser;
+  severity: 'low' | 'medium' | 'high';
+  status: 'open' | 'closed';
+  contact: string;
+  contactType: 'email' | 'phone';
   createdAt: string;
   updatedAt: string;
-  resolution?: string;
-  internalNotes: string[];
+  closedAt?: string;
 }
 
 export interface Transaction {
@@ -86,7 +91,7 @@ export interface Transaction {
   currency: string;
   status: 'pending' | 'completed' | 'failed' | 'cancelled';
   description: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   createdAt: string;
   processedAt?: string;
 }
@@ -125,7 +130,7 @@ export interface RecentActivity {
   description: string;
   userId?: string;
   userName?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   createdAt: string;
 }
 
@@ -154,9 +159,13 @@ export interface AdminLoginCredentials {
 }
 
 export interface AdminAuthResponse {
-  admin: AdminUser;
-  token: string;
-  refreshToken: string;
+  success: boolean;
+  message: string;
+  data: {
+    user: AdminUser;
+    token: string;
+    token_type: string;
+  };
 }
 
 // API Response Types
@@ -204,27 +213,111 @@ export interface ComplaintFilters {
   dateTo?: string;
 }
 
-// Task Creation Types
+// Task Creation Form Type
 export interface TaskCreationForm {
   title: string;
   description: string;
   category_id: number;
-  task_type: 'like' | 'follow' | 'comment' | 'subscribe';
+  category: string; // New field for category name
+  task_type: string;
   platform: string;
   instructions: string;
   target_url: string;
-  membership: 'Basic' | 'VIP1' | 'VIP2' | 'VIP3' | 'VIP4';
+  reward: number; // Changed to decimal
+  task_completion_count: number; // New field - read-only
   estimated_duration_minutes: number;
   requires_photo: boolean;
   is_active: boolean;
   sort_order: number;
   threshold_value: number;
-  status: 'active' | 'pause' | 'completed' | 'suspended';
+  task_status: string;
+  membership: string;
+  requirements: string[];
 }
 
+// Task Creation Form Errors Type
+export interface TaskCreationFormErrors {
+  title?: string;
+  description?: string;
+  category_id?: string;
+  category?: string;
+  task_type?: string;
+  platform?: string;
+  instructions?: string;
+  target_url?: string;
+  reward?: string;
+  task_completion_count?: string;
+  estimated_duration_minutes?: string;
+  requires_photo?: string;
+  is_active?: string;
+  sort_order?: string;
+  threshold_value?: string;
+  task_status?: string;
+  membership?: string;
+  requirements?: string;
+}
+
+// Task Category Type
 export interface TaskCategory {
   id: number;
   name: string;
   description: string;
   is_active: boolean;
+}
+
+// Membership Creation Form Type - Only the specified fields
+export interface MembershipCreationForm {
+  membership_name: string;
+  description: string;
+  tasks_per_day: number;
+  max_tasks: number;
+  benefits: string;
+  price: number;
+  duration_days: number;
+  reward_multiplier: number;
+  priority_level: number;
+  is_active: boolean;
+}
+
+// Notification Types
+export interface Notification {
+  id: string;
+  type: 'task_completed' | 'user_registered' | 'complaint_created' | 'withdrawal_requested' | 'system_alert';
+  title: string;
+  message: string;
+  userId?: string;
+  userName?: string;
+  taskId?: string;
+  taskTitle?: string;
+  amount?: number;
+  status: 'unread' | 'read';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  createdAt: string;
+  readAt?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface TaskCompletionNotification extends Notification {
+  type: 'task_completed';
+  taskId: string;
+  taskTitle: string;
+  completedBy: string;
+  completedAt: string;
+  rewardAmount: number;
+  platform: string;
+  taskType: string;
+}
+
+// Membership Creation Form Errors Type
+export interface MembershipCreationFormErrors {
+  membership_name?: string;
+  description?: string;
+  tasks_per_day?: string;
+  max_tasks?: string;
+  benefits?: string;
+  price?: string;
+  duration_days?: string;
+  reward_multiplier?: string;
+  priority_level?: string;
+  is_active?: string;
 }

@@ -62,7 +62,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuClick, admin }) => {
                   {admin?.name || 'Admin'}
                 </div>
                 <div className="text-xs text-text-secondary">
-                  {admin?.role?.replace('_', ' ').toUpperCase() || 'ADMIN'}
+                  {admin?.is_admin ? 'ADMIN' : 'USER'}
                 </div>
               </div>
             </div>

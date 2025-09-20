@@ -74,11 +74,11 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose, currentPat
       ),
     },
     {
-      name: 'Submissions',
-      href: '/admin/dashboard/submissions',
+      name: 'Notifications',
+      href: '/admin/dashboard/notifications',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM4.828 7l2.586 2.586a2 2 0 002.828 0L12 7H4.828zM4.828 17l2.586-2.586a2 2 0 012.828 0L12 17H4.828z" />
         </svg>
       ),
     },

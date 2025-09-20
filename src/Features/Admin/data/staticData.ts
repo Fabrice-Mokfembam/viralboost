@@ -7,7 +7,6 @@ import type {
   Transaction, 
   TaskSubmission,
   MembershipTier,
-  AdminUser,
   TaskCategory
 } from '../Types';
 
@@ -15,45 +14,51 @@ import type {
 export const membershipTiers: MembershipTier[] = [
   {
     id: '1',
-    name: 'Basic',
+    membership_name: 'Basic',
     description: 'Perfect for getting started',
+    tasks_per_day: 5,
+    max_tasks: 10,
+    benefits: 'Access to daily micro-tasks, Track earnings and withdraw, Basic support',
     price: 0,
-    rewardMultiplier: 1.0,
-    dailyTaskLimit: 5,
-    maxTasks: 10,
-    priorityLevel: 1,
-    icon: '⭐',
-    color: '#6B7280',
-    isActive: true,
-    createdAt: '2024-01-01T00:00:00Z'
+    duration_days: 30,
+    reward_multiplier: 1.0,
+    priority_level: 1,
+    is_active: true,
+    task_link: 'https://example.com/basic-tasks',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
   },
   {
     id: '2',
-    name: 'Premium',
+    membership_name: 'Premium',
     description: 'For serious earners',
+    tasks_per_day: 15,
+    max_tasks: 30,
+    benefits: 'Higher daily task limits, Priority withdrawals, Exclusive bonus tasks, Priority customer support',
     price: 9.99,
-    rewardMultiplier: 1.5,
-    dailyTaskLimit: 15,
-    maxTasks: 30,
-    priorityLevel: 2,
-    icon: '💎',
-    color: '#3B82F6',
-    isActive: true,
-    createdAt: '2024-01-01T00:00:00Z'
+    duration_days: 30,
+    reward_multiplier: 1.5,
+    priority_level: 2,
+    is_active: true,
+    task_link: 'https://example.com/premium-tasks',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
   },
   {
     id: '3',
-    name: 'VIP',
+    membership_name: 'VIP',
     description: 'Maximum earning potential',
+    tasks_per_day: 30,
+    max_tasks: 50,
+    benefits: 'Unlimited tasks & earnings, Highest priority withdrawals, Personal account manager, Exclusive invites & events',
     price: 19.99,
-    rewardMultiplier: 2.0,
-    dailyTaskLimit: 30,
-    maxTasks: 50,
-    priorityLevel: 3,
-    icon: '👑',
-    color: '#F59E0B',
-    isActive: true,
-    createdAt: '2024-01-01T00:00:00Z'
+    duration_days: 30,
+    reward_multiplier: 2.0,
+    priority_level: 3,
+    is_active: true,
+    task_link: 'https://example.com/vip-tasks',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
   }
 ];
 
@@ -163,6 +168,9 @@ export const staticTasks: Task[] = [
     status: 'active',
     membershipTiers: ['1', '2', '3'],
     totalCompletions: 45,
+    task_completion_count: 45,
+    category: 'Social Media',
+    reward: 0.50,
     createdAt: '2024-01-15T10:00:00Z',
     createdBy: 'admin_1'
   },
@@ -185,6 +193,9 @@ export const staticTasks: Task[] = [
     status: 'active',
     membershipTiers: ['1', '2', '3'],
     totalCompletions: 78,
+    task_completion_count: 78,
+    category: 'Video Content',
+    reward: 0.25,
     createdAt: '2024-01-10T14:30:00Z',
     createdBy: 'admin_1'
   },
@@ -209,6 +220,9 @@ export const staticTasks: Task[] = [
     status: 'active',
     membershipTiers: ['2', '3'],
     totalCompletions: 23,
+    task_completion_count: 23,
+    category: 'Video Content',
+    reward: 1.00,
     createdAt: '2024-01-18T16:00:00Z',
     createdBy: 'admin_2'
   },
@@ -231,6 +245,9 @@ export const staticTasks: Task[] = [
     status: 'paused',
     membershipTiers: ['1', '2', '3'],
     totalCompletions: 156,
+    task_completion_count: 156,
+    category: 'Social Media',
+    reward: 0.20,
     createdAt: '2024-01-20T11:00:00Z',
     createdBy: 'admin_1'
   },
@@ -254,6 +271,9 @@ export const staticTasks: Task[] = [
     status: 'expired',
     membershipTiers: ['2', '3'],
     totalCompletions: 12,
+    task_completion_count: 12,
+    category: 'Social Media',
+    reward: 0.75,
     createdAt: '2024-01-05T09:00:00Z',
     createdBy: 'admin_2'
   }
@@ -265,40 +285,43 @@ export const staticComplaints: Complaint[] = [
     id: '1',
     userId: '2',
     user: staticUsers[1],
-    subject: 'Task not approved',
+    userEmail: staticUsers[1].email,
+    title: 'Task not approved',
     description: 'I completed the Instagram story task but it was rejected without reason. I followed all instructions correctly.',
+    severity: 'medium',
     status: 'open',
-    priority: 'medium',
+    contact: staticUsers[1].email,
+    contactType: 'email',
     createdAt: '2024-01-20T10:30:00Z',
-    updatedAt: '2024-01-20T10:30:00Z',
-    internalNotes: ['User has good history', 'Need to review submission']
+    updatedAt: '2024-01-20T10:30:00Z'
   },
   {
     id: '2',
     userId: '4',
     user: staticUsers[3],
-    subject: 'Account suspension appeal',
+    userEmail: staticUsers[3].email,
+    title: 'Account suspension appeal',
     description: 'My account was suspended but I believe this was done in error. I have not violated any terms.',
-    status: 'in_progress',
-    priority: 'high',
-    assignedTo: 'admin_1',
+    severity: 'high',
+    status: 'open',
+    contact: staticUsers[3].phone || staticUsers[3].email,
+    contactType: staticUsers[3].phone ? 'phone' : 'email',
     createdAt: '2024-01-18T14:20:00Z',
-    updatedAt: '2024-01-19T09:15:00Z',
-    internalNotes: ['Reviewing account activity', 'Checking for policy violations']
+    updatedAt: '2024-01-19T09:15:00Z'
   },
   {
     id: '3',
     userId: '1',
     user: staticUsers[0],
-    subject: 'Points not credited',
+    userEmail: staticUsers[0].email,
+    title: 'Points not credited',
     description: 'I completed 3 tasks yesterday but only received points for 1. Please check my account.',
-    status: 'resolved',
-    priority: 'low',
-    assignedTo: 'admin_2',
+    severity: 'low',
+    status: 'closed',
+    contact: staticUsers[0].email,
+    contactType: 'email',
     createdAt: '2024-01-15T16:45:00Z',
-    updatedAt: '2024-01-16T11:30:00Z',
-    resolution: 'Points have been credited to your account. There was a system delay.',
-    internalNotes: ['Issue resolved', 'Points manually credited']
+    updatedAt: '2024-01-16T11:30:00Z'
   }
 ];
 
@@ -487,13 +510,3 @@ export const staticTaskCategories: TaskCategory[] = [
   }
 ];
 
-// Static Admin User
-export const staticAdminUser: AdminUser = {
-  id: 'admin_1',
-  email: 'admin@viralboost.com',
-  role: 'super_admin',
-  name: 'Admin User',
-  createdAt: '2024-01-01T00:00:00Z',
-  lastLogin: '2024-01-20T18:30:00Z',
-  isActive: true
-};

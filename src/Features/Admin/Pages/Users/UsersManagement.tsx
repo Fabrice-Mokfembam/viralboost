@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import type { UserFilters } from '../Types';
-import { staticUsers } from '../data/staticData';
+import type { UserFilters } from '../../Types';
+import { staticUsers } from '../../data/staticData';
 
 const UsersManagement: React.FC = () => {
   const [filters, setFilters] = useState<UserFilters>({});
@@ -24,11 +24,7 @@ const UsersManagement: React.FC = () => {
     if (filters.accountStatus) {
       filtered = filtered.filter(user => user.accountStatus === filters.accountStatus);
     }
-    
-    // Apply membership tier filter
-    if (filters.membershipTier) {
-      filtered = filtered.filter(user => user.membershipTier.name.toLowerCase() === filters.membershipTier?.toLowerCase());
-    }
+  
     
     return filtered;
   }, [filters]);
@@ -217,9 +213,7 @@ const UsersManagement: React.FC = () => {
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-text-primary">
-                      {user.membershipTier.name}
-                    </span>
+                   
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-text-primary">

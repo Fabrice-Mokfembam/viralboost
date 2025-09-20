@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAdminAuth } from '../Hooks/useAdminAuth';
 import { toast } from 'react-toastify';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { useAdminAuth } from '../../Hooks/useAdminAuth';
 
 const AdminLogin: React.FC = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAdminAuth();
+  const [showPassword, setShowPassword] = useState(false);
+  const { login, isLoginPending } = useAdminAuth();
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,23 +20,28 @@ const AdminLogin: React.FC = () => {
     });
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
 
-    try {
-      // Basic validation - just check if fields are not empty
-      if (formData.email.trim() && formData.password.trim()) {
-        await login(formData);
-        toast.success('Login successful!');
-        navigate('/admin/dashboard');
-      } else {
-        toast.error('Please enter both email and password');
-      }
-    } catch {
-      toast.error('Login failed');
-    } finally {
-      setIsLoading(false);
+    // Basic validation - just check if fields are not empty
+    if (formData.email.trim() && formData.password.trim()) {
+      login(formData, {
+        onSuccess: () => {
+          console.log('Admin login successful');
+          toast.success('Login successful!');
+          navigate('/admin/dashboard');
+        },
+        onError: (error) => {
+          console.log(error);
+          toast.error(error.message || 'Login failed');
+        }
+      });
+    } else {
+      toast.error('Please enter both email and password');
     }
   };
 
@@ -56,6 +62,7 @@ const AdminLogin: React.FC = () => {
             Sign in to access the ViralBoost admin panel
           </p>
         </div>
+
 
         {/* Login Form */}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -81,17 +88,26 @@ const AdminLogin: React.FC = () => {
               <label htmlFor="password" className="block text-sm font-medium text-text-primary">
                 Password
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                value={formData.password}
-                onChange={handleChange}
-                className="mt-1 appearance-none relative block w-full px-3 py-3 border border-border rounded-lg placeholder-text-muted text-text-primary bg-bg-secondary focus:outline-none focus:ring-2 focus:ring-accent-cyan focus:border-transparent sm:text-sm"
-                placeholder="Enter your password"
-              />
+              <div className="relative mt-1">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="appearance-none relative block w-full px-3 py-3 pr-10 border border-border rounded-lg placeholder-text-muted text-text-primary bg-bg-secondary focus:outline-none focus:ring-2 focus:ring-accent-cyan focus:border-transparent sm:text-sm"
+                  placeholder="Enter your password"
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -118,14 +134,14 @@ const AdminLogin: React.FC = () => {
           <div>
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoginPending}
               className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-accent-cyan hover:bg-accent-cyan-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-cyan disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
             >
-              {isLoading ? (
-                <div className="flex items-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Signing in...
-                </div>
+              {isLoginPending ? (
+                <>
+                  <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
+                  Signing In...
+                </>
               ) : (
                 'Sign in'
               )}

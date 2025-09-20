@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { Home, CheckSquare, Users, User, Globe2, Menu, SunMoon, Flag, LogOut } from 'lucide-react';
 import { useTheme } from '../../../Hooks/useTheme';
 
 const DashboardLayout = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const navigate = useNavigate();
   const {toggleTheme}= useTheme()
 
   // Close dropdown when clicking outside
@@ -26,7 +27,7 @@ const DashboardLayout = () => {
 
 
   const reportProblem = () => {
-    alert('Report problem clicked! (Connect this to your reporting workflow)');
+    navigate('/v/report-problem');
     setMenuOpen(false);
   };
 
@@ -89,7 +90,7 @@ const DashboardLayout = () => {
         <Outlet />
 
         {/* Bottom Navigation */}
-        <div className="fixed bottom-0 left-0 right-0 w-full">
+        <div className="fixed bottom-0 left-0 right-0 w-full z-50">
           <nav className="max-w-3xl mx-auto px-4 bg-bg-main border-t border-gray-700 flex justify-around text-text-muted">
             <NavLink
               to="/dashboard"

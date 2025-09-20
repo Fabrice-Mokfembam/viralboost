@@ -1,5 +1,7 @@
 
 
+import { useNavigate } from 'react-router-dom';
+
 const faqs = [
   {
     question: 'How do I complete tasks correctly?',
@@ -17,6 +19,7 @@ const faqs = [
 ];
 
 const HelpCenter = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-bg-main max-w-4xl mx-auto text-text-secondary">
       <h1 className="text-3xl font-bold text-accent-cyan mb-8 text-center">Help Center</h1>
@@ -27,6 +30,16 @@ const HelpCenter = () => {
             <p className="text-text-muted">{answer}</p>
           </div>
         ))}
+      </div>
+      
+      {/* Report a Problem Button */}
+      <div className="mt-8 text-center">
+        <button
+          onClick={() => navigate('/v/report-problem')}
+          className="bg-cyan-500 hover:bg-cyan-600 text-text-primary font-semibold py-3 px-6 rounded-lg shadow-lg transition-colors"
+        >
+          Report a Problem
+        </button>
       </div>
     </div>
   );

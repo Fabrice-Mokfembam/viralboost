@@ -43,7 +43,7 @@ const AdminLayout: React.FC = () => {
         <div className="fixed top-0 right-0 left-0 lg:left-64 z-40">
           <AdminHeader 
             onMenuClick={() => setSidebarOpen(true)}
-            admin={admin}
+            admin={admin || null}
           />
         </div>
         

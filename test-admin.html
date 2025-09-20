@@ -15,10 +15,19 @@
     
     <h2>Test Credentials:</h2>
     <ul>
-        <li><strong>Email:</strong> admin@viralboost.com</li>
-        <li><strong>Password:</strong> password123</li>
+        <li><strong>Email:</strong> admin@viralboast.com</li>
+        <li><strong>Password:</strong> [Your admin password]</li>
     </ul>
     
-    <p><em>Note: Any email/password combination will work as long as both fields are filled.</em></p>
+    <p><em>Note: This now uses the real API at http://viral.logisticcargoexpres.com/api/v1/admin/auth/login</em></p>
+    <p><em>No static admin user - all admin data comes from the API response</em></p>
+    
+    <h2>API Response Structure:</h2>
+    <p>The admin login now returns real admin data including:</p>
+    <ul>
+        <li>UUID, Name, Email, Phone</li>
+        <li>Admin status and verification dates</li>
+        <li>Authentication token</li>
+    </ul>
 </body>
 </html>

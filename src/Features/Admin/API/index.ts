@@ -1,274 +1,259 @@
+import { apiClient } from '../../../Services';
 import type { 
   AdminLoginCredentials, 
-  AdminAuthResponse, 
   User, 
-  Task, 
   MembershipTier, 
   Complaint, 
   Transaction, 
-  TaskSubmission, 
-  DashboardStats, 
-  RecentActivity, 
-  AdminSettings,
-  ApiResponse,
-  PaginatedResponse,
-  UserFilters,
+  Notification,
   TaskFilters,
-  ComplaintFilters
+  TaskCreationForm
 } from '../Types';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+// Admin login
+const loginAdmin = async (credentials: AdminLoginCredentials) => {
+  const { data } = await apiClient.post("/admin/auth/login", credentials);
+  return data;
+};
 
-class AdminAPI {
-  private async request<T>(
-    endpoint: string, 
-    options: RequestInit = {}
-  ): Promise<ApiResponse<T>> {
-    const token = localStorage.getItem('admin_token');
-    
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` }),
-        ...options.headers,
-      },
-    });
+// Admin logout
+const logoutAdmin = async () => {
+  const { data } = await apiClient.post("/admin/auth/logout");
+  return data;
+};
 
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status}`);
-    }
+// Refresh admin token
+const refreshAdminToken = async () => {
+  const { data } = await apiClient.post("/admin/auth/refresh");
+  return data;
+};
 
-    return response.json();
-  }
+// Users Management
+const getUsers = async (page = 1, limit = 20, search = '') => {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+    ...(search && { search }),
+  });
+  const { data } = await apiClient.get(`/admin/users?${params}`);
+  return data;
+};
 
-  // Authentication
-  async login(credentials: AdminLoginCredentials): Promise<AdminAuthResponse> {
-    const response = await this.request<AdminAuthResponse>('/admin/auth/login', {
-      method: 'POST',
-      body: JSON.stringify(credentials),
-    });
-    return response.data;
-  }
+const getUserById = async (userId: string) => {
+  const { data } = await apiClient.get(`/admin/users/${userId}`);
+  return data;
+};
 
-  async logout(): Promise<void> {
-    await this.request('/admin/auth/logout', { method: 'POST' });
-    localStorage.removeItem('admin_token');
-  }
+const updateUser = async (userId: string, userData: Partial<User>) => {
+  const { data } = await apiClient.patch(`/admin/users/${userId}`, userData);
+  return data;
+};
 
-  async refreshToken(): Promise<{ token: string }> {
-    const response = await this.request<{ token: string }>('/admin/auth/refresh', {
-      method: 'POST',
-    });
-    return response.data;
-  }
+const deleteUser = async (userId: string) => {
+  const { data } = await apiClient.delete(`/admin/users/${userId}`);
+  return data;
+};
 
-  // Dashboard
-  async getDashboardStats(): Promise<DashboardStats> {
-    const response = await this.request<DashboardStats>('/admin/dashboard/stats');
-    return response.data;
-  }
+// Membership Management
+const getMemberships = async () => {
+  const { data } = await apiClient.get("/admin/memberships");
+  return data;
+};
 
-  async getRecentActivity(limit = 10): Promise<RecentActivity[]> {
-    const response = await this.request<RecentActivity[]>(`/admin/dashboard/activity?limit=${limit}`);
-    return response.data;
-  }
+const createMembership = async (membership: Omit<MembershipTier, 'id' | 'created_at' | 'updated_at'>) => {
+  const { data } = await apiClient.post("/admin/memberships", membership);
+  return data;
+};
 
-  // User Management
-  async getUsers(filters: UserFilters = {}, page = 1, limit = 20): Promise<PaginatedResponse<User>> {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString(),
-      ...Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== undefined)),
-    });
-    
-    const response = await this.request<PaginatedResponse<User>>(`/admin/users?${params}`);
-    return response.data;
-  }
+const updateMembership = async (membershipId: string, membership: Partial<MembershipTier>) => {
+  const { data } = await apiClient.patch(`/admin/memberships/${membershipId}`, membership);
+  return data;
+};
 
-  async getUserById(id: string): Promise<User> {
-    const response = await this.request<User>(`/admin/users/${id}`);
-    return response.data;
-  }
+const deleteMembership = async (membershipId: string) => {
+  const { data } = await apiClient.delete(`/admin/memberships/${membershipId}`);
+  return data;
+};
 
-  async updateUser(id: string, updates: Partial<User>): Promise<User> {
-    const response = await this.request<User>(`/admin/users/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(updates),
-    });
-    return response.data;
-  }
+// Tasks Management
+const getTasks = async (filters: TaskFilters = {}, page = 1, limit = 20) => {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+    ...(filters.status && { status: filters.status }),
+    ...(filters.search && { search: filters.search }),
+  });
+  const { data } = await apiClient.get(`/admin/tasks?${params}`);
+  return data;
+};
 
-  async suspendUser(id: string, reason: string): Promise<void> {
-    await this.request(`/admin/users/${id}/suspend`, {
-      method: 'POST',
-      body: JSON.stringify({ reason }),
-    });
-  }
+const getTaskById = async (taskId: string) => {
+  const { data } = await apiClient.get(`/admin/tasks/${taskId}`);
+  return data;
+};
 
-  async banUser(id: string, reason: string): Promise<void> {
-    await this.request(`/admin/users/${id}/ban`, {
-      method: 'POST',
-      body: JSON.stringify({ reason }),
-    });
-  }
+const createTask = async (task: TaskCreationForm) => {
+  const { data } = await apiClient.post("/admin/tasks", task);
+  return data;
+};
 
-  async deleteUser(id: string): Promise<void> {
-    await this.request(`/admin/users/${id}`, { method: 'DELETE' });
-  }
+const updateTask = async (taskId: string, task: Partial<TaskCreationForm>) => {
+  const { data } = await apiClient.patch(`/admin/tasks/${taskId}`, task);
+  return data;
+};
 
-  // Task Management
-  async getTasks(filters: TaskFilters = {}, page = 1, limit = 20): Promise<PaginatedResponse<Task>> {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString(),
-      ...Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== undefined)),
-    });
-    
-    const response = await this.request<PaginatedResponse<Task>>(`/admin/tasks?${params}`);
-    return response.data;
-  }
+const deleteTask = async (taskId: string) => {
+  const { data } = await apiClient.delete(`/admin/tasks/${taskId}`);
+  return data;
+};
 
-  async getTaskById(id: string): Promise<Task> {
-    const response = await this.request<Task>(`/admin/tasks/${id}`);
-    return response.data;
-  }
+const getTaskStats = async () => {
+  const { data } = await apiClient.get("/admin/tasks/stats");
+  return data;
+};
 
-  async createTask(task: Omit<Task, 'id' | 'createdAt' | 'createdBy' | 'totalCompletions'>): Promise<Task> {
-    const response = await this.request<Task>('/admin/tasks', {
-      method: 'POST',
-      body: JSON.stringify(task),
-    });
-    return response.data;
-  }
+const assignDailyTasks = async () => {
+  const { data } = await apiClient.post("/admin/tasks/assign-daily");
+  return data;
+};
 
-  async updateTask(id: string, updates: Partial<Task>): Promise<Task> {
-    const response = await this.request<Task>(`/admin/tasks/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(updates),
-    });
-    return response.data;
-  }
+const resetDailyTasks = async () => {
+  const { data } = await apiClient.post("/admin/tasks/reset-daily");
+  return data;
+};
 
-  async deleteTask(id: string): Promise<void> {
-    await this.request(`/admin/tasks/${id}`, { method: 'DELETE' });
-  }
+const startTaskScheduler = async () => {
+  const { data } = await apiClient.post("/admin/tasks/start-scheduler");
+  return data;
+};
 
-  // Membership Management
-  async getMembershipTiers(): Promise<MembershipTier[]> {
-    const response = await this.request<MembershipTier[]>('/admin/membership-tiers');
-    return response.data;
-  }
+// Complaints Management
+const getComplaints = async (page = 1, limit = 20, status?: string) => {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+    ...(status && { status }),
+  });
+  const { data } = await apiClient.get(`/admin/complaints?${params}`);
+  return data;
+};
 
-  async createMembershipTier(tier: Omit<MembershipTier, 'id' | 'createdAt'>): Promise<MembershipTier> {
-    const response = await this.request<MembershipTier>('/admin/membership-tiers', {
-      method: 'POST',
-      body: JSON.stringify(tier),
-    });
-    return response.data;
-  }
+const getComplaintById = async (complaintId: string) => {
+  const { data } = await apiClient.get(`/admin/complaints/${complaintId}`);
+  return data;
+};
 
-  async updateMembershipTier(id: string, updates: Partial<MembershipTier>): Promise<MembershipTier> {
-    const response = await this.request<MembershipTier>(`/admin/membership-tiers/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(updates),
-    });
-    return response.data;
-  }
+const updateComplaint = async (complaintId: string, complaint: Partial<Complaint>) => {
+  const { data } = await apiClient.patch(`/admin/complaints/${complaintId}`, complaint);
+  return data;
+};
 
-  async deleteMembershipTier(id: string): Promise<void> {
-    await this.request(`/admin/membership-tiers/${id}`, { method: 'DELETE' });
-  }
+const deleteComplaint = async (complaintId: string) => {
+  const { data } = await apiClient.delete(`/admin/complaints/${complaintId}`);
+  return data;
+};
 
-  // Complaint Management
-  async getComplaints(filters: ComplaintFilters = {}, page = 1, limit = 20): Promise<PaginatedResponse<Complaint>> {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString(),
-      ...Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== undefined)),
-    });
-    
-    const response = await this.request<PaginatedResponse<Complaint>>(`/admin/complaints?${params}`);
-    return response.data;
-  }
+// Transactions Management
+const getTransactions = async (page = 1, limit = 20, status?: string) => {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+    ...(status && { status }),
+  });
+  const { data } = await apiClient.get(`/admin/transactions?${params}`);
+  return data;
+};
 
-  async getComplaintById(id: string): Promise<Complaint> {
-    const response = await this.request<Complaint>(`/admin/complaints/${id}`);
-    return response.data;
-  }
+const getTransactionById = async (transactionId: string) => {
+  const { data } = await apiClient.get(`/admin/transactions/${transactionId}`);
+  return data;
+};
 
-  async updateComplaint(id: string, updates: Partial<Complaint>): Promise<Complaint> {
-    const response = await this.request<Complaint>(`/admin/complaints/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(updates),
-    });
-    return response.data;
-  }
+const updateTransaction = async (transactionId: string, transaction: Partial<Transaction>) => {
+  const { data } = await apiClient.patch(`/admin/transactions/${transactionId}`, transaction);
+  return data;
+};
 
-  async assignComplaint(id: string, adminId: string): Promise<void> {
-    await this.request(`/admin/complaints/${id}/assign`, {
-      method: 'POST',
-      body: JSON.stringify({ adminId }),
-    });
-  }
+// Notifications Management
+const getNotifications = async (page = 1, limit = 20) => {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+  });
+  const { data } = await apiClient.get(`/admin/notifications?${params}`);
+  return data;
+};
 
-  // Task Submissions
-  async getTaskSubmissions(page = 1, limit = 20): Promise<PaginatedResponse<TaskSubmission>> {
-    const response = await this.request<PaginatedResponse<TaskSubmission>>(`/admin/task-submissions?page=${page}&limit=${limit}`);
-    return response.data;
-  }
+const createNotification = async (notification: Omit<Notification, 'id' | 'created_at' | 'updated_at'>) => {
+  const { data } = await apiClient.post("/admin/notifications", notification);
+  return data;
+};
 
-  async approveSubmission(id: string, pointsAwarded: number): Promise<void> {
-    await this.request(`/admin/task-submissions/${id}/approve`, {
-      method: 'POST',
-      body: JSON.stringify({ pointsAwarded }),
-    });
-  }
+const updateNotification = async (notificationId: string, notification: Partial<Notification>) => {
+  const { data } = await apiClient.patch(`/admin/notifications/${notificationId}`, notification);
+  return data;
+};
 
-  async rejectSubmission(id: string, reason: string): Promise<void> {
-    await this.request(`/admin/task-submissions/${id}/reject`, {
-      method: 'POST',
-      body: JSON.stringify({ reason }),
-    });
-  }
+const deleteNotification = async (notificationId: string) => {
+  const { data } = await apiClient.delete(`/admin/notifications/${notificationId}`);
+  return data;
+};
 
-  // Transactions
-  async getTransactions(page = 1, limit = 20): Promise<PaginatedResponse<Transaction>> {
-    const response = await this.request<PaginatedResponse<Transaction>>(`/admin/transactions?page=${page}&limit=${limit}`);
-    return response.data;
-  }
+// Reports
+const getReports = async (type: string, startDate?: string, endDate?: string) => {
+  const params = new URLSearchParams({
+    type,
+    ...(startDate && { start_date: startDate }),
+    ...(endDate && { end_date: endDate }),
+  });
+  const { data } = await apiClient.get(`/admin/reports?${params}`);
+  return data;
+};
 
-  // Settings
-  async getSettings(): Promise<AdminSettings> {
-    const response = await this.request<AdminSettings>('/admin/settings');
-    return response.data;
-  }
+// Settings
+const getSettings = async () => {
+  const { data } = await apiClient.get("/admin/settings");
+  return data;
+};
 
-  async updateSettings(settings: Partial<AdminSettings>): Promise<AdminSettings> {
-    const response = await this.request<AdminSettings>('/admin/settings', {
-      method: 'PUT',
-      body: JSON.stringify(settings),
-    });
-    return response.data;
-  }
+const updateSettings = async (settings: Record<string, unknown>) => {
+  const { data } = await apiClient.patch("/admin/settings", settings);
+  return data;
+};
 
-  // Reports
-  async generateReport(type: 'users' | 'tasks' | 'revenue', format: 'csv' | 'pdf', filters?: Record<string, unknown>): Promise<Blob> {
-    const response = await fetch(`${API_BASE_URL}/admin/reports/${type}?format=${format}`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('admin_token')}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(filters || {}),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to generate report');
-    }
-
-    return response.blob();
-  }
-}
-
-export const adminAPI = new AdminAPI();
+export {
+  loginAdmin,
+  logoutAdmin,
+  refreshAdminToken,
+  getUsers,
+  getUserById,
+  updateUser,
+  deleteUser,
+  getMemberships,
+  createMembership,
+  updateMembership,
+  deleteMembership,
+  getTasks,
+  getTaskById,
+  createTask,
+  updateTask,
+  deleteTask,
+  getTaskStats,
+  assignDailyTasks,
+  resetDailyTasks,
+  startTaskScheduler,
+  getComplaints,
+  getComplaintById,
+  updateComplaint,
+  deleteComplaint,
+  getTransactions,
+  getTransactionById,
+  updateTransaction,
+  getNotifications,
+  createNotification,
+  updateNotification,
+  deleteNotification,
+  getReports,
+  getSettings,
+  updateSettings,
+};

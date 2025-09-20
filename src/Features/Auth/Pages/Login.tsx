@@ -55,6 +55,7 @@ const Login: React.FC = () => {
         toast.error(errorMessage || 'Login failed. Please check your credentials.');
       }
     });
+
   };
 
   const togglePasswordVisibility = () => {
