@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff } from 'lucide-react';
-// import { useLogin } from '../Hooks/useAuth';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { useLogin } from '../Hooks/useAuth';
 import { toast } from 'react-toastify';
 
 const Login: React.FC = () => {
@@ -14,7 +14,7 @@ const Login: React.FC = () => {
   const [isPhoneLogin, setIsPhoneLogin] = useState(true);
   
   // Auth hook
-  // const { mutate: login, isPending, error } = useLogin();
+  const { mutate: login, isPending, error } = useLogin();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -43,19 +43,19 @@ const Login: React.FC = () => {
       loginPayload.email = loginData.LoginValue;
     }
 
-    // login(loginPayload, {
-    //   onSuccess: (data) => {
-    //     toast.success(data.message || 'Login successful!');
-    //     navigate('/dashboard');
-    //   },
-    //   onError: (error: unknown) => {
-    //     const errorMessage = error && typeof error === 'object' && 'response' in error 
-    //       ? (error as { response?: { data?: { message?: string } } }).response?.data?.message 
-    //       : 'Login failed. Please check your credentials.';
-    //     toast.error(errorMessage || 'Login failed. Please check your credentials.');
-    //   }
-    // });
-    navigate('/dashboard');
+    login(loginPayload, {
+      onSuccess: (data) => {
+        toast.success(data.message || 'Login successful!');
+        navigate('/dashboard');
+      },
+      onError: (error: unknown) => {
+        const errorMessage = error && typeof error === 'object' && 'response' in error 
+          ? (error as { response?: { data?: { message?: string } } }).response?.data?.message 
+          : 'Login failed. Please check your credentials.';
+        toast.error(errorMessage || 'Login failed. Please check your credentials.');
+      }
+    });
+    // navigate('/dashboard');
 
   };
 
@@ -127,7 +127,7 @@ const Login: React.FC = () => {
               </div>
             </div>
 
-            {/* {error && (
+            {error && (
               <div className="rounded-md bg-red-50 p-4">
                 <div className="flex">
                   <div className="flex-shrink-0">
@@ -145,21 +145,21 @@ const Login: React.FC = () => {
                   </div>
                 </div>
               </div>
-            )} */}
+            )}
             <div>
               <button
                 type="submit"
                 disabled={false}
                 className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-text-primary bg-cyan-500 hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {/* {isPending ? (
+                {isPending ? (
                   <>
                     <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
                     Signing In...
                   </>
                 ) : (
                   'Sign In'
-                )} */} sign in
+                )} 
               </button>
             </div>
           </form>
