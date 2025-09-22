@@ -50,18 +50,17 @@ export interface Task {
 }
 
 export interface MembershipTier {
-  id: string;
+  id: number;
   membership_name: string;
-  description: string;
+  description: string | null;
   tasks_per_day: number;
   max_tasks: number;
-  benefits: string;
+  benefits: number | null;
   price: number;
-  duration_days: number;
-  reward_multiplier: number;
+  reward_multiplier: string;
   priority_level: number;
-  is_active: boolean;
-  task_link: string;
+  is_active: number;
+  task_link: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -271,9 +270,8 @@ export interface MembershipCreationForm {
   description: string;
   tasks_per_day: number;
   max_tasks: number;
-  benefits: string;
+  benefits: number;
   price: number;
-  duration_days: number;
   reward_multiplier: number;
   priority_level: number;
   is_active: boolean;

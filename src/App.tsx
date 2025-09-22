@@ -33,7 +33,7 @@ import AdminDashboard from './Features/Admin/Pages/AdminDashboard.tsx';
 import UsersManagement from './Features/Admin/Pages/Users/UsersManagement.tsx';
 import TasksManagement from './Features/Admin/Pages/Tasks/TasksManagement.tsx';
 import TaskCreation from './Features/Admin/Pages/Tasks/TaskCreation.tsx';
-// import AdminProtectedRoute from './Features/Admin/Components/AdminProtectedRoute.tsx';
+import AdminProtectedRoute from './Features/Admin/Components/AdminProtectedRoute.tsx';
 
 import TaskEdit from './Features/Admin/Pages/Tasks/TaskEdit.tsx';
 import TaskAdminDetail from './Features/Admin/Pages/Tasks/TaskDetail.tsx';
@@ -178,9 +178,9 @@ const router = createBrowserRouter([
   {
     path: "/admin/dashboard",
     element: (
-     
+      <AdminProtectedRoute>
         <AdminLayout />
-      
+      </AdminProtectedRoute>
     ),
     children: [
       {

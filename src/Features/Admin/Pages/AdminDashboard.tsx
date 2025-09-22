@@ -1,15 +1,33 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { staticDashboardStats, staticRecentActivities } from '../data/staticData';
 import RecentActivityList from '../Components/RecentActivityList';
 import StatsCard from '../Components/StatsCard';
 import { useAdminAuth } from '../Hooks/useAdminAuth';
+import { useDashboardStats, useRecentActivity } from '../Hooks/useAdminData';
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { admin } = useAdminAuth();
-  const stats = staticDashboardStats;
-  const activities = staticRecentActivities.slice(0, 5);
+  
+  // Use real API calls (these are currently disabled until backend endpoints are implemented)
+  const { data: statsData } = useDashboardStats();
+  const { data: activitiesData } = useRecentActivity(5);
+  
+  // For now, use empty data since the endpoints are not implemented yet
+  const stats = statsData || {
+    totalUsers: 0,
+    totalUsersGrowth: 0,
+    totalTasksCreated: 0,
+    totalTasksCompleted: 0,
+    totalRevenue: 0,
+    totalRevenueGrowth: 0,
+    activeUsers: 0,
+    pendingSubmissions: 0,
+    openComplaints: 0,
+    systemHealth: 'healthy' as const
+  };
+  
+  const activities = activitiesData || [];
 
   return (
     <div className="space-y-6">

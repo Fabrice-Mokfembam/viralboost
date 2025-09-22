@@ -1,21 +1,17 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-// import { useGetTaskById } from '../../Hooks/useTasks'; // Commented out for offline mode
-import { staticTasks } from '../../data/staticData';
+import { useGetTaskById } from '../../Hooks/useTasks';
 import { ArrowLeft, Clock, Target, Award, Settings, ExternalLink } from 'lucide-react';
+import { normalizeInstructions } from '../../Utils/taskUtils';
 
 const TaskAdminDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  // Commented out for offline mode - using static data instead
-  // const { data: taskData, isLoading, error } = useGetTaskById(id || '');
-
-  // Mock states for offline mode
-  const isLoading = false;
-  const error = null;
+  // Use real API call
+  const { data: taskData, isLoading, error } = useGetTaskById(id || '');
   
-  // Get task from static data
-  const task = staticTasks.find(t => t.id === id);
+  // Get task from API data
+  const task = taskData?.data;
 
   console.log(task);
 
@@ -300,21 +296,24 @@ const TaskAdminDetail: React.FC = () => {
       </div>
 
       {/* Requirements */}
-      {task.instructions && task.instructions.length > 0 && (
-        <div className="bg-bg-secondary rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-text-primary mb-4">Requirements</h3>
-          <div className="space-y-2">
-            {task.instructions.map((instruction: string, index: number) => (
-              <div key={index} className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-accent-cyan rounded-full"></div>
-                <span className="text-text-secondary capitalize">
-                  {instruction.replace(/_/g, ' ')}
-                </span>
-              </div>
-            ))}
+      {(() => {
+        const instructionsList = normalizeInstructions(task.instructions);
+        return instructionsList.length > 0 && (
+          <div className="bg-bg-secondary rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-text-primary mb-4">Requirements</h3>
+            <div className="space-y-2">
+              {instructionsList.map((instruction: string, index: number) => (
+                <div key={index} className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-accent-cyan rounded-full"></div>
+                  <span className="text-text-secondary capitalize">
+                    {instruction.replace(/_/g, ' ')}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 };

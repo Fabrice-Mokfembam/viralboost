@@ -1,21 +1,21 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGetMembershipById } from '../../Hooks/useMemberships';
-import { ArrowLeft, DollarSign, Calendar, Target, Award, Settings, ExternalLink } from 'lucide-react';
+import { ArrowLeft, DollarSign, Target, Award, Settings, ExternalLink } from 'lucide-react';
 
 const MembershipDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: membershipData, isLoading, error } = useGetMembershipById(id || '');
 
-  const membership = membershipData?.data;
+  const membership = membershipData;
 
-  const getStatusBadge = (isActive: boolean) => {
+  const getStatusBadge = (isActive: number) => {
     return (
       <span className={`px-3 py-1 text-sm font-medium rounded-full ${
-        isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+        isActive === 1 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
       }`}>
-        {isActive ? 'Active' : 'Inactive'}
+        {isActive === 1 ? 'Active' : 'Inactive'}
       </span>
     );
   };
@@ -147,15 +147,6 @@ const MembershipDetail: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-bg-main rounded-lg p-4 border border-border">
-            <div className="flex items-center">
-              <Calendar className="h-8 w-8 text-accent-cyan mr-3" />
-              <div>
-                <p className="text-sm text-text-secondary">Duration</p>
-                <p className="text-2xl font-bold text-text-primary">{membership.duration_days} days</p>
-              </div>
-            </div>
-          </div>
 
           <div className="bg-bg-main rounded-lg p-4 border border-border">
             <div className="flex items-center">
@@ -187,10 +178,9 @@ const MembershipDetail: React.FC = () => {
             <Award className="h-5 w-5 mr-2 text-accent-cyan" />
             Benefits
           </h3>
-          <div className="prose prose-sm max-w-none">
-            <pre className="whitespace-pre-wrap text-text-secondary bg-bg-main p-4 rounded-lg border border-border">
-              {membership.benefits}
-            </pre>
+          <div className="text-text-secondary bg-bg-main p-4 rounded-lg border border-border">
+            <span className="text-2xl font-bold text-accent-cyan">{membership.benefits || 'N/A'}</span>
+            <span className="ml-2 text-text-secondary">benefits included</span>
           </div>
         </div>
 

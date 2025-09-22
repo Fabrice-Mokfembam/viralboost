@@ -20,9 +20,8 @@ const CreateMembership: React.FC = () => {
     description: '',
     tasks_per_day: 5,
     max_tasks: 50,
-    benefits: '',
+    benefits: 0,
     price: 0,
-    duration_days: 30,
     reward_multiplier: 1.0,
     priority_level: 3,
     is_active: true,
@@ -71,17 +70,14 @@ const CreateMembership: React.FC = () => {
       newErrors.max_tasks = 'Max tasks must be at least 1';
     }
 
-    if (!formData.benefits.trim()) {
-      newErrors.benefits = 'Benefits are required';
+    if (formData.benefits <= 0) {
+      newErrors.benefits = 'Benefits must be greater than 0';
     }
 
     if (formData.price < 0) {
       newErrors.price = 'Price cannot be negative';
     }
 
-    if (formData.duration_days < 1) {
-      newErrors.duration_days = 'Duration must be at least 1 day';
-    }
 
     if (formData.reward_multiplier < 0.1) {
       newErrors.reward_multiplier = 'Reward multiplier must be at least 0.1';
@@ -104,6 +100,7 @@ const CreateMembership: React.FC = () => {
     }
 
     setIsSubmitting(true);
+    console.log(formData);
 
     createMembership(formData, {
       onSuccess: () => {
@@ -213,27 +210,6 @@ const CreateMembership: React.FC = () => {
               )}
             </div>
 
-            {/* Duration Days */}
-            <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
-                Duration (days) *
-              </label>
-              <input
-                type="number"
-                name="duration_days"
-                value={formData.duration_days}
-                onChange={handleInputChange}
-                min="1"
-                className={`w-full px-3 py-2 border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan ${
-                  errors.duration_days ? 'border-red-500' : 'border-border'
-                }`}
-                placeholder="30"
-              />
-              {errors.duration_days && (
-                <p className="mt-1 text-sm text-red-500">{errors.duration_days}</p>
-              )}
-            </div>
-
             {/* Tasks Per Day */}
             <div>
               <label className="block text-sm font-medium text-text-primary mb-2">
@@ -286,17 +262,19 @@ const CreateMembership: React.FC = () => {
             {/* Benefits */}
             <div>
               <label className="block text-sm font-medium text-text-primary mb-2">
-                Benefits *
+                Benefits (Number) *
               </label>
-              <textarea
+              <input
+                type="number"
                 name="benefits"
                 value={formData.benefits}
                 onChange={handleInputChange}
-                rows={6}
+                min="1"
+                step="1"
                 className={`w-full px-3 py-2 border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan ${
                   errors.benefits ? 'border-red-500' : 'border-border'
                 }`}
-                placeholder="List the benefits of this membership tier..."
+                placeholder="Enter benefits number..."
               />
               {errors.benefits && (
                 <p className="mt-1 text-sm text-red-500">{errors.benefits}</p>

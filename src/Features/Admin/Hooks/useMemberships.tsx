@@ -32,7 +32,7 @@ export const useGetAllMemberships = () => {
 
 export const useGetMembershipById = (membershipId: string) => {
   return useQuery({
-    queryKey: ["membership", membershipId],
+    queryKey: ["membership"],
     queryFn: () => getMembershipById(membershipId),
     enabled: !!membershipId,
   });
@@ -44,11 +44,10 @@ export const useUpdateMembership = () => {
   return useMutation({
     mutationFn: ({ membershipId, updates }: { membershipId: string; updates: Partial<MembershipTier> }) =>
       updateMembership(membershipId, updates),
-    onSuccess: (data, variables) => {
-      // Update the specific membership in cache
-      queryClient.setQueryData(["membership", variables.membershipId], data);
-      // Invalidate memberships list to refetch
+    onSuccess: () => {
+    
       queryClient.invalidateQueries({ queryKey: ["memberships"] });
+      queryClient.invalidateQueries({ queryKey: ["membership"] });
     },
     onError: (error) => {
       console.error("Failed to update membership:", error);

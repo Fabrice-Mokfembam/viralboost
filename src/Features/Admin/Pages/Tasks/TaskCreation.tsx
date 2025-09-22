@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import type { TaskCreationForm, TaskCreationFormErrors } from '../../Types';
-import { staticTaskCategories } from '../../data/staticData';
+
 import { useCreateTask } from '../../Hooks/useTasks';
 
 interface ApiError {
@@ -43,9 +43,19 @@ const TaskCreation: React.FC = () => {
 
   // Initialize category name when component mounts
   useEffect(() => {
-    const selectedCategory = staticTaskCategories.find(cat => cat.id === formData.category_id);
-    if (selectedCategory && !formData.category) {
-      setFormData(prev => ({ ...prev, category: selectedCategory.name }));
+    // This would need to be replaced with a real API call to get categories
+    // For now, we'll use a simple mapping
+    const categoryMap: { [key: number]: string } = {
+      1: 'Social Media Engagement',
+      2: 'Content Creation',
+      3: 'Brand Promotion',
+      4: 'Community Building',
+      5: 'Market Research'
+    };
+    
+    const selectedCategoryName = categoryMap[formData.category_id];
+    if (selectedCategoryName && !formData.category) {
+      setFormData(prev => ({ ...prev, category: selectedCategoryName }));
     }
   }, [formData.category_id, formData.category]);
 
@@ -104,11 +114,19 @@ const TaskCreation: React.FC = () => {
       }
     } else if (name === 'category_id') {
       // When category is selected, also set the category name
-      const selectedCategory = staticTaskCategories.find(cat => cat.id === parseInt(value));
+      const categoryMap: { [key: number]: string } = {
+        1: 'Social Media Engagement',
+        2: 'Content Creation',
+        3: 'Brand Promotion',
+        4: 'Community Building',
+        5: 'Market Research'
+      };
+      
+      const selectedCategoryName = categoryMap[parseInt(value) || 1];
       setFormData((prev: TaskCreationForm) => ({ 
         ...prev, 
         [name]: parseInt(value) || 1,
-        category: selectedCategory?.name || ''
+        category: selectedCategoryName || ''
       }));
     } else {
       setFormData((prev: TaskCreationForm) => ({ ...prev, [name]: value }));
@@ -198,11 +216,19 @@ const TaskCreation: React.FC = () => {
     setIsSubmitting(true);
 
     // Set the category name based on the selected category_id
-    const selectedCategory = staticTaskCategories.find(cat => cat.id === formData.category_id);
+    const categoryMap: { [key: number]: string } = {
+      1: 'Social Media Engagement',
+      2: 'Content Creation',
+      3: 'Brand Promotion',
+      4: 'Community Building',
+      5: 'Market Research'
+    };
+    
+    const selectedCategoryName = categoryMap[formData.category_id];
     const updatedFormData = {
       ...formData,
-      category: selectedCategory?.name || '',
-      category_id:1
+      category: selectedCategoryName || '',
+      category_id: formData.category_id
     };
     
     console.log(updatedFormData);
@@ -304,7 +330,13 @@ const TaskCreation: React.FC = () => {
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
               >
-                {staticTaskCategories.map(category => (
+                {[
+                  { id: 1, name: 'Social Media Engagement' },
+                  { id: 2, name: 'Content Creation' },
+                  { id: 3, name: 'Brand Promotion' },
+                  { id: 4, name: 'Community Building' },
+                  { id: 5, name: 'Market Research' }
+                ].map((category: { id: number; name: string }) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
                   </option>

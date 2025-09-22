@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import type { TaskCreationForm, TaskCreationFormErrors } from '../../Types';
-import { staticTaskCategories } from '../../data/staticData';
-// import { useGetTaskById, useUpdateTask } from '../../Hooks/useTasks'; // Commented out for offline mode
-import { staticTasks } from '../../data/staticData';
+import { useGetTaskById, useUpdateTask } from '../../Hooks/useTasks';
 
 interface ApiError {
   response?: {
@@ -41,43 +39,36 @@ const TaskEdit: React.FC = () => {
 
   const [errors, setErrors] = useState<TaskCreationFormErrors>({});
 
-  // Commented out for offline mode - using static data instead
-  // const { data: taskData, isLoading, error } = useGetTaskById(id || '');
-  // const { mutate: updateTask, isPending: isUpdatingTask, isError: isUpdatingTaskError, error: updateTaskError } = useUpdateTask();
-  
-  // Mock states for offline mode
-  const isLoading = false;
-  const error = null;
-  const isUpdatingTask = false;
-  const isUpdatingTaskError = false;
-  const updateTaskError = null;
+  // Use real API calls
+  const { data: taskData, isLoading, error } = useGetTaskById(id || '');
+  const { mutate: updateTask, isPending: isUpdatingTask, isError: isUpdatingTaskError, error: updateTaskError } = useUpdateTask();
 
-  // Populate form when task data is loaded - using static data
+  // Populate form when task data is loaded from API
   useEffect(() => {
-    const task = staticTasks.find(t => t.id === id);
+    const task = taskData?.data;
     if (task) {
       setFormData({
         title: task.title || '',
         description: task.description || '',
-        category_id: 1, // Default category ID
-        category: task.category || '', // Set category name from static data
-        task_type: 'like', // Default task type
+        category_id: task.category_id || 1,
+        category: task.category || '',
+        task_type: task.task_type || 'like',
         platform: task.platform || '',
         instructions: Array.isArray(task.instructions) ? task.instructions.join('\n') : (task.instructions || ''),
-        target_url: task.targetUrl || '',
+        target_url: task.target_url || '',
         reward: task.reward || 25,
-        task_completion_count: task.totalCompletions || 0, // Set completion count from static data
-        estimated_duration_minutes: task.estimatedDurationMinutes || 2,
-        requires_photo: task.requiresPhoto || false,
-        is_active: task.status === 'active',
-        sort_order: 5, // Default sort order
-        threshold_value: task.thresholdValue || 100,
-        task_status: task.status || 'active',
-        membership: 'basic', // Default since not in static data
-        requirements: Array.isArray(task.instructions) ? task.instructions : []
+        task_completion_count: task.task_completion_count || 0,
+        estimated_duration_minutes: task.estimated_duration_minutes || 2,
+        requires_photo: task.requires_photo || false,
+        is_active: task.is_active || false,
+        sort_order: task.sort_order || 5,
+        threshold_value: task.threshold_value || 100,
+        task_status: task.task_status || 'active',
+        membership: task.membership || 'basic',
+        requirements: Array.isArray(task.requirements) ? task.requirements : []
       });
     }
-  }, [id]); // Changed dependency to id for static data
+  }, [taskData]); // Changed dependency to taskData for API data
 
   const platforms = [
     'Instagram',
@@ -129,11 +120,19 @@ const TaskEdit: React.FC = () => {
       setFormData((prev: TaskCreationForm) => ({ ...prev, [name]: parseInt(value) || 0 }));
     } else if (name === 'category_id') {
       // When category is selected, also set the category name
-      const selectedCategory = staticTaskCategories.find(cat => cat.id === parseInt(value));
+      const categoryMap: { [key: number]: string } = {
+        1: 'Social Media Engagement',
+        2: 'Content Creation',
+        3: 'Brand Promotion',
+        4: 'Community Building',
+        5: 'Market Research'
+      };
+      
+      const selectedCategoryName = categoryMap[parseInt(value) || 1];
       setFormData((prev: TaskCreationForm) => ({ 
         ...prev, 
         [name]: parseInt(value) || 1,
-        category: selectedCategory?.name || ''
+        category: selectedCategoryName || ''
       }));
     } else {
       setFormData((prev: TaskCreationForm) => ({ ...prev, [name]: value }));
@@ -227,27 +226,23 @@ const TaskEdit: React.FC = () => {
 
     setIsSubmitting(true);
 
-    // Mock update for offline mode - just show success message
-    // In real implementation, this would update the static data or call API
-    setTimeout(() => {
-      toast.success('Task updated successfully! (offline mode)');
-      navigate('/admin/dashboard/tasks');
-      setIsSubmitting(false);
-    }, 1000);
-
-    // Commented out for offline mode
-    // updateTask({ taskId: id, updates: formData }, {
-    //   onSuccess: () => {
-    //     toast.success('Task updated successfully!');
-    //     navigate('/admin/dashboard/tasks');
-    //   },
-    //   onError: (error: Error) => {
-    //     console.error('Error updating task:', error);
-    //     const apiError = error as unknown as ApiError;
-    //     const errorMessage = apiError?.response?.data?.message || 'Error updating task. Please try again.';
-    //     toast.error(errorMessage);
-    //   }
-    // });
+    // Use real API call to update task
+    updateTask({ taskId: id, updates: formData }, {
+      onSuccess: () => {
+        toast.success('Task updated successfully!');
+        navigate('/admin/dashboard/tasks');
+      },
+      onError: (error: unknown) => {
+        console.error('Error updating task:', error);
+        const errorMessage = error && typeof error === 'object' && 'response' in error && 
+          error.response && typeof error.response === 'object' && 'data' in error.response &&
+          error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data
+          ? (error.response.data as { message: string }).message
+          : 'Failed to update task. Please try again.';
+        toast.error(errorMessage);
+        setIsSubmitting(false);
+      }
+    });
   };
 
   const handleCancel = () => {
@@ -271,7 +266,8 @@ const TaskEdit: React.FC = () => {
     );
   }
 
-  const task = staticTasks.find(t => t.id === id);
+  // Get task from API data
+  const task = taskData?.data;
   
   if (error || !task) {
     return (
@@ -380,7 +376,13 @@ const TaskEdit: React.FC = () => {
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
               >
-                {staticTaskCategories.map(category => (
+                {[
+                  { id: 1, name: 'Social Media Engagement' },
+                  { id: 2, name: 'Content Creation' },
+                  { id: 3, name: 'Brand Promotion' },
+                  { id: 4, name: 'Community Building' },
+                  { id: 5, name: 'Market Research' }
+                ].map((category: { id: number; name: string }) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
                   </option>

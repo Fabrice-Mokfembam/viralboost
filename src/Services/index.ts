@@ -1,5 +1,6 @@
 import axios, {type AxiosInstance } from 'axios';
 import { getAuthToken, clearAuthData } from '../Features/Auth/Utils/authUtils';
+import { getAdminToken, clearAdminData } from '../Features/Admin/Utils/adminUtils';
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: 'https://viral.logisticcargoexpres.com/api/v1',
@@ -8,13 +9,26 @@ const apiClient: AxiosInstance = axios.create({
   },
 });
 
-// Request interceptor to add auth token
+// Request interceptor to add auth token (user or admin)
 apiClient.interceptors.request.use(
   (config) => {
-    const token = getAuthToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    // Check if this is an admin endpoint
+    const isAdminEndpoint = config.url?.includes('/admin/');
+    
+    if (isAdminEndpoint) {
+      // Use admin token for admin endpoints
+      const adminToken = getAdminToken();
+      if (adminToken) {
+        config.headers.Authorization = `Bearer ${adminToken}`;
+      }
+    } else {
+      // Use regular user token for other endpoints
+      const userToken = getAuthToken();
+      if (userToken) {
+        config.headers.Authorization = `Bearer ${userToken}`;
+      }
     }
+    
     return config;
   },
   (error) => {
@@ -27,14 +41,25 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error?.response?.status === 401) {
-      const hadAuthHeader = Boolean(error?.config?.headers?.Authorization) || Boolean(getAuthToken());
+      const isAdminEndpoint = typeof error?.config?.url === 'string' && error.config.url.includes('/admin/');
       const isAuthEndpoint = typeof error?.config?.url === 'string' && error.config.url.includes('/auth/');
-
-      // Only force logout/redirect for authenticated requests to non-auth endpoints
-      if (hadAuthHeader && !isAuthEndpoint) {
-        clearAuthData();
-        window.location.href = '/';
-        return; // stop further processing
+      
+      if (isAdminEndpoint) {
+        // Handle admin auth errors
+        const hadAdminAuthHeader = Boolean(error?.config?.headers?.Authorization) || Boolean(getAdminToken());
+        if (hadAdminAuthHeader && !isAuthEndpoint) {
+          clearAdminData();
+          window.location.href = '/admin';
+          return; // stop further processing
+        }
+      } else {
+        // Handle user auth errors
+        const hadUserAuthHeader = Boolean(error?.config?.headers?.Authorization) || Boolean(getAuthToken());
+        if (hadUserAuthHeader && !isAuthEndpoint) {
+          clearAuthData();
+          window.location.href = '/';
+          return; // stop further processing
+        }
       }
       // For auth endpoints (e.g., login with bad credentials), don't redirect
     }

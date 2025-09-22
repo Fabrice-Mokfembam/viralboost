@@ -2,83 +2,17 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import type { MembershipTier } from '../../Types';
+import { useGetAllMemberships, useDeleteMembership } from '../../Hooks/useMemberships';
 
-// Dummy data for memberships
-const dummyMemberships: MembershipTier[] = [
-  {
-    id: '1',
-    membership_name: 'Basic',
-    description: 'Perfect for getting started with micro-tasks',
-    tasks_per_day: 5,
-    max_tasks: 10,
-    task_link: 'https://example.com/basic-tasks',
-    benefits: 'Access to daily micro-tasks, Basic support, Track earnings',
-    price: 0,
-    duration_days: 30,
-    reward_multiplier: 1.0,
-    priority_level: 1,
-    is_active: true,
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z'
-  },
-  {
-    id: '2',
-    membership_name: 'Premium',
-    description: 'Enhanced features for serious earners',
-    tasks_per_day: 15,
-    max_tasks: 30,
-    task_link: 'https://example.com/premium-tasks',
-    benefits: 'Higher daily task limits, Priority withdrawals, Exclusive bonus tasks, Priority customer support',
-    price: 9.99,
-    duration_days: 30,
-    reward_multiplier: 1.5,
-    priority_level: 2,
-    is_active: true,
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z'
-  },
-  {
-    id: '3',
-    membership_name: 'VIP',
-    description: 'Ultimate experience with unlimited access',
-    tasks_per_day: 50,
-    max_tasks: 100,
-    task_link: 'https://example.com/vip-tasks',
-    benefits: 'Unlimited tasks & earnings, Highest priority withdrawals, Personal account manager, Exclusive invites & events',
-    price: 29.99,
-    duration_days: 30,
-    reward_multiplier: 2.0,
-    priority_level: 3,
-    is_active: true,
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z'
-  },
-  {
-    id: '4',
-    membership_name: 'Enterprise',
-    description: 'Custom solutions for large organizations',
-    tasks_per_day: 100,
-    max_tasks: 200,
-    task_link: 'https://example.com/enterprise-tasks',
-    benefits: 'Custom task creation, Dedicated support team, Advanced analytics, White-label options',
-    price: 99.99,
-    duration_days: 30,
-    reward_multiplier: 3.0,
-    priority_level: 4,
-    is_active: false,
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-15T00:00:00Z'
-  }
-];
 
 const MembershipManagement: React.FC = () => {
   const navigate = useNavigate();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [membershipToDelete, setMembershipToDelete] = useState<MembershipTier | null>(null);
-  const [memberships, setMemberships] = useState<MembershipTier[]>(dummyMemberships);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isDeletingMembership, setIsDeletingMembership] = useState(false);
-
+  
+  // Use API hooks
+  const { data: membershipsData, isLoading, error } = useGetAllMemberships();
+  const { mutate: deleteMembership, isPending: isDeleting } = useDeleteMembership();
   const handleDeleteClick = (membership: MembershipTier) => {
     setMembershipToDelete(membership);
     setDeleteModalOpen(true);
@@ -87,30 +21,34 @@ const MembershipManagement: React.FC = () => {
   const handleDeleteConfirm = () => {
     if (!membershipToDelete) return;
 
-    setIsDeletingMembership(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setMemberships(prev => prev.filter(membership => membership.id !== membershipToDelete.id));
-      toast.success('Membership deleted successfully!');
-      setDeleteModalOpen(false);
-      setMembershipToDelete(null);
-      setIsDeletingMembership(false);
-    }, 1000);
+    deleteMembership(membershipToDelete.id.toString(), {
+      onSuccess: () => {
+        toast.success('Membership deleted successfully!');
+        setDeleteModalOpen(false);
+        setMembershipToDelete(null);
+      },
+      onError: (error: unknown) => {
+        const errorMessage = error && typeof error === 'object' && 'response' in error && 
+          error.response && typeof error.response === 'object' && 'data' in error.response &&
+          error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data
+          ? (error.response.data as { message: string }).message
+          : 'Failed to delete membership. Please try again.';
+        toast.error(errorMessage);
+      }
+    });
   };
 
   const handleDeleteCancel = () => {
-    setIsLoading(false);
     setDeleteModalOpen(false);
     setMembershipToDelete(null);
   };
 
-  const getStatusBadge = (isActive: boolean) => {
+  const getStatusBadge = (isActive: number) => {
     return (
       <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-        isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+        isActive === 1 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
       }`}>
-        {isActive ? 'Active' : 'Inactive'}
+        {isActive === 1 ? 'Active' : 'Inactive'}
       </span>
     );
   };
@@ -172,9 +110,37 @@ const MembershipManagement: React.FC = () => {
         </button>
       </div>
 
+      {/* Loading State */}
+      {isLoading && (
+        <div className="bg-bg-secondary rounded-lg p-8 text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-cyan mx-auto"></div>
+          <p className="text-text-secondary mt-4">Loading memberships...</p>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">Error loading memberships</h3>
+              <div className="mt-2 text-sm text-red-700">
+                <p>Failed to load memberships. Please try again later.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Memberships Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {memberships?.map((membership: MembershipTier) => (
+      {!isLoading && !error && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {membershipsData?.map((membership: MembershipTier) => (
           <div key={membership.id} className="bg-bg-secondary rounded-lg p-6 border border-border hover:shadow-lg transition-shadow duration-200">
             <div className="flex justify-between items-start mb-4">
               <div>
@@ -193,10 +159,6 @@ const MembershipManagement: React.FC = () => {
                 <span className="text-text-primary font-medium">${membership.price}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-text-secondary text-sm">Duration:</span>
-                <span className="text-text-primary font-medium">{membership.duration_days} days</span>
-              </div>
-              <div className="flex justify-between items-center">
                 <span className="text-text-secondary text-sm">Tasks/Day:</span>
                 <span className="text-text-primary font-medium">{membership.tasks_per_day}</span>
               </div>
@@ -207,6 +169,10 @@ const MembershipManagement: React.FC = () => {
               <div className="flex justify-between items-center">
                 <span className="text-text-secondary text-sm">Reward Multiplier:</span>
                 <span className="text-text-primary font-medium">{membership.reward_multiplier}x</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-text-secondary text-sm">Benefits:</span>
+                <span className="text-text-primary font-medium">{membership.benefits || 'N/A'}</span>
               </div>
             </div>
 
@@ -231,11 +197,12 @@ const MembershipManagement: React.FC = () => {
               </button>
             </div>
           </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Empty State */}
-      {memberships.length === 0 && (
+      {!isLoading && !error && (!membershipsData || membershipsData.length === 0) && (
         <div className="bg-bg-secondary rounded-lg p-8 text-center">
           <div className="flex flex-col items-center justify-center">
             <svg className="w-16 h-16 text-text-muted mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -280,7 +247,7 @@ const MembershipManagement: React.FC = () => {
                 <div className="mt-3 p-3 bg-bg-main rounded-lg border border-border">
                   <p className="text-sm font-medium text-text-primary">{membershipToDelete.membership_name}</p>
                   <p className="text-xs text-text-secondary mt-1">
-                    ${membershipToDelete.price} • {membershipToDelete.duration_days} days
+                    ${membershipToDelete.price}
                   </p>
                 </div>
               )}
@@ -289,17 +256,17 @@ const MembershipManagement: React.FC = () => {
             <div className="flex justify-end space-x-3">
               <button
                 onClick={handleDeleteCancel}
-                disabled={isDeletingMembership}
+                disabled={isDeleting}
                 className="px-4 py-2 text-text-secondary hover:text-text-primary border border-border rounded-lg hover:bg-bg-tertiary transition-colors duration-200 disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteConfirm}
-                disabled={isDeletingMembership}
+                disabled={isDeleting}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
               >
-                {isDeletingMembership ? 'Deleting...' : 'Delete Membership'}
+                {isDeleting ? 'Deleting...' : 'Delete Membership'}
               </button>
             </div>
           </div>

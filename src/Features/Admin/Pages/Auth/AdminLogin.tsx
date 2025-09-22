@@ -31,13 +31,25 @@ const AdminLogin: React.FC = () => {
     if (formData.email.trim() && formData.password.trim()) {
       try {
         console.log('Attempting admin login...');
-        login();
-        console.log('Admin login successful');
-        toast.success('Login successful!');
-        // Small delay to ensure state updates before navigation
-        setTimeout(() => {
-          navigate('/admin/dashboard');
-        }, 100);
+        login(formData, {
+          onSuccess: () => {
+            console.log('Admin login successful');
+            toast.success('Login successful!');
+            // Small delay to ensure state updates before navigation
+            setTimeout(() => {
+              navigate('/admin/dashboard');
+            }, 100);
+          },
+          onError: (error: unknown) => {
+            console.error('Admin login error:', error);
+            const errorMessage = error && typeof error === 'object' && 'response' in error && 
+              error.response && typeof error.response === 'object' && 'data' in error.response &&
+              error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data
+              ? (error.response.data as { message: string }).message
+              : 'Login failed. Please try again.';
+            toast.error(errorMessage);
+          }
+        });
       } catch (error) {
         console.error('Admin login error:', error);
         toast.error('Login failed. Please try again.');

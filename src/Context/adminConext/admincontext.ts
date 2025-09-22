@@ -7,7 +7,7 @@ interface AdminAuthContextType {
   admin: AdminUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: () => void;
+  login: (credentials: any) => void;
   isLoginPending: boolean;
   loginError: Error | null;
   logout: () => void;

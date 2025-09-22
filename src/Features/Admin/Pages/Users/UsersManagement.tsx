@@ -1,49 +1,22 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import type { UserFilters } from '../../Types';
-import { staticUsers } from '../../data/staticData';
+import { useUsers } from '../../Hooks/useAdminData';
 
 const UsersManagement: React.FC = () => {
   const [filters, setFilters] = useState<UserFilters>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   
-  // Filter and paginate users
-  const filteredUsers = useMemo(() => {
-    let filtered = staticUsers;
-    
-    // Apply search filter
-    if (filters.search) {
-      const search = filters.search.toLowerCase();
-      filtered = filtered.filter(user => 
-        user.username.toLowerCase().includes(search) ||
-        user.email.toLowerCase().includes(search)
-      );
-    }
-    
-    // Apply status filter
-    if (filters.accountStatus) {
-      filtered = filtered.filter(user => user.accountStatus === filters.accountStatus);
-    }
+  // Use real API call
+  const { data: usersData } = useUsers(filters, currentPage, 20);
   
-    
-    return filtered;
-  }, [filters]);
-  
-  // Paginate results
-  const usersPerPage = 20;
-  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
-  const paginatedUsers = filteredUsers.slice(
-    (currentPage - 1) * usersPerPage,
-    currentPage * usersPerPage
-  );
-  
-  const users = {
-    data: paginatedUsers,
+  const users = usersData?.data || {
+    data: [],
     pagination: {
       page: currentPage,
-      limit: usersPerPage,
-      total: filteredUsers.length,
-      totalPages: totalPages
+      limit: 20,
+      total: 0,
+      totalPages: 0
     }
   };
 
@@ -177,7 +150,7 @@ const UsersManagement: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-bg-secondary divide-y divide-border">
-              {users?.data.map((user) => (
+              {users?.data.map((user: any) => (
                 <tr key={user.id} className="hover:bg-bg-tertiary">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
