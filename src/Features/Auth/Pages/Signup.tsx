@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, AlertCircle } from 'lucide-react';
-// import { useRegister } from '../Hooks/useAuth';
-// import { toast } from 'react-toastify';
+import { Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
+import { useRegister } from '../Hooks/useAuth';
+import { toast } from 'react-toastify';
 
 const Signup: React.FC = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isPhoneLogin, setIsPhoneLogin] = useState(true);
-  // const { mutate: register, isPending, error } = useRegister();
+  const { mutate: register, isPending, error } = useRegister();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -184,7 +184,13 @@ const Signup: React.FC = () => {
     
     if (isNameValid && isPasswordValid && isConfirmPasswordValid && isPhoneValid && isEmailValid) {
       // Prepare registration data
-      const registrationData: any = {
+      const registrationData: {
+        name: string;
+        password: string;
+        phone?: string;
+        email?: string;
+        referralCode?: string;
+      } = {
         name: formData.name,
         password: formData.password,
       };
@@ -202,27 +208,25 @@ const Signup: React.FC = () => {
       }
 
       // Call the register mutation
-      // register(registrationData, {
-      //   onSuccess: (data) => {
-      //     toast.success(data.message || 'Registration successful! Please check your email to verify your account.');
-      //     // Navigate to verification page with the email
-      //     navigate('/code-verification', { 
-      //       state: { 
-      //         email: isPhoneLogin ? formData.email : formData.email,
-      //         isPhone: isPhoneLogin
-      //       } 
-      //     });
-      //   },
-      //   onError: (error: any) => {
-      //     toast.error(error.response?.data?.message || 'Registration failed. Please try again.');
-      //   }
-      // });
-
-      navigate('/code-verification', { 
-        state: { 
-          email: isPhoneLogin ? formData.email : formData.email,
-          isPhone: isPhoneLogin
-        } 
+      register(registrationData, {
+        onSuccess: (data) => {
+          toast.success(data.message || 'Registration successful! Please check your email to verify your account.');
+          // Navigate to verification page with the email
+          navigate('/code-verification', { 
+            state: { 
+              email: isPhoneLogin ? formData.email : formData.email,
+              isPhone: isPhoneLogin
+            } 
+          });
+        },
+        onError: (error: unknown) => {
+          const errorMessage = error && typeof error === 'object' && 'response' in error && 
+            error.response && typeof error.response === 'object' && 'data' in error.response &&
+            error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data
+            ? (error.response.data as { message: string }).message
+            : 'Registration failed. Please try again.';
+          toast.error(errorMessage);
+        }
       });
     }
   };
@@ -423,7 +427,7 @@ const Signup: React.FC = () => {
               </div>
             </div>
 
-            {/* {error && (
+            {error && (
               <div className="rounded-md bg-red-50 p-4">
                 <div className="flex">
                   <div className="flex-shrink-0">
@@ -439,23 +443,23 @@ const Signup: React.FC = () => {
                   </div>
                 </div>
               </div>
-            )} */}
+            )}
 
             <div>
               <button
                 type="submit"
                 className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-text-primary bg-cyan-500 hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                // disabled={false || !!errors.name || !!errors.password || !!errors.confirmPassword || (isPhoneLogin && !!errors.phonenumber) || (!isPhoneLogin && !!errors.email)}
+                disabled={isPending || !!errors.name || !!errors.password || !!errors.confirmPassword || (isPhoneLogin && !!errors.phonenumber) || (!isPhoneLogin && !!errors.email)}
               >
-                {/* {isPending ? (
+                {isPending ? (
                   <>
                     <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
                     Registering...
                   </>
                 ) : (
                   'Sign Up'
-                )} */}
-                sign up
+                )}
+            
               </button>
             </div>
           </form>

@@ -2,9 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import type { ChangeEvent, KeyboardEvent } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { useResendVerification } from '../Hooks/useAuth';
+import { useResendVerification, useVerify } from '../Hooks/useAuth';
 import { toast } from 'react-toastify';
-// import { Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 const EmailVerification: React.FC = () => {
   const [code, setCode] = useState<string[]>(new Array(6).fill(''));
@@ -18,7 +18,7 @@ const EmailVerification: React.FC = () => {
   const email = location.state?.email || '';
   
   // Auth hooks
-  // const { mutate: verify, isPending: isVerifying } = useVerify();
+  const { mutate: verify, isPending: isVerifying } = useVerify();
   const { mutate: resendCode, isPending: isResending } = useResendVerification();
 
   useEffect(() => {
@@ -62,26 +62,29 @@ const EmailVerification: React.FC = () => {
       return;
     }
 
-    // if (!email) {
-    //   toast.error('Email not found. Please try registering again.');
-    //   navigate('/signup');
-    //   return;
-    // }
+    if (!email) {
+      toast.error('Email not found. Please try registering again.');
+      navigate('/signup');
+      return;
+    }
 
-    // verify(
-    //   { email, code: fullCode },
-    //   {
-    //     onSuccess: (data) => {
-    //       toast.success(data.message || 'Email verified successfully!');
-    //       navigate('/');
-    //     },
-    //     onError: (error: any) => {
-    //       toast.error(error.response?.data?.message || 'Verification failed. Please try again.');
-    //     }
-    //   }
-    // );
-
-    navigate('/');
+    verify(
+      { email, code: fullCode },
+      {
+        onSuccess: (data) => {
+          toast.success(data.message || 'Email verified successfully!');
+          navigate('/');
+        },
+        onError: (error: unknown) => {
+          const errorMessage = error && typeof error === 'object' && 'response' in error && 
+            error.response && typeof error.response === 'object' && 'data' in error.response &&
+            error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data
+            ? (error.response.data as { message: string }).message
+            : 'Verification failed. Please try again.';
+          toast.error(errorMessage);
+        }
+      }
+    );
   };
 
   const handleResendCode = () => {
@@ -95,8 +98,13 @@ const EmailVerification: React.FC = () => {
           setTimeLeft(120);
           setCanResend(false);
         },
-        onError: (error: any) => {
-          toast.error(error.response?.data?.message || 'Failed to resend code. Please try again.');
+        onError: (error: unknown) => {
+          const errorMessage = error && typeof error === 'object' && 'response' in error && 
+            error.response && typeof error.response === 'object' && 'data' in error.response &&
+            error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data
+            ? (error.response.data as { message: string }).message
+            : 'Failed to resend code. Please try again.';
+          toast.error(errorMessage);
         }
       }
     );
@@ -165,18 +173,17 @@ const EmailVerification: React.FC = () => {
           <button
             type="button"
             onClick={handleVerify}
-            // disabled={code.join('').length !== 6 || isVerifying}
+            disabled={code.join('').length !== 6 || isVerifying}
             className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-text-primary bg-cyan-500 hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {/* {isVerifying ? (
+            {isVerifying ? (
               <>
                 <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
                 Verifying...
               </>
             ) : (
               'Verify Email'
-            )} */}
-            verify email
+            )}
           </button>
 
           {/* Countdown timer */}

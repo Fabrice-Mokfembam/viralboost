@@ -2,7 +2,7 @@ import axios, {type AxiosInstance } from 'axios';
 import { getAuthToken, clearAuthData } from '../Features/Auth/Utils/authUtils';
 
 const apiClient: AxiosInstance = axios.create({
-  baseURL: 'http://viral.logisticcargoexpres.com/api/v1',
+  baseURL: 'https://viral.logisticcargoexpres.com/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },
