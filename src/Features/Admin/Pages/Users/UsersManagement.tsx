@@ -1,28 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import type { UserFilters } from '../../Types';
-import { useUsers } from '../../Hooks/useAdminData';
+import { useGetUsers } from '../../Hooks/useUsers';
+
+interface UserWithMembership {
+  uuid: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  is_active: boolean;
+  total_points: number;
+  created_at: string;
+  membership: string;
+  totalPointsEarned: number;
+  accountStatus: string;
+  registrationDate: string;
+  username: string;
+  profilePicture: string | null;
+}
 
 const UsersManagement: React.FC = () => {
   const [filters, setFilters] = useState<UserFilters>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+
+  const { data: usersResponse, isLoading, error } = useGetUsers(currentPage, 15, searchTerm);
   
-  // Use real API call
-  const { data: usersData } = useUsers(filters, currentPage, 20);
-  
-  const users = usersData?.data || {
-    data: [],
-    pagination: {
-      page: currentPage,
-      limit: 20,
-      total: 0,
-      totalPages: 0
-    }
-  };
+  // Add random membership to each user
+  const usersWithMemberships = useMemo((): UserWithMembership[] => {
+    if (!usersResponse?.data?.users) return [];
+    
+    const membershipTiers = ['Basic', 'Premium', 'VIP', 'Gold', 'Platinum'];
+    
+    return usersResponse.data.users.map((user: Record<string, unknown>) => ({
+      ...user,
+      membership: membershipTiers[Math.floor(Math.random() * membershipTiers.length)],
+      totalPointsEarned: user.total_points || 0,
+      accountStatus: user.is_active ? 'active' : 'inactive',
+      registrationDate: user.created_at,
+      username: user.name,
+      profilePicture: null
+    }));
+  }, [usersResponse?.data?.users]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setFilters({ ...filters, search: searchTerm });
     setCurrentPage(1);
   };
 
@@ -150,8 +171,30 @@ const UsersManagement: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-bg-secondary divide-y divide-border">
-              {users?.data.map((user: any) => (
-                <tr key={user.id} className="hover:bg-bg-tertiary">
+              {isLoading ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-8 text-center text-text-secondary">
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-accent-cyan"></div>
+                      <span className="ml-2">Loading users...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : error ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-8 text-center text-red-500">
+                    Error loading users. Please try again.
+                  </td>
+                </tr>
+              ) : usersWithMemberships.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-8 text-center text-text-secondary">
+                    No users found.
+                  </td>
+                </tr>
+              ) : (
+                usersWithMemberships.map((user: UserWithMembership) => (
+                <tr key={user.uuid} className="hover:bg-bg-tertiary">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
@@ -164,29 +207,37 @@ const UsersManagement: React.FC = () => {
                         ) : (
                           <div className="h-10 w-10 rounded-full bg-accent-cyan flex items-center justify-center">
                             <span className="text-sm font-medium text-white">
-                              {user.username.charAt(0).toUpperCase()}
+                              {user.username?.charAt(0)?.toUpperCase() || 'U'}
                             </span>
                           </div>
                         )}
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-text-primary">
-                          {user.username}
+                          {user.username || 'Unknown User'}
                         </div>
                         <div className="text-sm text-text-secondary">
-                          ID: {user.id}
+                          ID: {user.uuid?.slice(0, 8)}...
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-text-primary">{user.email}</div>
+                    <div className="text-sm text-text-primary">{user.email || 'No email'}</div>
                     {user.phone && (
                       <div className="text-sm text-text-secondary">{user.phone}</div>
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                   
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                      user.membership === 'VIP' || user.membership === 'Platinum' 
+                        ? 'bg-purple-100 text-purple-800'
+                        : user.membership === 'Premium' || user.membership === 'Gold'
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {user.membership}
+                    </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-text-primary">
@@ -219,13 +270,14 @@ const UsersManagement: React.FC = () => {
                     </div>
                   </td>
                 </tr>
-              ))}
+                ))
+              )}
             </tbody>
           </table>
         </div>
 
         {/* Pagination */}
-        {users && users.pagination.totalPages > 1 && (
+        {usersResponse?.data?.pagination && usersResponse.data.pagination.last_page > 1 && (
           <div className="bg-bg-main px-4 py-3 flex items-center justify-between border-t border-border">
             <div className="flex-1 flex justify-between sm:hidden">
               <button
@@ -236,8 +288,8 @@ const UsersManagement: React.FC = () => {
                 Previous
               </button>
               <button
-                onClick={() => setCurrentPage(Math.min(users.pagination.totalPages, currentPage + 1))}
-                disabled={currentPage === users.pagination.totalPages}
+                onClick={() => setCurrentPage(Math.min(usersResponse.data.pagination.last_page, currentPage + 1))}
+                disabled={currentPage === usersResponse.data.pagination.last_page}
                 className="ml-3 relative inline-flex items-center px-4 py-2 border border-border text-sm font-medium rounded-md text-text-primary bg-bg-secondary hover:bg-bg-tertiary disabled:opacity-50"
               >
                 Next
@@ -248,20 +300,20 @@ const UsersManagement: React.FC = () => {
                 <p className="text-sm text-text-secondary">
                   Showing{' '}
                   <span className="font-medium">
-                    {(currentPage - 1) * 20 + 1}
+                    {usersResponse.data.pagination.from}
                   </span>{' '}
                   to{' '}
                   <span className="font-medium">
-                    {Math.min(currentPage * 20, users.pagination.total)}
+                    {usersResponse.data.pagination.to}
                   </span>{' '}
                   of{' '}
-                  <span className="font-medium">{users.pagination.total}</span>{' '}
+                  <span className="font-medium">{usersResponse.data.pagination.total}</span>{' '}
                   results
                 </p>
               </div>
               <div>
                 <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                  {Array.from({ length: users.pagination.totalPages }, (_, i) => i + 1).map((page) => (
+                  {Array.from({ length: usersResponse.data.pagination.last_page }, (_, i) => i + 1).map((page) => (
                     <button
                       key={page}
                       onClick={() => setCurrentPage(page)}

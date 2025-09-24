@@ -89,6 +89,35 @@ export const isTokenExpired = (): boolean => {
 };
 
 /**
+ * Update user data while preserving token and timestamp
+ */
+export const updateUserData = (updatedUser: Partial<User>): boolean => {
+  try {
+    const authData = getStoredUserData();
+    if (!authData) {
+      console.error('No stored auth data found');
+      return false;
+    }
+
+    // Merge the existing user data with the updated data
+    const updatedAuthData: StoredAuthData = {
+      ...authData,
+      user: {
+        ...authData.user,
+        ...updatedUser
+      }
+    };
+
+    // Store the updated data back to localStorage
+    localStorage.setItem(USER_DATA_KEY, JSON.stringify(updatedAuthData));
+    return true;
+  } catch (error) {
+    console.error('Error updating user data:', error);
+    return false;
+  }
+};
+
+/**
  * Get authorization header for API requests
  */
 export const getAuthHeader = (): { Authorization: string } => {

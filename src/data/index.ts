@@ -1,16 +1,30 @@
 export interface User {
-  id: number;
+  uuid: string;
   name: string;
   email: string;
   phone: string;
-  referralCode: string;
-  referredBy?: string;
-  emailVerified: boolean;
-  phoneVerified: boolean;
-  emailVerifiedAt?: string;
-  phoneVerifiedAt?: string;
-  createdAt: string;
-  updatedAt: string;
+  password: string;
+  email_verification_code?: string;
+  email_verification_expires_at?: string;
+  phone_verification_code?: string;
+  phone_verification_expires_at?: string;
+  phone_verified_at?: string;
+  referral_code: string;
+  referred_by?: string;
+  total_points: number;
+  tasks_completed_today: number;
+  last_task_reset_date?: string;
+  profile_picture?: string;
+  is_active: boolean;
+  is_admin: boolean;
+  deactivated_at?: string;
+  deactivation_reason?: string;
+  profile_visibility: 'public' | 'private' | 'friends';
+  show_email: boolean;
+  show_phone: boolean;
+  show_activity: boolean;
+  email_notifications: boolean;
+  sms_notifications: boolean;
 }
 
 export interface RegisterRequest {

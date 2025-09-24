@@ -3,27 +3,29 @@ import { useNavigate } from 'react-router-dom';
 import RecentActivityList from '../Components/RecentActivityList';
 import StatsCard from '../Components/StatsCard';
 import { useAdminAuth } from '../Hooks/useAdminAuth';
-import { useDashboardStats, useRecentActivity } from '../Hooks/useAdminData';
+import { useRecentActivity } from '../Hooks/useAdminData';
+import { useGetUserStats } from '../Hooks/useUsers';
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { admin } = useAdminAuth();
+
+  const { data: userStats } = useGetUserStats();
   
   // Use real API calls (these are currently disabled until backend endpoints are implemented)
-  const { data: statsData } = useDashboardStats();
   const { data: activitiesData } = useRecentActivity(5);
   
-  // For now, use empty data since the endpoints are not implemented yet
-  const stats = statsData || {
-    totalUsers: 0,
-    totalUsersGrowth: 0,
-    totalTasksCreated: 0,
-    totalTasksCompleted: 0,
-    totalRevenue: 0,
-    totalRevenueGrowth: 0,
-    activeUsers: 0,
-    pendingSubmissions: 0,
-    openComplaints: 0,
+  // Use real user stats data from API
+  const stats = {
+    totalUsers: userStats?.data?.total_users || 0,
+    totalUsersGrowth: 0, // You can calculate this based on previous data if needed
+    totalTasksCreated: 0, // Will be updated when backend is ready
+    totalTasksCompleted: 0, // Will be updated when backend is ready
+    totalRevenue: 0, // Will be updated when backend is ready
+    totalRevenueGrowth: 0, // Will be updated when backend is ready
+    activeUsers: userStats?.data?.active_users || 0,
+    pendingSubmissions: 0, // Will be updated when backend is ready
+    openComplaints: 0, // Will be updated when backend is ready
     systemHealth: 'healthy' as const
   };
   
@@ -136,7 +138,7 @@ const AdminDashboard: React.FC = () => {
         </div>
 
       {/* Additional Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatsCard
             title="Active Users"
             value={stats.activeUsers.toLocaleString()}
@@ -150,25 +152,37 @@ const AdminDashboard: React.FC = () => {
           />
           
           <StatsCard
-            title="Pending Submissions"
-            value={stats.pendingSubmissions.toLocaleString()}
+            title="Verified Users"
+            value={userStats?.data?.verified_users?.toLocaleString() || '0'}
             change={0}
             changeType="neutral"
             icon={
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             }
           />
           
           <StatsCard
-            title="Open Complaints"
-            value={stats.openComplaints.toLocaleString()}
+            title="Monthly Registrations"
+            value={userStats?.data?.monthly_registrations?.toLocaleString() || '0'}
             change={0}
             changeType="neutral"
             icon={
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            }
+          />
+          
+          <StatsCard
+            title="Users with Phone"
+            value={userStats?.data?.users_with_phone?.toLocaleString() || '0'}
+            change={0}
+            changeType="neutral"
+            icon={
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
             }
           />

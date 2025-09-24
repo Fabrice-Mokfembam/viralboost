@@ -21,6 +21,8 @@ import PrivacyPolicy from './Features/dashboard/Pages/privacypolicy.tsx';
 import CompanyAbout from './Features/dashboard/Pages/AboutCompany.tsx';
 import ReportProblem from './Features/dashboard/Pages/ReportProblem.tsx';
 import NewComplaint from './Features/dashboard/Pages/NewComplaint.tsx';
+import EditProfile from './Features/dashboard/Pages/EditProfile.tsx';
+import ChangePassword from './Features/dashboard/Pages/ChangePassword.tsx';
 import ProtectedRoute from './Components/ProtectedRoute.tsx';
 import AuthRoute from './Components/AuthRoute.tsx';
 import { Bounce, ToastContainer } from 'react-toastify';
@@ -87,6 +89,14 @@ const router = createBrowserRouter([
     element: (
       <AuthRoute>
         <ResetPassword />
+      </AuthRoute>
+    ),
+  },
+  {
+    path: "/referral/:code",
+    element: (
+      <AuthRoute>
+        <Signup />
       </AuthRoute>
     ),
   },
@@ -162,6 +172,14 @@ const router = createBrowserRouter([
       {
         path: "new-complaint",
         element: <NewComplaint />,
+      },
+      {
+        path: "edit-profile",
+        element: <EditProfile />,
+      },
+      {
+        path: "change-password",
+        element: <ChangePassword />,
       }
     ]
   },

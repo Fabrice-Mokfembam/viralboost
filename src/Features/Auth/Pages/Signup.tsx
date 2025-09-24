@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import { useRegister } from '../Hooks/useAuth';
 import { toast } from 'react-toastify';
+import { getReferralCodeFromUrl } from '../Utils/referralUtils';
 
 const Signup: React.FC = () => {
   const navigate = useNavigate();
@@ -35,6 +36,17 @@ const Signup: React.FC = () => {
     phonenumber: false,
     email: false
   });
+
+  // Extract referral code from URL on component mount
+  useEffect(() => {
+    const referralCode = getReferralCodeFromUrl();
+    if (referralCode) {
+      setFormData(prev => ({
+        ...prev,
+        referralCode: referralCode
+      }));
+    }
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

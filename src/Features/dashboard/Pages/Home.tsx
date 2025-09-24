@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { getUserData } from '../../Auth/Utils/authUtils';
 import { useGetProfile } from '../../Auth/Hooks/useAuth';
 
+
 const activities = [
   {
     id: 1,
@@ -36,10 +37,14 @@ const Home = () => {
   const tasksCompleted = 3;
   const dailyGoal = 15;
 
+
+
+
   
 
   return (
-    <div className="min-h-screen bg-bg-main text-text-primary md:px-6 py-8 md:max-w-xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-bg-main via-bg-secondary to-bg-main">
+      <div className="max-w-lg mx-auto px-4 py-8">
       {/* Header */}
       <header className="mb-8 space-y-5">
         <h1 className="text-3xl font-extrabold text-cyan-400 text-center">
@@ -50,7 +55,9 @@ const Home = () => {
         </p>
 
         {/* Balance & Top-up */}
-        <div className="bg-bg-secondary rounded-lg p-4 flex justify-between items-center shadow-lg">
+        <div className="relative overflow-hidden rounded-2xl shadow-2xl mb-8">
+          <div className="relative p-6">
+            <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-4 flex justify-between items-center shadow-lg">
           <div>
             <p className="text-text-muted text-sm">Current Balance</p>
             <p className="text-text-primary font-bold text-xl">$350.00</p>
@@ -62,120 +69,154 @@ const Home = () => {
             <PlusCircle size={20} className="mr-2" />
             Top Up
           </button>
+            </div>
+          </div>
         </div>
 
         {/* Main Buttons */}
-        <div className="flex justify-around space-x-4">
+        <div className="grid grid-cols-3 gap-3 mb-8">
           <button
             onClick={() => navigate('/dashboard/membership')}
-            className="flex-1 bg-cyan-500 hover:bg-cyan-600 rounded-lg py-3 flex flex-col items-center shadow-lg font-semibold"
+            className="group bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 rounded-xl p-4 shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
           >
-            <UserCheck size={28} />
-            <span className="mt-1">Membership</span>
+            <div className="flex flex-col items-center space-y-2">
+              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                <UserCheck size={20} className="text-white" />
+              </div>
+              <span className="text-white text-sm font-semibold">Membership</span>
+            </div>
           </button>
           <button
             onClick={() => navigate('/v/withdraw')}
-            className="flex-1 bg-cyan-500 hover:bg-cyan-600 rounded-lg py-3 flex flex-col items-center shadow-lg font-semibold"
+            className="group bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 rounded-xl p-4 shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
           >
-            <CreditCard size={28} />
-            <span className="mt-1">Withdraw</span>
+            <div className="flex flex-col items-center space-y-2">
+              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                <CreditCard size={20} className="text-white" />
+              </div>
+              <span className="text-white text-sm font-semibold">Withdraw</span>
+            </div>
           </button>
           <button
             onClick={() => navigate('/v/aboutcompany')}
-            className="flex-1 bg-cyan-500 hover:bg-cyan-600 rounded-lg py-3 flex flex-col items-center shadow-lg font-semibold"
+            className="group bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 rounded-xl p-4 shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
           >
-            <Info size={28} />
-            <span className="mt-1">About Company</span>
+            <div className="flex flex-col items-center space-y-2">
+              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                <Info size={20} className="text-white" />
+              </div>
+              <span className="text-white text-sm font-semibold">About</span>
+            </div>
           </button>
         </div>
       </header>
 
       {/* Tasks Progress */}
-      <section className="mb-6">
-        <h2 className="text-xl font-bold mb-3 text-cyan-400">Today's Progress</h2>
-        <div className="bg-gray-800 rounded-full overflow-hidden h-5 mb-1 shadow-inner">
-          <div
-            className="bg-cyan-500 h-full transition-all"
-            style={{ width: `${(tasksCompleted / dailyGoal) * 100}%` }}
-          />
+      <div className="relative overflow-hidden rounded-2xl shadow-2xl mb-8">
+        <div className="relative p-6">
+          <h2 className="text-xl font-bold mb-4 text-cyan-400">Today's Progress</h2>
+          <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-4">
+            <div className="bg-gray-800 rounded-full overflow-hidden h-5 mb-2 shadow-inner">
+              <div
+                className="bg-gradient-to-r from-cyan-500 to-cyan-600 h-full transition-all"
+                style={{ width: `${(tasksCompleted / dailyGoal) * 100}%` }}
+              />
+            </div>
+            <p className="text-text-muted text-sm">
+              {tasksCompleted} / {dailyGoal} Tasks Completed
+            </p>
+          </div>
         </div>
-        <p className="text-text-muted text-sm">
-          {tasksCompleted} / {dailyGoal} Tasks Completed
-        </p>
-      </section>
+      </div>
 
       {/* Activities */}
-      <section className="mb-6">
-        <h2 className="text-xl font-bold mb-4 text-cyan-400">Your Activities</h2>
-        <div className="space-y-4">
-          {activities.map(({ id, title, description, icon, reward }) => (
-            <div
-              key={id}
-              className="flex items-center bg-gray-800 rounded-xl shadow-lg p-4 hover:bg-bg-tertiary transition cursor-pointer"
-            >
-              <div>{icon}</div>
-              <div className="ml-4 flex-1">
-                <h3 className="text-lg font-semibold">{title}</h3>
-                <p className="text-sm text-text-muted">{description}</p>
+      <div className="relative overflow-hidden rounded-2xl shadow-2xl mb-8">
+        <div className="relative p-6">
+          <h2 className="text-xl font-bold mb-4 text-cyan-400">Your Activities</h2>
+          <div className="space-y-4">
+            {activities.map(({ id, title, description, icon, reward }) => (
+              <div
+                key={id}
+                className="flex items-center bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl shadow-lg p-4 hover:from-cyan-500/10 hover:to-cyan-600/10 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl cursor-pointer border border-gray-700/50 hover:border-cyan-500/50"
+              >
+                <div className="w-12 h-12 bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl flex items-center justify-center group-hover:from-cyan-500/20 group-hover:to-cyan-600/20 transition-all duration-300">
+                  {icon}
+                </div>
+                <div className="ml-4 flex-1">
+                  <h3 className="text-lg font-semibold text-text-primary">{title}</h3>
+                  <p className="text-sm text-text-muted">{description}</p>
+                </div>
+                <div className="text-cyan-400 font-bold text-lg">{reward}</div>
               </div>
-              <div className="text-accent-cyan font-bold text-lg">{reward}</div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </section>
+      </div>
 
       {/* Referral Invite */}
-      <section className="mb-6 bg-gray-800 rounded-lg p-4 shadow-lg">
-        <div className="flex items-center space-x-4 mb-2">
-          <Gift size={28} className="text-cyan-400" />
-          <h3 className="text-cyan-400 font-semibold">Invite Friends</h3>
+      <div className="relative overflow-hidden rounded-2xl shadow-2xl mb-8">
+        <div className="relative p-6">
+          <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-4 border border-cyan-500/20">
+            <div className="flex items-center space-x-4 mb-3">
+              <div className="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center">
+                <Gift size={24} className="text-cyan-400" />
+              </div>
+              <h3 className="text-cyan-400 font-semibold text-lg">Invite Friends</h3>
+            </div>
+            <p className="text-text-muted text-sm mb-4">
+              Earn bonus rewards when your friends join and complete tasks!
+            </p>
+            <button
+              onClick={() => navigate('/v/invitefriends')}
+              className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 rounded-xl p-3 shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl flex items-center justify-center space-x-2"
+            >
+              <Gift size={20} className="text-white" />
+              <span className="text-white font-semibold">Invite Now</span>
+            </button>
+          </div>
         </div>
-        <p className="text-text-muted text-sm mb-3">
-          Earn bonus rewards when your friends join and complete tasks!
-        </p>
-        <button
-          onClick={() => navigate('/v/invitefriends')}
-          className="bg-cyan-500 hover:bg-cyan-600 text-text-primary rounded-lg py-2 px-4 font-semibold w-full"
-        >
-          Invite Now
-        </button>
-      </section>
+      </div>
 
       {/* About & Support Links */}
-      <section className="bg-gray-800 rounded-lg p-4 shadow-lg text-text-secondary text-sm space-y-3">
-        <h3 className="font-semibold text-cyan-400 mb-2">About Company & Support</h3>
-        <p>
-          This app helps you earn rewards by completing simple online tasks like
-          liking videos and subscribing to channels. Manage your balance,
-          withdraw earnings, and track your progress easily.
-        </p>
-        <ul className="list-disc pl-5 space-y-1">
-          <li>
-            <a
-              onClick={() => navigate('/v/helpcenter')}
-              className="text-cyan-400 hover:underline cursor-pointer"
-            >
-              Support Center
-            </a>
-          </li>
-          <li>
-            <a
-              onClick={() => navigate('/v/helpcenter')}
-              className="text-cyan-400 hover:underline cursor-pointer"
-            >
-              FAQs
-            </a>
-          </li>
-          <li>
-            <a
-              onClick={() => navigate('/v/privacypolicy')}
-              className="text-cyan-400 hover:underline cursor-pointer"
-            >
-              Privacy Policy
-            </a>
-          </li>
-        </ul>
-      </section>
+      <div className="relative overflow-hidden rounded-2xl shadow-2xl">
+        <div className="relative p-6">
+          <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-4 border border-cyan-500/20">
+            <h3 className="font-semibold text-cyan-400 mb-4 text-lg">About Company & Support</h3>
+            <p className="text-text-muted text-sm mb-4">
+              This app helps you earn rewards by completing simple online tasks like
+              liking videos and subscribing to channels. Manage your balance,
+              withdraw earnings, and track your progress easily.
+            </p>
+            <ul className="space-y-2">
+              <li>
+                <button
+                  onClick={() => navigate('/v/helpcenter')}
+                  className="text-cyan-400 hover:text-cyan-300 hover:underline cursor-pointer text-sm transition-colors"
+                >
+                  Support Center
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => navigate('/v/helpcenter')}
+                  className="text-cyan-400 hover:text-cyan-300 hover:underline cursor-pointer text-sm transition-colors"
+                >
+                  FAQs
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => navigate('/v/privacypolicy')}
+                  className="text-cyan-400 hover:text-cyan-300 hover:underline cursor-pointer text-sm transition-colors"
+                >
+                  Privacy Policy
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      </div>
     </div>
   );
 };

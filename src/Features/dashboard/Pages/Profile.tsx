@@ -25,10 +25,10 @@ const Profile = () => {
       action: () => navigate('/v/invitefriends')
     },
     { 
-      name: 'Change Password', 
+      name: 'Update Profile', 
       icon: <Key size={20} className="text-blue-400" />, 
-      description: 'Update your account security',
-      action: () => navigate('/v/accountdetails')
+      description: 'Edit your profile and security',
+      action: () => navigate('/v/edit-profile')
     },
     { 
       name: 'Help Center', 
