@@ -1,5 +1,5 @@
 import axios, {type AxiosInstance } from 'axios';
-import { getAuthToken, clearAuthData } from '../Features/Auth/Utils/authUtils';
+import { getAuthToken, clearAuthData } from '../Features/user/auth/Utils/authUtils';
 import { getAdminToken, clearAdminData } from '../Features/Admin/Utils/adminUtils';
 
 const apiClient: AxiosInstance = axios.create({

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import type { TaskCreationForm, TaskCreationFormErrors } from '../../Types';
@@ -19,45 +19,24 @@ const TaskCreation: React.FC = () => {
   const [formData, setFormData] = useState<TaskCreationForm>({
     title: '',
     description: '',
-    category_id: 1,
-    category: '', // Will be set when category is selected
-    task_type: 'like',
+    category: '',
+    task_type: 'social_media',
     platform: '',
     instructions: '',
     target_url: '',
-    reward: 25.00, // Changed to decimal
-    task_completion_count: 0, // Read-only field
-    estimated_duration_minutes: 2,
-    requires_photo: false,
+    benefit: 1.00,
     is_active: true,
-    sort_order: 5,
-    threshold_value: 100,
     task_status: 'active',
-    membership: 'basic',
-    requirements: []
+    priority: 'medium',
+    threshold_value: 100,
+    task_completion_count: 0,
+    task_distribution_count: 0
   });
 
   const [errors, setErrors] = useState<TaskCreationFormErrors>({});
 
   const { mutate: createTask, isPending: isCreatingTask, isError: isCreatingTaskError, error: createTaskError } = useCreateTask();
 
-  // Initialize category name when component mounts
-  useEffect(() => {
-    // This would need to be replaced with a real API call to get categories
-    // For now, we'll use a simple mapping
-    const categoryMap: { [key: number]: string } = {
-      1: 'Social Media Engagement',
-      2: 'Content Creation',
-      3: 'Brand Promotion',
-      4: 'Community Building',
-      5: 'Market Research'
-    };
-    
-    const selectedCategoryName = categoryMap[formData.category_id];
-    if (selectedCategoryName && !formData.category) {
-      setFormData(prev => ({ ...prev, category: selectedCategoryName }));
-    }
-  }, [formData.category_id, formData.category]);
 
   const platforms = [
     'Instagram',
@@ -71,33 +50,27 @@ const TaskCreation: React.FC = () => {
   ];
 
   const taskTypes = [
-    { value: 'like', label: 'Like' },
-    { value: 'follow', label: 'Follow' },
-    { value: 'comment', label: 'Comment' },
-    { value: 'subscribe', label: 'Subscribe' }
-  ];
-
-  const membershipTiers = [
-    'basic',
-    'vip1', 
-    'vip2',
-    'vip3',
-    'vip4'
+    { value: 'social_media', label: 'Social Media' },
+    { value: 'website_visit', label: 'Website Visit' },
+    { value: 'app_download', label: 'App Download' },
+    { value: 'survey', label: 'Survey' },
+    { value: 'other', label: 'Other' }
   ];
 
   const statusOptions = [
+    { value: 'pending', label: 'Pending' },
     { value: 'active', label: 'Active' },
-    { value: 'pause', label: 'Paused' },
     { value: 'completed', label: 'Completed' },
-    { value: 'suspended', label: 'Suspended' }
+    { value: 'cancelled', label: 'Cancelled' }
   ];
 
-  const requirementOptions = [
-    { value: 'must_follow', label: 'Must Follow' },
-    { value: 'must_like_before_comment', label: 'Must Like Before Comment' },
-    { value: 'must_verify_account', label: 'Must Verify Account' },
-    { value: 'must_have_minimum_followers', label: 'Must Have Minimum Followers' }
+  const priorityOptions = [
+    { value: 'low', label: 'Low' },
+    { value: 'medium', label: 'Medium' },
+    { value: 'high', label: 'High' },
+    { value: 'urgent', label: 'Urgent' }
   ];
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -106,28 +79,12 @@ const TaskCreation: React.FC = () => {
       const checked = (e.target as HTMLInputElement).checked;
       setFormData((prev: TaskCreationForm) => ({ ...prev, [name]: checked }));
     } else if (type === 'number') {
-      // Handle decimal values for reward field
-      if (name === 'reward') {
+      // Handle decimal values for benefit field
+      if (name === 'benefit') {
         setFormData((prev: TaskCreationForm) => ({ ...prev, [name]: parseFloat(value) || 0 }));
       } else {
         setFormData((prev: TaskCreationForm) => ({ ...prev, [name]: parseInt(value) || 0 }));
       }
-    } else if (name === 'category_id') {
-      // When category is selected, also set the category name
-      const categoryMap: { [key: number]: string } = {
-        1: 'Social Media Engagement',
-        2: 'Content Creation',
-        3: 'Brand Promotion',
-        4: 'Community Building',
-        5: 'Market Research'
-      };
-      
-      const selectedCategoryName = categoryMap[parseInt(value) || 1];
-      setFormData((prev: TaskCreationForm) => ({ 
-        ...prev, 
-        [name]: parseInt(value) || 1,
-        category: selectedCategoryName || ''
-      }));
     } else {
       setFormData((prev: TaskCreationForm) => ({ ...prev, [name]: value }));
     }
@@ -138,59 +95,54 @@ const TaskCreation: React.FC = () => {
     }
   };
 
-  const handleRequirementChange = (requirement: string, checked: boolean) => {
-    setFormData((prev: TaskCreationForm) => {
-      const currentRequirements = Array.isArray(prev.requirements) ? prev.requirements : [];
-      return {
-        ...prev,
-        requirements: checked 
-          ? [...currentRequirements, requirement]
-          : currentRequirements.filter((req: string) => req !== requirement)
-      };
-    });
-  };
 
   const validateForm = (): boolean => {
     const newErrors: TaskCreationFormErrors = {};
 
     if (!formData.title.trim()) {
       newErrors.title = 'Title is required';
-    } else if (formData.title.length > 255) {
-      newErrors.title = 'Title must be 255 characters or less';
+    } else if (formData.title.length > 100) {
+      newErrors.title = 'Title must be 100 characters or less';
     }
 
     if (!formData.description.trim()) {
       newErrors.description = 'Description is required';
+    } else if (formData.description.length > 1000) {
+      newErrors.description = 'Description must be 1000 characters or less';
+    }
+
+    if (!formData.category.trim()) {
+      newErrors.category = 'Category is required';
+    } else if (formData.category.length > 50) {
+      newErrors.category = 'Category must be 50 characters or less';
     }
 
     if (!formData.platform.trim()) {
       newErrors.platform = 'Platform is required';
+    } else if (formData.platform.length > 50) {
+      newErrors.platform = 'Platform must be 50 characters or less';
     }
 
     if (!formData.instructions.trim()) {
       newErrors.instructions = 'Instructions are required';
+    } else if (formData.instructions.length > 2000) {
+      newErrors.instructions = 'Instructions must be 2000 characters or less';
     }
 
     if (!formData.target_url.trim()) {
       newErrors.target_url = 'Target URL is required';
     } else if (!isValidUrl(formData.target_url)) {
       newErrors.target_url = 'Please enter a valid URL';
-    }
-
-    if (formData.estimated_duration_minutes < 1) {
-      newErrors.estimated_duration_minutes = 'Duration must be at least 1 minute';
+    } else if (formData.target_url.length > 255) {
+      newErrors.target_url = 'Target URL must be 255 characters or less';
     }
 
     if (formData.threshold_value < 1) {
       newErrors.threshold_value = 'Threshold value must be at least 1';
     }
 
-    if (formData.reward < 0.01) {
-      newErrors.reward = 'Reward must be at least 0.01';
-    }
-
-    if (formData.sort_order < 1) {
-      newErrors.sort_order = 'Sort order must be at least 1';
+    if (formData.benefit < 0) {
+      newErrors.benefit = 'Benefit cannot be negative';
     }
 
     setErrors(newErrors);
@@ -216,7 +168,7 @@ const TaskCreation: React.FC = () => {
     setIsSubmitting(true);
 
     // Set the category name based on the selected category_id
-    const categoryMap: { [key: number]: string } = {
+    const categoryMap: { [key: string]: string } = {
       1: 'Social Media Engagement',
       2: 'Content Creation',
       3: 'Brand Promotion',
@@ -224,11 +176,11 @@ const TaskCreation: React.FC = () => {
       5: 'Market Research'
     };
     
-    const selectedCategoryName = categoryMap[formData.category_id];
+    const selectedCategoryName = categoryMap[formData.category];
     const updatedFormData = {
       ...formData,
       category: selectedCategoryName || '',
-      category_id: formData.category_id
+      
     };
     
     console.log(updatedFormData);
@@ -285,7 +237,7 @@ const TaskCreation: React.FC = () => {
                 name="title"
                 value={formData.title}
                 onChange={handleInputChange}
-                maxLength={255}
+                maxLength={100}
                 className={`w-full px-3 py-2 border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan ${
                   errors.title ? 'border-red-500' : 'border-border'
                 }`}
@@ -295,7 +247,7 @@ const TaskCreation: React.FC = () => {
                 <p className="mt-1 text-sm text-red-500">{errors.title}</p>
               )}
               <p className="mt-1 text-xs text-text-secondary">
-                {formData.title.length}/255 characters
+                {formData.title.length}/100 characters
               </p>
             </div>
 
@@ -324,29 +276,19 @@ const TaskCreation: React.FC = () => {
               <label className="block text-sm font-medium text-text-primary mb-2">
                 Category *
               </label>
-              <select
-                name="category_id"
-                value={formData.category_id}
+              <input
+                type="text"
+                name="category"
+                value={formData.category}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
-              >
-                {[
-                  { id: 1, name: 'Social Media Engagement' },
-                  { id: 2, name: 'Content Creation' },
-                  { id: 3, name: 'Brand Promotion' },
-                  { id: 4, name: 'Community Building' },
-                  { id: 5, name: 'Market Research' }
-                ].map((category: { id: number; name: string }) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-              {/* Display selected category name */}
-              {formData.category && (
-                <p className="mt-1 text-sm text-cyan-400">
-                  Selected: {formData.category}
-                </p>
+                maxLength={50}
+                className={`w-full px-3 py-2 border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan ${
+                  errors.category ? 'border-red-500' : 'border-border'
+                }`}
+                placeholder="Enter category name"
+              />
+              {errors.category && (
+                <p className="mt-1 text-sm text-red-500">{errors.category}</p>
               )}
             </div>
 
@@ -412,44 +354,25 @@ const TaskCreation: React.FC = () => {
               )}
             </div>
 
-            {/* Membership Tier */}
+            {/* Benefit */}
             <div>
               <label className="block text-sm font-medium text-text-primary mb-2">
-                Membership Tier *
-              </label>
-              <select
-                name="membership"
-                value={formData.membership}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
-              >
-                {membershipTiers.map(tier => (
-                  <option key={tier} value={tier}>
-                    {tier.charAt(0).toUpperCase() + tier.slice(1)}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Reward */}
-            <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
-                Reward ($) *
+                Benefit ($) *
               </label>
               <input
                 type="number"
-                name="reward"
-                value={formData.reward}
+                name="benefit"
+                value={formData.benefit}
                 onChange={handleInputChange}
-                min="0.01"
+                min="0"
                 step="0.01"
                 className={`w-full px-3 py-2 border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan ${
-                  errors.reward ? 'border-red-500' : 'border-border'
+                  errors.benefit ? 'border-red-500' : 'border-border'
                 }`}
-                placeholder="Enter reward amount (e.g., 25.50)"
+                placeholder="Enter benefit amount (e.g., 1.50)"
               />
-              {errors.reward && (
-                <p className="mt-1 text-sm text-red-500">{errors.reward}</p>
+              {errors.benefit && (
+                <p className="mt-1 text-sm text-red-500">{errors.benefit}</p>
               )}
             </div>
           </div>
@@ -501,26 +424,6 @@ const TaskCreation: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Estimated Duration */}
-              <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">
-                  Duration (minutes) *
-                </label>
-                <input
-                  type="number"
-                  name="estimated_duration_minutes"
-                  value={formData.estimated_duration_minutes}
-                  onChange={handleInputChange}
-                  min="1"
-                  className={`w-full px-3 py-2 border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan ${
-                    errors.estimated_duration_minutes ? 'border-red-500' : 'border-border'
-                  }`}
-                />
-                {errors.estimated_duration_minutes && (
-                  <p className="mt-1 text-sm text-red-500">{errors.estimated_duration_minutes}</p>
-                )}
-              </div>
-
               {/* Threshold Value */}
               <div>
                 <label className="block text-sm font-medium text-text-primary mb-2">
@@ -541,24 +444,23 @@ const TaskCreation: React.FC = () => {
                 )}
               </div>
 
-              {/* Sort Order */}
+              {/* Task Distribution Count */}
               <div>
                 <label className="block text-sm font-medium text-text-primary mb-2">
-                  Sort Order *
+                  Task Distribution Count
                 </label>
                 <input
                   type="number"
-                  name="sort_order"
-                  value={formData.sort_order}
+                  name="task_distribution_count"
+                  value={formData.task_distribution_count}
                   onChange={handleInputChange}
-                  min="1"
-                  className={`w-full px-3 py-2 border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan ${
-                    errors.sort_order ? 'border-red-500' : 'border-border'
-                  }`}
+                  min="0"
+                  className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
+                  placeholder="0"
                 />
-                {errors.sort_order && (
-                  <p className="mt-1 text-sm text-red-500">{errors.sort_order}</p>
-                )}
+                <p className="mt-1 text-xs text-text-muted">
+                  Number of times this task has been distributed
+                </p>
               </div>
             </div>
           </div>
@@ -588,21 +490,27 @@ const TaskCreation: React.FC = () => {
               </select>
             </div>
 
-            {/* Checkboxes */}
-            <div className="space-y-4">
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  name="requires_photo"
-                  checked={formData.requires_photo}
-                  onChange={handleInputChange}
-                  className="h-4 w-4 text-accent-cyan focus:ring-accent-cyan border-border rounded"
-                />
-                <label className="ml-2 text-sm text-text-primary">
-                  Requires Photo Proof
-                </label>
-              </div>
+            {/* Priority */}
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-2">
+                Priority *
+              </label>
+              <select
+                name="priority"
+                value={formData.priority}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
+              >
+                {priorityOptions.map(priority => (
+                  <option key={priority.value} value={priority.value}>
+                    {priority.label}
+                  </option>
+                ))}
+              </select>
+            </div>
 
+            {/* Checkboxes */}
+            <div className="md:col-span-2">
               <div className="flex items-center">
                 <input
                   type="checkbox"
@@ -615,29 +523,6 @@ const TaskCreation: React.FC = () => {
                   Task is Active
                 </label>
               </div>
-            </div>
-          </div>
-
-          {/* Requirements Section */}
-          <div className="mt-6">
-            <label className="block text-sm font-medium text-text-primary mb-3">
-              Task Requirements
-            </label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {requirementOptions.map(requirement => (
-                <div key={requirement.value} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id={requirement.value}
-                    checked={Array.isArray(formData.requirements) && formData.requirements.includes(requirement.value)}
-                    onChange={(e) => handleRequirementChange(requirement.value, e.target.checked)}
-                    className="h-4 w-4 text-accent-cyan focus:ring-accent-cyan border-border rounded"
-                  />
-                  <label htmlFor={requirement.value} className="ml-2 text-sm text-text-primary">
-                    {requirement.label}
-                  </label>
-                </div>
-              ))}
             </div>
           </div>
         </div>

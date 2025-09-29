@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { authApi } from '../API';
 import { storeAuthData, clearAuthData } from '../Utils/authUtils';
-import type { ForgotPasswordRequest, LoginRequest, RegisterRequest, ResendVerificationRequest, ResetPasswordRequest, ValidateResetTokenRequest, VerifyRequest } from '../../../data';
+import type { ForgotPasswordRequest, LoginRequest, RegisterRequest, ResendVerificationRequest, ResetPasswordRequest, ValidateResetTokenRequest, VerifyRequest } from '../../../../data';
 
 
 export const useRegister = () => {

@@ -5,11 +5,7 @@ import {
   getAllTasks, 
   getTaskById, 
   updateTask,
-  getAvailableTasks,
-  getTaskStats,
-  assignDailyTasks,
-  resetDailyTasks,
-  startTaskScheduler
+  getAvailableTasks
 } from "../API/tasks";
 import type {  TaskCreationForm, TaskFilters } from "../Types";
 
@@ -28,10 +24,10 @@ export const useCreateTask = () => {
   });
 };
 
-export const useGetAllTasks = (filters: TaskFilters = {}, page = 1, limit = 20) => {
+export const useGetAllTasks = (filters: TaskFilters = {}) => {
   return useQuery({
     queryKey: ["tasks"],
-    queryFn: () => getAllTasks(filters, page, limit),
+    queryFn: () => getAllTasks(filters),
   });
 };
 
@@ -83,48 +79,3 @@ export const useGetAvailableTasks = () => {
   });
 };
 
-export const useGetTaskStats = () => {
-  return useQuery({
-    queryKey: ["taskStats"],
-    queryFn: () => getTaskStats(),
-  });
-};
-
-export const useAssignDailyTasks = () => {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: () => assignDailyTasks(),
-    onSuccess: () => {
-      // Invalidate tasks list to refetch
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
-    },
-    onError: (error) => {
-      console.error("Failed to assign daily tasks:", error);
-    },
-  });
-};
-
-export const useResetDailyTasks = () => {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: () => resetDailyTasks(),
-    onSuccess: () => {
-      // Invalidate tasks list to refetch
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
-    },
-    onError: (error) => {
-      console.error("Failed to reset daily tasks:", error);
-    },
-  });
-};
-
-export const useStartTaskScheduler = () => {
-  return useMutation({
-    mutationFn: () => startTaskScheduler(),
-    onError: (error) => {
-      console.error("Failed to start task scheduler:", error);
-    },
-  });
-};

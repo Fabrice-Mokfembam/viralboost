@@ -1,5 +1,5 @@
-import type { AuthResponse, ForgotPasswordRequest, LoginRequest, ProfileResponse, RegisterRequest, ResendVerificationRequest, ResetPasswordRequest, ValidateResetTokenRequest, VerifyRequest } from "../../../data";
-import { apiClient } from "../../../Services";
+import type { AuthResponse, ForgotPasswordRequest, LoginRequest, ProfileResponse, RegisterRequest, ResendVerificationRequest, ResetPasswordRequest, ValidateResetTokenRequest, VerifyRequest } from "../../../../data";
+import { apiClient } from "../../../../Services";
 
 
 export const authApi = {

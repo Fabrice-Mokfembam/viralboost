@@ -19,22 +19,18 @@ const TaskEdit: React.FC = () => {
   const [formData, setFormData] = useState<TaskCreationForm>({
     title: '',
     description: '',
-    category_id: 1,
-    category: '', // Will be set when category is selected
-    task_type: 'like',
+    category: '',
+    task_type: 'social_media',
     platform: '',
     instructions: '',
     target_url: '',
-    reward: 25,
-    task_completion_count: 0, // Read-only field
-    estimated_duration_minutes: 2,
-    requires_photo: false,
+    benefit: 1.00,
     is_active: true,
-    sort_order: 5,
-    threshold_value: 100,
     task_status: 'active',
-    membership: 'basic',
-    requirements: []
+    priority: 'medium',
+    threshold_value: 100,
+    task_completion_count: 0,
+    task_distribution_count: 0
   });
 
   const [errors, setErrors] = useState<TaskCreationFormErrors>({});
@@ -50,25 +46,21 @@ const TaskEdit: React.FC = () => {
       setFormData({
         title: task.title || '',
         description: task.description || '',
-        category_id: task.category_id || 1,
         category: task.category || '',
-        task_type: task.task_type || 'like',
+        task_type: task.task_type || 'social_media',
         platform: task.platform || '',
-        instructions: Array.isArray(task.instructions) ? task.instructions.join('\n') : (task.instructions || ''),
+        instructions: task.instructions || '',
         target_url: task.target_url || '',
-        reward: task.reward || 25,
-        task_completion_count: task.task_completion_count || 0,
-        estimated_duration_minutes: task.estimated_duration_minutes || 2,
-        requires_photo: task.requires_photo || false,
+        benefit: parseFloat(task.benefit) || 1.00,
         is_active: task.is_active || false,
-        sort_order: task.sort_order || 5,
-        threshold_value: task.threshold_value || 100,
         task_status: task.task_status || 'active',
-        membership: task.membership || 'basic',
-        requirements: Array.isArray(task.requirements) ? task.requirements : []
+        priority: task.priority || 'medium',
+        threshold_value: task.threshold_value || 100,
+        task_completion_count: task.task_completion_count || 0,
+        task_distribution_count: task.task_distribution_count || 0
       });
     }
-  }, [taskData]); // Changed dependency to taskData for API data
+  }, [taskData]);
 
   const platforms = [
     'Instagram',
@@ -82,32 +74,25 @@ const TaskEdit: React.FC = () => {
   ];
 
   const taskTypes = [
-    { value: 'like', label: 'Like' },
-    { value: 'follow', label: 'Follow' },
-    { value: 'comment', label: 'Comment' },
-    { value: 'subscribe', label: 'Subscribe' }
-  ];
-
-  const membershipTiers = [
-    'basic',
-    'vip1', 
-    'vip2',
-    'vip3',
-    'vip4'
+    { value: 'social_media', label: 'Social Media' },
+    { value: 'website_visit', label: 'Website Visit' },
+    { value: 'app_download', label: 'App Download' },
+    { value: 'survey', label: 'Survey' },
+    { value: 'other', label: 'Other' }
   ];
 
   const statusOptions = [
+    { value: 'pending', label: 'Pending' },
     { value: 'active', label: 'Active' },
-    { value: 'pause', label: 'Paused' },
     { value: 'completed', label: 'Completed' },
-    { value: 'suspended', label: 'Suspended' }
+    { value: 'cancelled', label: 'Cancelled' }
   ];
 
-  const requirementOptions = [
-    { value: 'must_follow', label: 'Must Follow' },
-    { value: 'must_like_before_comment', label: 'Must Like Before Comment' },
-    { value: 'must_verify_account', label: 'Must Verify Account' },
-    { value: 'must_have_minimum_followers', label: 'Must Have Minimum Followers' }
+  const priorityOptions = [
+    { value: 'low', label: 'Low' },
+    { value: 'medium', label: 'Medium' },
+    { value: 'high', label: 'High' },
+    { value: 'urgent', label: 'Urgent' }
   ];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -117,23 +102,12 @@ const TaskEdit: React.FC = () => {
       const checked = (e.target as HTMLInputElement).checked;
       setFormData((prev: TaskCreationForm) => ({ ...prev, [name]: checked }));
     } else if (type === 'number') {
-      setFormData((prev: TaskCreationForm) => ({ ...prev, [name]: parseInt(value) || 0 }));
-    } else if (name === 'category_id') {
-      // When category is selected, also set the category name
-      const categoryMap: { [key: number]: string } = {
-        1: 'Social Media Engagement',
-        2: 'Content Creation',
-        3: 'Brand Promotion',
-        4: 'Community Building',
-        5: 'Market Research'
-      };
-      
-      const selectedCategoryName = categoryMap[parseInt(value) || 1];
-      setFormData((prev: TaskCreationForm) => ({ 
-        ...prev, 
-        [name]: parseInt(value) || 1,
-        category: selectedCategoryName || ''
-      }));
+      // Handle decimal values for benefit field
+      if (name === 'benefit') {
+        setFormData((prev: TaskCreationForm) => ({ ...prev, [name]: parseFloat(value) || 0 }));
+      } else {
+        setFormData((prev: TaskCreationForm) => ({ ...prev, [name]: parseInt(value) || 0 }));
+      }
     } else {
       setFormData((prev: TaskCreationForm) => ({ ...prev, [name]: value }));
     }
@@ -144,59 +118,58 @@ const TaskEdit: React.FC = () => {
     }
   };
 
-  const handleRequirementChange = (requirement: string, checked: boolean) => {
-    setFormData((prev: TaskCreationForm) => {
-      const currentRequirements = Array.isArray(prev.requirements) ? prev.requirements : [];
-      return {
-        ...prev,
-        requirements: checked 
-          ? [...currentRequirements, requirement]
-          : currentRequirements.filter((req: string) => req !== requirement)
-      };
-    });
-  };
 
   const validateForm = (): boolean => {
     const newErrors: TaskCreationFormErrors = {};
 
     if (!formData.title.trim()) {
       newErrors.title = 'Title is required';
-    } else if (formData.title.length > 255) {
-      newErrors.title = 'Title must be 255 characters or less';
+    } else if (formData.title.length > 100) {
+      newErrors.title = 'Title must be 100 characters or less';
     }
 
     if (!formData.description.trim()) {
       newErrors.description = 'Description is required';
+    } else if (formData.description.length > 1000) {
+      newErrors.description = 'Description must be 1000 characters or less';
+    }
+
+    if (!formData.category.trim()) {
+      newErrors.category = 'Category is required';
+    } else if (formData.category.length > 50) {
+      newErrors.category = 'Category must be 50 characters or less';
     }
 
     if (!formData.platform.trim()) {
       newErrors.platform = 'Platform is required';
+    } else if (formData.platform.length > 50) {
+      newErrors.platform = 'Platform must be 50 characters or less';
     }
 
     if (!formData.instructions.trim()) {
       newErrors.instructions = 'Instructions are required';
+    } else if (formData.instructions.length > 2000) {
+      newErrors.instructions = 'Instructions must be 2000 characters or less';
     }
 
     if (!formData.target_url.trim()) {
       newErrors.target_url = 'Target URL is required';
     } else if (!isValidUrl(formData.target_url)) {
       newErrors.target_url = 'Please enter a valid URL';
+    } else if (formData.target_url.length > 255) {
+      newErrors.target_url = 'Target URL must be 255 characters or less';
     }
 
-    if (formData.estimated_duration_minutes < 1) {
-      newErrors.estimated_duration_minutes = 'Duration must be at least 1 minute';
+    if (formData.benefit < 0) {
+      newErrors.benefit = 'Benefit must be 0 or greater';
     }
 
     if (formData.threshold_value < 1) {
       newErrors.threshold_value = 'Threshold value must be at least 1';
     }
 
-    if (formData.reward < 1) {
-      newErrors.reward = 'Reward must be at least 1';
-    }
-
-    if (formData.sort_order < 1) {
-      newErrors.sort_order = 'Sort order must be at least 1';
+    if (formData.task_distribution_count < 0) {
+      newErrors.task_distribution_count = 'Task distribution count must be 0 or greater';
     }
 
     setErrors(newErrors);
@@ -331,7 +304,7 @@ const TaskEdit: React.FC = () => {
                 name="title"
                 value={formData.title}
                 onChange={handleInputChange}
-                maxLength={255}
+                maxLength={100}
                 className={`w-full px-3 py-2 border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan ${
                   errors.title ? 'border-red-500' : 'border-border'
                 }`}
@@ -341,7 +314,7 @@ const TaskEdit: React.FC = () => {
                 <p className="mt-1 text-sm text-red-500">{errors.title}</p>
               )}
               <p className="mt-1 text-xs text-text-secondary">
-                {formData.title.length}/255 characters
+                {formData.title.length}/100 characters
               </p>
             </div>
 
@@ -355,6 +328,7 @@ const TaskEdit: React.FC = () => {
                 value={formData.description}
                 onChange={handleInputChange}
                 rows={4}
+                maxLength={1000}
                 className={`w-full px-3 py-2 border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan ${
                   errors.description ? 'border-red-500' : 'border-border'
                 }`}
@@ -363,6 +337,9 @@ const TaskEdit: React.FC = () => {
               {errors.description && (
                 <p className="mt-1 text-sm text-red-500">{errors.description}</p>
               )}
+              <p className="mt-1 text-xs text-text-secondary">
+                {formData.description.length}/1000 characters
+              </p>
             </div>
 
             {/* Category */}
@@ -370,30 +347,41 @@ const TaskEdit: React.FC = () => {
               <label className="block text-sm font-medium text-text-primary mb-2">
                 Category *
               </label>
-              <select
-                name="category_id"
-                value={formData.category_id}
+              <input
+                type="text"
+                name="category"
+                value={formData.category}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
-              >
-                {[
-                  { id: 1, name: 'Social Media Engagement' },
-                  { id: 2, name: 'Content Creation' },
-                  { id: 3, name: 'Brand Promotion' },
-                  { id: 4, name: 'Community Building' },
-                  { id: 5, name: 'Market Research' }
-                ].map((category: { id: number; name: string }) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-              {/* Display selected category name */}
-              {formData.category && (
-                <p className="mt-1 text-sm text-cyan-400">
-                  Selected: {formData.category}
-                </p>
+                maxLength={50}
+                className={`w-full px-3 py-2 border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan ${
+                  errors.category ? 'border-red-500' : 'border-border'
+                }`}
+                placeholder="Enter category (e.g., Social Media, App Download)"
+              />
+              {errors.category && (
+                <p className="mt-1 text-sm text-red-500">{errors.category}</p>
               )}
+              <p className="mt-1 text-xs text-text-secondary">
+                {formData.category.length}/50 characters
+              </p>
+            </div>
+
+            {/* Task Completion Count (Read-only) */}
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-2">
+                Task Completion Count
+              </label>
+              <input
+                type="number"
+                name="task_completion_count"
+                value={formData.task_completion_count}
+                readOnly
+                className="w-full px-3 py-2 border border-border rounded-lg bg-bg-tertiary text-text-muted cursor-not-allowed"
+                placeholder="Auto-generated"
+              />
+              <p className="mt-1 text-xs text-text-muted">
+                This field is automatically managed by the system
+              </p>
             </div>
 
             {/* Task Type */}
@@ -440,43 +428,25 @@ const TaskEdit: React.FC = () => {
               )}
             </div>
 
-            {/* Membership Tier */}
+            {/* Benefit */}
             <div>
               <label className="block text-sm font-medium text-text-primary mb-2">
-                Membership Tier *
-              </label>
-              <select
-                name="membership"
-                value={formData.membership}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
-              >
-                {membershipTiers.map(tier => (
-                  <option key={tier} value={tier}>
-                    {tier.charAt(0).toUpperCase() + tier.slice(1)}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Reward */}
-            <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
-                Reward (points) *
+                Benefit ($) *
               </label>
               <input
                 type="number"
-                name="reward"
-                value={formData.reward}
+                name="benefit"
+                value={formData.benefit}
                 onChange={handleInputChange}
-                min="1"
+                min="0"
+                step="0.01"
                 className={`w-full px-3 py-2 border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan ${
-                  errors.reward ? 'border-red-500' : 'border-border'
+                  errors.benefit ? 'border-red-500' : 'border-border'
                 }`}
-                placeholder="Enter reward points"
+                placeholder="Enter benefit amount (e.g., 1.50)"
               />
-              {errors.reward && (
-                <p className="mt-1 text-sm text-red-500">{errors.reward}</p>
+              {errors.benefit && (
+                <p className="mt-1 text-sm text-red-500">{errors.benefit}</p>
               )}
             </div>
           </div>
@@ -497,6 +467,7 @@ const TaskEdit: React.FC = () => {
                 value={formData.instructions}
                 onChange={handleInputChange}
                 rows={6}
+                maxLength={2000}
                 className={`w-full px-3 py-2 border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan ${
                   errors.instructions ? 'border-red-500' : 'border-border'
                 }`}
@@ -505,6 +476,9 @@ const TaskEdit: React.FC = () => {
               {errors.instructions && (
                 <p className="mt-1 text-sm text-red-500">{errors.instructions}</p>
               )}
+              <p className="mt-1 text-xs text-text-secondary">
+                {formData.instructions.length}/2000 characters
+              </p>
             </div>
 
             {/* Target URL */}
@@ -517,6 +491,7 @@ const TaskEdit: React.FC = () => {
                 name="target_url"
                 value={formData.target_url}
                 onChange={handleInputChange}
+                maxLength={255}
                 className={`w-full px-3 py-2 border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan ${
                   errors.target_url ? 'border-red-500' : 'border-border'
                 }`}
@@ -525,28 +500,14 @@ const TaskEdit: React.FC = () => {
               {errors.target_url && (
                 <p className="mt-1 text-sm text-red-500">{errors.target_url}</p>
               )}
+              <p className="mt-1 text-xs text-text-secondary">
+                {formData.target_url.length}/255 characters
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Estimated Duration */}
-              <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">
-                  Duration (minutes) *
-                </label>
-                <input
-                  type="number"
-                  name="estimated_duration_minutes"
-                  value={formData.estimated_duration_minutes}
-                  onChange={handleInputChange}
-                  min="1"
-                  className={`w-full px-3 py-2 border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan ${
-                    errors.estimated_duration_minutes ? 'border-red-500' : 'border-border'
-                  }`}
-                />
-                {errors.estimated_duration_minutes && (
-                  <p className="mt-1 text-sm text-red-500">{errors.estimated_duration_minutes}</p>
-                )}
-              </div>
+        
+        
 
               {/* Threshold Value */}
               <div>
@@ -568,25 +529,7 @@ const TaskEdit: React.FC = () => {
                 )}
               </div>
 
-              {/* Sort Order */}
-              <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">
-                  Sort Order *
-                </label>
-                <input
-                  type="number"
-                  name="sort_order"
-                  value={formData.sort_order}
-                  onChange={handleInputChange}
-                  min="1"
-                  className={`w-full px-3 py-2 border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan ${
-                    errors.sort_order ? 'border-red-500' : 'border-border'
-                  }`}
-                />
-                {errors.sort_order && (
-                  <p className="mt-1 text-sm text-red-500">{errors.sort_order}</p>
-                )}
-              </div>
+           
             </div>
           </div>
         </div>
@@ -595,7 +538,7 @@ const TaskEdit: React.FC = () => {
         <div className="bg-bg-secondary rounded-lg p-6">
           <h2 className="text-lg font-semibold text-text-primary mb-6">Task Settings</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Status */}
             <div>
               <label className="block text-sm font-medium text-text-primary mb-2">
@@ -615,58 +558,63 @@ const TaskEdit: React.FC = () => {
               </select>
             </div>
 
-            {/* Checkboxes */}
-            <div className="space-y-4">
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  name="requires_photo"
-                  checked={formData.requires_photo}
-                  onChange={handleInputChange}
-                  className="h-4 w-4 text-accent-cyan focus:ring-accent-cyan border-border rounded"
-                />
-                <label className="ml-2 text-sm text-text-primary">
-                  Requires Photo Proof
-                </label>
-              </div>
+            {/* Priority */}
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-2">
+                Priority *
+              </label>
+              <select
+                name="priority"
+                value={formData.priority}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
+              >
+                {priorityOptions.map(priority => (
+                  <option key={priority.value} value={priority.value}>
+                    {priority.label}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  name="is_active"
-                  checked={formData.is_active}
-                  onChange={handleInputChange}
-                  className="h-4 w-4 text-accent-cyan focus:ring-accent-cyan border-border rounded"
-                />
-                <label className="ml-2 text-sm text-text-primary">
-                  Task is Active
-                </label>
-              </div>
+            {/* Task Distribution Count */}
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-2">
+                Task Distribution Count *
+              </label>
+              <input
+                type="number"
+                name="task_distribution_count"
+                value={formData.task_distribution_count}
+                onChange={handleInputChange}
+                min="0"
+                className={`w-full px-3 py-2 border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan ${
+                  errors.task_distribution_count ? 'border-red-500' : 'border-border'
+                }`}
+                placeholder="Enter distribution count"
+              />
+              {errors.task_distribution_count && (
+                <p className="mt-1 text-sm text-red-500">{errors.task_distribution_count}</p>
+              )}
             </div>
           </div>
 
-          {/* Requirements Section */}
+          {/* Checkboxes */}
           <div className="mt-6">
-            <label className="block text-sm font-medium text-text-primary mb-3">
-              Task Requirements
-            </label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {requirementOptions.map(requirement => (
-                <div key={requirement.value} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id={requirement.value}
-                    checked={Array.isArray(formData.requirements) && formData.requirements.includes(requirement.value)}
-                    onChange={(e) => handleRequirementChange(requirement.value, e.target.checked)}
-                    className="h-4 w-4 text-accent-cyan focus:ring-accent-cyan border-border rounded"
-                  />
-                  <label htmlFor={requirement.value} className="ml-2 text-sm text-text-primary">
-                    {requirement.label}
-                  </label>
-                </div>
-              ))}
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                name="is_active"
+                checked={formData.is_active}
+                onChange={handleInputChange}
+                className="h-4 w-4 text-accent-cyan focus:ring-accent-cyan border-border rounded"
+              />
+              <label className="ml-2 text-sm text-text-primary">
+                Task is Active
+              </label>
             </div>
           </div>
+
         </div>
 
         {/* Error Message */}

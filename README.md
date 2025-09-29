@@ -120,3 +120,9 @@ Upon successful execution, the application will be available in your browser, us
     --color-gradient-vip-end: #dc2626;
   }
 }
+
+
+
+Supabase Credentials
+
+Viralboast123

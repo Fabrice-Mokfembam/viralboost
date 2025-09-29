@@ -1,7 +1,7 @@
 import { CreditCard, Repeat, Settings, User, Crown, Mail, ChevronRight, Gift, Key, HelpCircle, Star, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { getUserData } from '../../Auth/Utils/authUtils';
-import { useGetProfile } from '../../Auth/Hooks/useAuth';
+import { getUserData } from '../../auth/Utils/authUtils';
+import { useGetProfile } from '../../auth/Hooks/useAuth';
 
 const Profile = () => {
   const navigate = useNavigate();

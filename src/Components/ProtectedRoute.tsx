@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { isAuthenticated, isTokenExpired } from '../Features/Auth/Utils/authUtils';
+import { isAuthenticated, isTokenExpired } from '../Features/user/auth/Utils/authUtils';
 import LoadingSpinner from './LoadingSpinner';
 
 interface ProtectedRouteProps {

@@ -27,40 +27,34 @@ export interface User {
 }
 
 export interface Task {
-  id: string;
+  id: number;
   title: string;
   description: string;
-  platform: 'instagram' | 'youtube' | 'twitter' | 'tiktok' | 'facebook' | 'linkedin';
-  basePoints: number;
-  estimatedDurationMinutes: number;
-  requiresPhoto: boolean;
-  samplePhotoUrl?: string;
-  thresholdValue: number;
-  instructions: string[];
-  targetUrl: string;
-  expiresAt: string;
-  status: 'pending' | 'active' | 'paused' | 'expired';
-  membershipTiers: string[];
-  totalCompletions: number;
-  task_completion_count: number;
   category: string;
-  reward: number; // Changed to decimal
-  createdAt: string;
-  createdBy: string;
+  task_type: 'social_media' | 'website_visit' | 'app_download' | 'survey' | 'other';
+  platform: string;
+  instructions: string;
+  target_url: string;
+  benefit: string;
+  is_active: number;
+  task_status: 'pending' | 'active' | 'completed' | 'cancelled';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  threshold_value: number;
+  task_completion_count: number;
+  task_distribution_count: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface MembershipTier {
   id: number;
   membership_name: string;
-  description: string | null;
+  description: string;
   tasks_per_day: number;
   max_tasks: number;
-  benefits: number | null;
-  price: number;
-  reward_multiplier: string;
-  priority_level: number;
+  price: string | number;
+  benefit_amount_per_task: string | number;
   is_active: number;
-  task_link: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -198,6 +192,7 @@ export interface TaskFilters {
   search?: string;
   platform?: string;
   status?: string;
+  category?: string;
   membershipTier?: string;
   dateFrom?: string;
   dateTo?: string;
@@ -216,44 +211,36 @@ export interface ComplaintFilters {
 export interface TaskCreationForm {
   title: string;
   description: string;
-  category_id: number;
-  category: string; // New field for category name
-  task_type: string;
+  category: string;
+  task_type: 'social_media' | 'website_visit' | 'app_download' | 'survey' | 'other';
   platform: string;
   instructions: string;
   target_url: string;
-  reward: number; // Changed to decimal
-  task_completion_count: number; // New field - read-only
-  estimated_duration_minutes: number;
-  requires_photo: boolean;
+  benefit: number;
   is_active: boolean;
-  sort_order: number;
+  task_status: 'pending' | 'active' | 'completed' | 'cancelled';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
   threshold_value: number;
-  task_status: string;
-  membership: string;
-  requirements: string[];
+  task_completion_count: number;
+  task_distribution_count: number;
 }
 
 // Task Creation Form Errors Type
 export interface TaskCreationFormErrors {
   title?: string;
   description?: string;
-  category_id?: string;
   category?: string;
   task_type?: string;
   platform?: string;
   instructions?: string;
   target_url?: string;
-  reward?: string;
-  task_completion_count?: string;
-  estimated_duration_minutes?: string;
-  requires_photo?: string;
+  benefit?: string;
   is_active?: string;
-  sort_order?: string;
-  threshold_value?: string;
   task_status?: string;
-  membership?: string;
-  requirements?: string;
+  priority?: string;
+  threshold_value?: string;
+  task_completion_count?: string;
+  task_distribution_count?: string;
 }
 
 // Task Category Type
@@ -270,10 +257,8 @@ export interface MembershipCreationForm {
   description: string;
   tasks_per_day: number;
   max_tasks: number;
-  benefits: number;
   price: number;
-  reward_multiplier: number;
-  priority_level: number;
+  benefit_amount_per_task: number;
   is_active: boolean;
 }
 
@@ -312,10 +297,7 @@ export interface MembershipCreationFormErrors {
   description?: string;
   tasks_per_day?: string;
   max_tasks?: string;
-  benefits?: string;
   price?: string;
-  duration_days?: string;
-  reward_multiplier?: string;
-  priority_level?: string;
+  benefit_amount_per_task?: string;
   is_active?: string;
 }

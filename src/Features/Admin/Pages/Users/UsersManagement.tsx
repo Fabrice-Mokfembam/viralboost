@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { UserFilters } from '../../Types';
-import { useGetUsers } from '../../Hooks/useUsers';
+import { useGetUsers, useDeactivateUser, useActivateUser } from '../../Hooks/useUsers';
+import { toast } from 'react-toastify';
 
 interface UserWithMembership {
   uuid: string;
@@ -19,9 +21,14 @@ interface UserWithMembership {
 }
 
 const UsersManagement: React.FC = () => {
+  const navigate = useNavigate();
   const [filters, setFilters] = useState<UserFilters>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+  const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; user: UserWithMembership | null }>({ show: false, user: null });
+  
+  const { mutate: deactivateUser, isPending: isDeactivating } = useDeactivateUser();
+  const { mutate: activateUser, isPending: isActivating } = useActivateUser();
 
   const { data: usersResponse, isLoading, error } = useGetUsers(currentPage, 15, searchTerm);
   
@@ -50,6 +57,50 @@ const UsersManagement: React.FC = () => {
   const handleFilterChange = (key: keyof UserFilters, value: string) => {
     setFilters({ ...filters, [key]: value || undefined });
     setCurrentPage(1);
+  };
+
+  const handleViewUser = (uuid: string) => {
+    navigate(`/admin/dashboard/users/${uuid}`);
+  };
+
+  const handleDeleteUser = (user: UserWithMembership) => {
+    setDeleteConfirm({ show: true, user });
+  };
+
+  const confirmDelete = () => {
+    if (deleteConfirm.user) {
+      deactivateUser(deleteConfirm.user.uuid, {
+        onSuccess: () => {
+          toast.success('User deactivated successfully');
+          setDeleteConfirm({ show: false, user: null });
+        },
+        onError: () => {
+          toast.error('Failed to deactivate user');
+        }
+      });
+    }
+  };
+
+  const handleSuspendUser = (user: UserWithMembership) => {
+    if (user.accountStatus === 'active') {
+      deactivateUser(user.uuid, {
+        onSuccess: () => {
+          toast.success('User suspended successfully');
+        },
+        onError: () => {
+          toast.error('Failed to suspend user');
+        }
+      });
+    } else {
+      activateUser(user.uuid, {
+        onSuccess: () => {
+          toast.success('User activated successfully');
+        },
+        onError: () => {
+          toast.error('Failed to activate user');
+        }
+      });
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -252,21 +303,33 @@ const UsersManagement: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
-                      <button className="text-accent-cyan hover:text-accent-cyan-hover">
+                      <button 
+                        onClick={() => handleViewUser(user.uuid)}
+                        className="text-accent-cyan hover:text-accent-cyan-hover disabled:opacity-50"
+                        disabled={isDeactivating || isActivating}
+                      >
                         View
                       </button>
-                      <button className="text-text-secondary hover:text-text-primary">
-                        Edit
+                      <button 
+                        onClick={() => handleDeleteUser(user)}
+                        className="text-red-600 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={isDeactivating || isActivating}
+                      >
+                        {isDeactivating ? 'Deleting...' : 'Delete'}
                       </button>
-                      {user.accountStatus === 'active' ? (
-                        <button className="text-yellow-600 hover:text-yellow-700">
-                          Suspend
-                        </button>
-                      ) : (
-                        <button className="text-green-600 hover:text-green-700">
-                          Activate
-                        </button>
-                      )}
+                      <button 
+                        onClick={() => handleSuspendUser(user)}
+                        className={`disabled:opacity-50 disabled:cursor-not-allowed ${
+                          user.accountStatus === 'active' 
+                            ? "text-yellow-600 hover:text-yellow-700" 
+                            : "text-green-600 hover:text-green-700"
+                        }`}
+                        disabled={isDeactivating || isActivating}
+                      >
+                        {isDeactivating ? 'Processing...' : 
+                         isActivating ? 'Activating...' :
+                         user.accountStatus === 'active' ? 'Suspend' : 'Activate'}
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -332,6 +395,55 @@ const UsersManagement: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm.show && (
+        <div 
+          className="fixed inset-0 bg-black/20 flex items-center justify-center z-50"
+          onClick={isDeactivating ? undefined : () => setDeleteConfirm({ show: false, user: null })}
+        >
+          <div 
+            className="bg-bg-secondary rounded-lg p-6 max-w-md w-full mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-semibold text-text-primary mb-4">
+              Confirm User Deletion
+            </h3>
+            <p className="text-text-secondary mb-4">
+              Are you sure you want to deactivate user <strong>{deleteConfirm.user?.username}</strong>? 
+              This action will prevent them from accessing their account.
+            </p>
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+              <p className="text-sm text-yellow-800">
+                <strong>Reason:</strong> Spam activity
+              </p>
+            </div>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setDeleteConfirm({ show: false, user: null })}
+                className="flex-1 px-4 py-2 text-text-secondary hover:text-text-primary border border-border rounded-lg hover:bg-bg-tertiary transition-colors duration-200 disabled:opacity-50"
+                disabled={isDeactivating}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                disabled={isDeactivating}
+              >
+                {isDeactivating ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Deactivating...
+                  </>
+                ) : (
+                  'Deactivate User'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

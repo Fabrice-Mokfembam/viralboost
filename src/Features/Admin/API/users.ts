@@ -25,7 +25,9 @@ export const getUserById = async (uuid: string) => {
 
 // Deactivate user
 export const deactivateUser = async (uuid: string) => {
-  const { data } = await apiClient.post(`/admin/users/${uuid}/deactivate`);
+  const { data } = await apiClient.post(`/admin/users/${uuid}/deactivate`, {
+    reason: 'Spam activity'
+  });
   return data;
 };
 

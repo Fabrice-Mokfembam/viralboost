@@ -9,19 +9,18 @@ interface ApiTask {
   id: number;
   title: string;
   description: string;
-  platform: string;
+  category: string;
   task_type: string;
-  task_status: string;
-  reward: number;
-  estimated_duration_minutes: number;
-  threshold_value: number;
-  requires_photo: boolean;
-  is_active: boolean;
+  platform: string;
+  instructions: string;
   target_url: string;
-  instructions: string | string[]; // Can be either string or array
-  requirements: string[];
-  category_id: number;
-  sort_order: number;
+  benefit: string;
+  is_active: number;
+  task_status: string;
+  priority: string;
+  threshold_value: number;
+  task_completion_count: number;
+  task_distribution_count: number;
   created_at: string;
   updated_at: string;
 }
@@ -56,7 +55,7 @@ const TasksManagement: React.FC = () => {
   const [taskToDelete, setTaskToDelete] = useState<TaskData | null>(null);
 
   // Use real API calls
-  const { data: taskData, isLoading, error } = useGetAllTasks(filters, currentPage, 20);
+  const { data: taskData, isLoading, error } = useGetAllTasks(filters);
   const { mutate: deleteTask, isPending: isDeletingTask } = useDeleteTask();
 
   useEffect(() => {
@@ -95,11 +94,11 @@ const TasksManagement: React.FC = () => {
       filtered = filtered.filter((task: TaskData) => getTaskProperty(task, 'task_status', 'status') === filters.status);
     }
     
-    // Apply membership tier filter
-    if (filters.membershipTier) {
+    // Apply category filter
+    if (filters.category) {
       filtered = filtered.filter((task: TaskData) => {
-        const membershipTiers = (task as Record<string, unknown>).membershipTiers as string[] || [];
-        return membershipTiers.includes(filters.membershipTier!);
+        const category = getTaskProperty(task, 'category', 'category');
+        return category === filters.category;
       });
     }
     
@@ -305,17 +304,19 @@ const TasksManagement: React.FC = () => {
             
             <div>
               <label className="block text-sm font-medium text-text-primary mb-2">
-                Membership Tier
+                Category
               </label>
               <select
-                value={filters.membershipTier || ''}
-                onChange={(e) => handleFilterChange('membershipTier', e.target.value)}
+                value={filters.category || ''}
+                onChange={(e) => handleFilterChange('category', e.target.value)}
                 className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
               >
-                <option value="">All Tiers</option>
-                <option value="basic">Basic</option>
-                <option value="premium">Premium</option>
-                <option value="vip">VIP</option>
+                <option value="">All Categories</option>
+                <option value="Social Media">Social Media</option>
+                <option value="Website">Website</option>
+                <option value="App">App</option>
+                <option value="Survey">Survey</option>
+                <option value="Other">Other</option>
               </select>
             </div>
             
@@ -344,13 +345,16 @@ const TasksManagement: React.FC = () => {
                   Platform
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                  Points
+                  Category
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
+                  Benefit
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                  Expires
+                  Priority
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                   Completions
@@ -396,21 +400,25 @@ const TasksManagement: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-text-primary">
-                      {getTaskProperty(task, 'reward', 'basePoints')}
+                      {getTaskProperty(task, 'category', 'category')}
                     </div>
-                    <div className="text-xs text-text-secondary">
-                      {getTaskProperty(task, 'estimated_duration_minutes', 'estimatedDurationMinutes')} min
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-text-primary">
+                      ${getTaskProperty(task, 'benefit', 'benefit')}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {getStatusBadge(getTaskProperty(task, 'task_status', 'status') as string)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">
-                    {new Date(getTaskProperty(task, 'created_at', 'expiresAt') as string).toLocaleDateString()}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-text-primary">
+                      {getTaskProperty(task, 'priority', 'priority')}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-text-primary">
-                      {getTaskProperty(task, 'threshold_value', 'thresholdValue')}
+                      {getTaskProperty(task, 'task_completion_count', 'task_completion_count')}
                     </div>
                     <div className="text-xs text-text-secondary">
                       / {getTaskProperty(task, 'threshold_value', 'thresholdValue')} target

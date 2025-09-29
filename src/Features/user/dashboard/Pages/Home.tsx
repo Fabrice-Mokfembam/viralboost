@@ -1,31 +1,41 @@
 
-import { UserCheck, CreditCard, Info, PlusCircle, Gift } from 'lucide-react';
+import { UserCheck, CreditCard, Info, PlusCircle, Gift, Youtube, Twitter, Instagram, Smartphone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { getUserData } from '../../Auth/Utils/authUtils';
-import { useGetProfile } from '../../Auth/Hooks/useAuth';
+import { getUserData } from '../../auth/Utils/authUtils';
+import { useGetProfile } from '../../auth/Hooks/useAuth';
+import { useRunTaskDistribution } from '../../tasks/Hooks/useTasks';
+import { useEffect } from 'react';
 
 
-const activities = [
-  {
-    id: 1,
-    title: 'Like a Video',
-    description: 'Complete this task to earn $0.50',
-    icon: <UserCheck size={28} className="text-cyan-500 bg-gray-800 rounded-md p-2" />,
-    reward: '$0.50',
-  },
-  {
-    id: 2,
-    title: 'Subscribe to Channel',
-    description: 'Gain $1.00 by subscribing',
-    icon: <UserCheck size={28} className="text-cyan-500 bg-gray-800 rounded-md p-2" />,
-    reward: '$1.00',
-  },
-];
+// Function to get platform icon
+const getPlatformIcon = (platform: string) => {
+  const iconProps = { size: 28, className: "text-cyan-500 bg-gray-800 rounded-md p-2" };
+  
+  switch (platform.toLowerCase()) {
+    case 'youtube':
+      return <Youtube {...iconProps} />;
+    case 'twitter':
+      return <Twitter {...iconProps} />;
+    case 'instagram':
+      return <Instagram {...iconProps} />;
+    case 'tiktok':
+      return <Smartphone {...iconProps} />;
+    default:
+      return <UserCheck {...iconProps} />;
+  }
+};
 
 const Home = () => {
   const navigate = useNavigate();
   const { data: userProfile } = useGetProfile();
   const storedUser = getUserData();
+
+  const { data: Tasks } = useRunTaskDistribution();
+
+
+  useEffect(() => {
+    console.log('Tasks',Tasks);
+  }, [Tasks]);
   
   // Use profile data if available, otherwise fall back to stored user data
   const user = userProfile || storedUser;
@@ -134,19 +144,20 @@ const Home = () => {
         <div className="relative p-6">
           <h2 className="text-xl font-bold mb-4 text-cyan-400">Your Activities</h2>
           <div className="space-y-4">
-            {activities.map(({ id, title, description, icon, reward }) => (
+            {Tasks?.data?.slice(0, 3).map((task: any) => (
               <div
-                key={id}
+                key={task.id}
+                onClick={() => navigate(`/v/task/${task.id}`)}
                 className="flex items-center bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl shadow-lg p-4 hover:from-cyan-500/10 hover:to-cyan-600/10 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl cursor-pointer border border-gray-700/50 hover:border-cyan-500/50"
               >
                 <div className="w-12 h-12 bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl flex items-center justify-center group-hover:from-cyan-500/20 group-hover:to-cyan-600/20 transition-all duration-300">
-                  {icon}
+                  {getPlatformIcon(task.platform)}
                 </div>
                 <div className="ml-4 flex-1">
-                  <h3 className="text-lg font-semibold text-text-primary">{title}</h3>
-                  <p className="text-sm text-text-muted">{description}</p>
+                  <h3 className="text-lg font-semibold text-text-primary">{task.title}</h3>
+                  <p className="text-sm text-text-muted line-clamp-1">{task.description}</p>
                 </div>
-                <div className="text-cyan-400 font-bold text-lg">{reward}</div>
+                <div className="text-cyan-400 font-bold text-lg">${task.benefit}</div>
               </div>
             ))}
           </div>

@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Lock, Eye, EyeOff, ArrowLeft, Shield, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useUpdatePassword } from '../Hooks/useProfile';
+import { toast } from 'react-toastify';
 
 const ChangePassword = () => {
   const navigate = useNavigate();
+  const { mutate: updatePassword, isPending: isUpdating } = useUpdatePassword();
   
   // Form state
   const [formData, setFormData] = useState({
@@ -18,7 +21,6 @@ const ChangePassword = () => {
     confirm: false,
   });
 
-  const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,13 +76,39 @@ const ChangePassword = () => {
   const handleChangePassword = async () => {
     if (!validateForm()) return;
 
-    setIsLoading(true);
-    // TODO: Implement change password API call
-    setTimeout(() => {
-      setIsLoading(false);
-      // Navigate back to edit profile after successful update
-      navigate('/v/edit-profile');
-    }, 1500);
+    updatePassword({
+      current_password: formData.currentPassword,
+      password: formData.newPassword,
+      password_confirmation: formData.confirmPassword,
+    }, {
+      onSuccess: () => {
+        toast.success('Password updated successfully!');
+        // Clear form
+        setFormData({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: '',
+        });
+        setErrors({});
+        // Navigate back to edit profile after successful update
+        navigate('/v/edit-profile');
+      },
+      onError: (error: any) => {
+        console.error('Password update error:', error);
+        const errorMessage = error?.response?.data?.message || 'Failed to update password';
+        toast.error(errorMessage);
+        
+        // Handle specific validation errors
+        if (error?.response?.data?.errors) {
+          const apiErrors = error.response.data.errors;
+          setErrors({
+            currentPassword: apiErrors.current_password?.[0] || '',
+            newPassword: apiErrors.password?.[0] || '',
+            confirmPassword: apiErrors.password_confirmation?.[0] || '',
+          });
+        }
+      }
+    });
   };
 
   const passwordStrength = (password: string) => {
@@ -275,12 +303,12 @@ const ChangePassword = () => {
           {/* Update Password Button */}
           <button
             onClick={handleChangePassword}
-            disabled={isLoading}
+            disabled={isUpdating}
             className={`w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 rounded-xl p-4 shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl flex items-center justify-center space-x-2 ${
-              isLoading ? 'opacity-75 cursor-not-allowed' : ''
+              isUpdating ? 'opacity-75 cursor-not-allowed' : ''
             }`}
           >
-            {isLoading ? (
+            {isUpdating ? (
               <>
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                 <span className="text-white font-semibold">Updating Password...</span>

@@ -1,7 +1,7 @@
 import  { useState } from 'react';
 import { Clipboard } from 'lucide-react';
-import { generateReferralLink } from '../../Auth/Utils/referralUtils';
-import { getUserData } from '../../Auth/Utils/authUtils';
+import { generateReferralLink } from '../../auth/Utils/referralUtils';
+import { getUserData } from '../../auth/Utils/authUtils';
 
 const InviteFriends = () => {
   const user = getUserData();

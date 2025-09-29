@@ -20,10 +20,8 @@ const CreateMembership: React.FC = () => {
     description: '',
     tasks_per_day: 5,
     max_tasks: 50,
-    benefits: 0,
     price: 0,
-    reward_multiplier: 1.0,
-    priority_level: 3,
+    benefit_amount_per_task: 0,
     is_active: true,
   });
 
@@ -54,12 +52,14 @@ const CreateMembership: React.FC = () => {
 
     if (!formData.membership_name.trim()) {
       newErrors.membership_name = 'Membership name is required';
-    } else if (formData.membership_name.length > 255) {
-      newErrors.membership_name = 'Membership name must be 255 characters or less';
+    } else if (formData.membership_name.length > 50) {
+      newErrors.membership_name = 'Membership name must be 50 characters or less';
     }
 
     if (!formData.description.trim()) {
       newErrors.description = 'Description is required';
+    } else if (formData.description.length > 500) {
+      newErrors.description = 'Description must be 500 characters or less';
     }
 
     if (formData.tasks_per_day < 1) {
@@ -70,21 +70,12 @@ const CreateMembership: React.FC = () => {
       newErrors.max_tasks = 'Max tasks must be at least 1';
     }
 
-    if (formData.benefits <= 0) {
-      newErrors.benefits = 'Benefits must be greater than 0';
-    }
-
     if (formData.price < 0) {
       newErrors.price = 'Price cannot be negative';
     }
 
-
-    if (formData.reward_multiplier < 0.1) {
-      newErrors.reward_multiplier = 'Reward multiplier must be at least 0.1';
-    }
-
-    if (formData.priority_level < 1 || formData.priority_level > 3) {
-      newErrors.priority_level = 'Priority level must be between 1 and 3';
+    if (formData.benefit_amount_per_task < 0) {
+      newErrors.benefit_amount_per_task = 'Benefit amount per task cannot be negative';
     }
 
     setErrors(newErrors);
@@ -154,7 +145,7 @@ const CreateMembership: React.FC = () => {
                 name="membership_name"
                 value={formData.membership_name}
                 onChange={handleInputChange}
-                maxLength={255}
+                maxLength={50}
                 className={`w-full px-3 py-2 border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan ${
                   errors.membership_name ? 'border-red-500' : 'border-border'
                 }`}
@@ -164,7 +155,7 @@ const CreateMembership: React.FC = () => {
                 <p className="mt-1 text-sm text-red-500">{errors.membership_name}</p>
               )}
               <p className="mt-1 text-xs text-text-secondary">
-                {formData.membership_name.length}/255 characters
+                {formData.membership_name.length}/50 characters
               </p>
             </div>
 
@@ -178,6 +169,7 @@ const CreateMembership: React.FC = () => {
                 value={formData.description}
                 onChange={handleInputChange}
                 rows={4}
+                maxLength={500}
                 className={`w-full px-3 py-2 border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan ${
                   errors.description ? 'border-red-500' : 'border-border'
                 }`}
@@ -186,6 +178,9 @@ const CreateMembership: React.FC = () => {
               {errors.description && (
                 <p className="mt-1 text-sm text-red-500">{errors.description}</p>
               )}
+              <p className="mt-1 text-xs text-text-secondary">
+                {formData.description.length}/500 characters
+              </p>
             </div>
 
             {/* Price */}
@@ -258,87 +253,41 @@ const CreateMembership: React.FC = () => {
         <div className="bg-bg-secondary rounded-lg p-6">
           <h2 className="text-lg font-semibold text-text-primary mb-6">Advanced Settings</h2>
           
-          <div className="space-y-6">
-            {/* Benefits */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Benefit Amount Per Task */}
             <div>
               <label className="block text-sm font-medium text-text-primary mb-2">
-                Benefits (Number) *
+                Benefit Amount Per Task ($) *
               </label>
               <input
                 type="number"
-                name="benefits"
-                value={formData.benefits}
+                name="benefit_amount_per_task"
+                value={formData.benefit_amount_per_task}
                 onChange={handleInputChange}
-                min="1"
-                step="1"
+                min="0"
+                step="0.01"
                 className={`w-full px-3 py-2 border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan ${
-                  errors.benefits ? 'border-red-500' : 'border-border'
+                  errors.benefit_amount_per_task ? 'border-red-500' : 'border-border'
                 }`}
-                placeholder="Enter benefits number..."
+                placeholder="0.00"
               />
-              {errors.benefits && (
-                <p className="mt-1 text-sm text-red-500">{errors.benefits}</p>
+              {errors.benefit_amount_per_task && (
+                <p className="mt-1 text-sm text-red-500">{errors.benefit_amount_per_task}</p>
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Reward Multiplier */}
-              <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">
-                  Reward Multiplier *
-                </label>
-                <input
-                  type="number"
-                  name="reward_multiplier"
-                  value={formData.reward_multiplier}
-                  onChange={handleInputChange}
-                  min="0.1"
-                  step="0.1"
-                  className={`w-full px-3 py-2 border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan ${
-                    errors.reward_multiplier ? 'border-red-500' : 'border-border'
-                  }`}
-                  placeholder="1.0"
-                />
-                {errors.reward_multiplier && (
-                  <p className="mt-1 text-sm text-red-500">{errors.reward_multiplier}</p>
-                )}
-              </div>
-
-              {/* Priority Level */}
-              <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">
-                  Priority Level *
-                </label>
-                <select
-                  name="priority_level"
-                  value={formData.priority_level}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan ${
-                    errors.priority_level ? 'border-red-500' : 'border-border'
-                  }`}
-                >
-                  <option value={1}>High (1)</option>
-                  <option value={2}>Medium (2)</option>
-                  <option value={3}>Low (3)</option>
-                </select>
-                {errors.priority_level && (
-                  <p className="mt-1 text-sm text-red-500">{errors.priority_level}</p>
-                )}
-              </div>
-
-              {/* Is Active */}
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  name="is_active"
-                  checked={formData.is_active}
-                  onChange={handleInputChange}
-                  className="h-4 w-4 text-accent-cyan focus:ring-accent-cyan border-border rounded"
-                />
-                <label className="ml-2 text-sm text-text-primary">
-                  Membership is Active
-                </label>
-              </div>
+            {/* Is Active */}
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                name="is_active"
+                checked={formData.is_active}
+                onChange={handleInputChange}
+                className="h-4 w-4 text-accent-cyan focus:ring-accent-cyan border-border rounded"
+              />
+              <label className="ml-2 text-sm text-text-primary">
+                Membership is Active
+              </label>
             </div>
           </div>
         </div>

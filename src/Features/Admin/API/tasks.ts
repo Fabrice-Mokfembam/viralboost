@@ -8,14 +8,12 @@ export const createTask = async (task: TaskCreationForm) => {
 };
 
 // Get all tasks
-export const getAllTasks = async (filters: TaskFilters = {}, page = 1, limit = 20) => {
-  const params = new URLSearchParams({
-    page: page.toString(),
-    limit: limit.toString(),
-    ...Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== undefined)),
-  });
+export const getAllTasks = async (filters: TaskFilters = {}) => {
+  const params = new URLSearchParams(
+    Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== undefined))
+  );
   
-  const { data } = await apiClient.get(`/admin/tasks?${params}`);
+  const { data } = await apiClient.get(`/admin/tasks${params.toString() ? `?${params}` : ''}`);
   return data;
 };
 
@@ -40,30 +38,6 @@ export const deleteTask = async (taskId: string) => {
 // Get available tasks for preview
 export const getAvailableTasks = async () => {
   const { data } = await apiClient.get("/admin/tasks/available");
-  return data;
-};
-
-// Get task statistics
-export const getTaskStats = async () => {
-  const { data } = await apiClient.get("/admin/tasks/stats");
-  return data;
-};
-
-// Manually assign daily tasks
-export const assignDailyTasks = async () => {
-  const { data } = await apiClient.post("/admin/tasks/assign-daily");
-  return data;
-};
-
-// Reset daily tasks
-export const resetDailyTasks = async () => {
-  const { data } = await apiClient.post("/admin/tasks/reset-daily");
-  return data;
-};
-
-// Start the self-scheduling task system
-export const startTaskScheduler = async (immediate = false) => {
-  const { data } = await apiClient.post("/admin/tasks/start-scheduler", { immediate });
   return data;
 };
 

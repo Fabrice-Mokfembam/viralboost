@@ -53,21 +53,6 @@ const MembershipManagement: React.FC = () => {
     );
   };
 
-  const getPriorityBadge = (priority: number) => {
-    const priorityConfig = {
-      1: { color: 'bg-red-100 text-red-800', text: 'High' },
-      2: { color: 'bg-yellow-100 text-yellow-800', text: 'Medium' },
-      3: { color: 'bg-blue-100 text-blue-800', text: 'Low' },
-    };
-    
-    const config = priorityConfig[priority as keyof typeof priorityConfig] || priorityConfig[3];
-    
-    return (
-      <span className={`px-2 py-1 text-xs font-medium rounded-full ${config.color}`}>
-        {config.text}
-      </span>
-    );
-  };
 
   if (isLoading) {
     return (
@@ -149,7 +134,6 @@ const MembershipManagement: React.FC = () => {
               </div>
               <div className="flex space-x-2">
                 {getStatusBadge(membership.is_active)}
-                {getPriorityBadge(membership.priority_level)}
               </div>
             </div>
 
@@ -167,12 +151,8 @@ const MembershipManagement: React.FC = () => {
                 <span className="text-text-primary font-medium">{membership.max_tasks}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-text-secondary text-sm">Reward Multiplier:</span>
-                <span className="text-text-primary font-medium">{membership.reward_multiplier}x</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-text-secondary text-sm">Benefits:</span>
-                <span className="text-text-primary font-medium">{membership.benefits || 'N/A'}</span>
+                <span className="text-text-secondary text-sm">Benefit per Task:</span>
+                <span className="text-text-primary font-medium">${membership.benefit_amount_per_task}</span>
               </div>
             </div>
 
