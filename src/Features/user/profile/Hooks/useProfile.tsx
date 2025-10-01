@@ -6,10 +6,10 @@ export const useUpdateProfile = () => {
   
   return useMutation({
     mutationFn: (profileData: {
-      name: string;
-      email: string;
+      name?: string;
+      email?: string;
       phone?: string;
-      profile_image?: File;
+      profile_image?: string;
     }) => updateProfile(profileData),
     onSuccess: () => {
       // Invalidate and refetch user profile data

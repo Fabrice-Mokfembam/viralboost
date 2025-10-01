@@ -5,15 +5,17 @@ import { getUserData, updateUserData } from '../../auth/Utils/authUtils';
 import { useGetProfile } from '../../auth/Hooks/useAuth';
 import { useUpdateProfile } from '../Hooks/useProfile';
 import { toast } from 'react-toastify';
+import { useCloudinaryUpload } from '../../../../Hooks/useCloudinaryUpload';
 
 const EditProfile = () => {
   const navigate = useNavigate();
   const { data: userProfile } = useGetProfile();
   const storedUser = getUserData();
   const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
+  const { uploadImage, isUploading, uploadProgress, error: uploadError } = useCloudinaryUpload();
   
   // Use profile data if available, otherwise fall back to stored user data
-  const user = userProfile || storedUser;
+  const user = userProfile?.data?.user || storedUser;
   
   // Get first name and last name from user name
   const nameParts = user?.name ? user.name.split(' ') : ['User'];
@@ -31,6 +33,7 @@ const EditProfile = () => {
 
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -40,7 +43,7 @@ const EditProfile = () => {
     }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setSelectedImage(file);
@@ -49,39 +52,59 @@ const EditProfile = () => {
         setImagePreview(e.target?.result as string);
       };
       reader.readAsDataURL(file);
+
+      // Upload to Cloudinary immediately
+      try {
+        const uploadResponse = await uploadImage(file, 'profile_images', {
+          tags: ['profile', 'avatar']
+        });
+        setUploadedImageUrl(uploadResponse.secure_url);
+        console.log('Profile image uploaded:', uploadResponse.secure_url);
+      } catch (error) {
+        console.error('Upload failed:', error);
+        toast.error('Failed to upload image. Please try again.');
+      }
     }
   };
 
   const handleSave = async () => {
-    if (!formData.firstName.trim() || !formData.email.trim()) {
-      toast.error('First name and email are required');
-      return;
-    }
-
     const fullName = `${formData.firstName.trim()} ${formData.lastName.trim()}`.trim();
     
-    // Build the profile data object, only including fields that have values
+    // Build the profile data object, only including fields that have been changed
     const profileData: {
-      name: string;
-      email: string;
+      name?: string;
+      email?: string;
       phone?: string;
-      profile_image?: File;
-    } = {
-      name: fullName,
-      email: formData.email.trim(),
-    };
+      profile_image?: string;
+    } = {};
 
-    // Only add phone if it has a value
-    if (formData.phone.trim()) {
+    // Only include name if it's different from current user name
+    if (fullName !== user?.name) {
+      profileData.name = fullName;
+    }
+
+    // Only include email if it's different from current user email
+    if (formData.email.trim() !== user?.email) {
+      profileData.email = formData.email.trim();
+    }
+
+    // Only include phone if it's different from current user phone
+    if (formData.phone.trim() !== (user?.phone || '')) {
       profileData.phone = formData.phone.trim();
     }
 
-    // Only add profile_image if a file is selected
-    if (selectedImage) {
-      profileData.profile_image = selectedImage;
+    // Only include profile_image if a new image was uploaded
+    if (uploadedImageUrl) {
+      profileData.profile_image = uploadedImageUrl;
     }
 
-    console.log(profileData);
+    // Check if there are any changes to save
+    if (Object.keys(profileData).length === 0) {
+      toast.info('No changes to save');
+      return;
+    }
+
+    console.log('Profile data to update:', profileData);
 
     updateProfile(profileData, {
       onSuccess: (response) => {
@@ -133,9 +156,9 @@ const EditProfile = () => {
                       alt="Profile preview" 
                       className="w-full h-full object-cover"
                     />
-                  ) : (user as any)?.profile_picture ? (
+                  ) : user?.profile_image ? (
                     <img 
-                      src={(user as any).profile_picture} 
+                      src={user.profile_image} 
                       alt="Profile" 
                       className="w-full h-full object-cover"
                     />
@@ -160,8 +183,26 @@ const EditProfile = () => {
                 </div>
               </div>
               <p className="text-text-muted text-sm mt-2">
-                {selectedImage ? 'Image selected - click save to update' : 'Tap to change profile picture'}
+                {isUploading ? 'Uploading image...' : 
+                 uploadedImageUrl ? 'Image uploaded - click save to update' : 
+                 selectedImage ? 'Image selected - click save to update' : 
+                 'Tap to change profile picture'}
               </p>
+              
+              {/* Upload Progress */}
+              {isUploading && uploadProgress && (
+                <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-cyan-500 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${uploadProgress.percentage}%` }}
+                  ></div>
+                </div>
+              )}
+
+              {/* Upload Error */}
+              {uploadError && (
+                <p className="text-red-500 text-sm mt-2">Upload failed: {uploadError}</p>
+              )}
             </div>
           </div>
         </div>
@@ -266,15 +307,20 @@ const EditProfile = () => {
           {/* Save Button */}
           <button
             onClick={handleSave}
-            disabled={isUpdating}
+            disabled={isUpdating || isUploading}
             className={`w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 rounded-xl p-4 shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl flex items-center justify-center space-x-2 ${
-              isUpdating ? 'opacity-75 cursor-not-allowed' : ''
+              isUpdating || isUploading ? 'opacity-75 cursor-not-allowed' : ''
             }`}
           >
             {isUpdating ? (
               <>
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                 <span className="text-white font-semibold">Saving...</span>
+              </>
+            ) : isUploading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                <span className="text-white font-semibold">Uploading...</span>
               </>
             ) : (
               <>

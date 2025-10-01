@@ -124,15 +124,54 @@ export interface AuthResponse {
   user: User;
 }
 
+export interface ReferralStats {
+  total_referrals: number;
+  active_referrals: number;
+  pending_referrals: number;
+}
+
 export interface ProfileResponse {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  referral_code: string;
-  referred_by?: string;
-  email_verified_at?: string;
-  phone_verified_at?: string;
-  created_at: string;
-  updated_at: string;
+  success: boolean;
+  data: {
+    user: {
+      id: number | null;
+      uuid: string;
+      name: string;
+      email: string;
+      phone: string | null;
+      profile_image: string | null;
+      email_verified_at: string | null;
+      phone_verified_at: string | null;
+      referral_code: string;
+      referred_by: string | null;
+      total_points: string;
+      total_tasks: number;
+      tasks_completed_today: number;
+      last_task_reset_date: string | null;
+      account_balance: string;
+      membership_level: number;
+      role: string;
+      isActive: boolean;
+      is_active: boolean;
+      is_admin: boolean;
+      deactivated_at: string | null;
+      deactivation_reason: string | null;
+      lastLogin: string | null;
+      profile_visibility: string;
+      show_email: boolean;
+      show_phone: boolean;
+      show_activity: boolean;
+      email_notifications: boolean;
+      sms_notifications: boolean;
+      created_at: string;
+      updated_at: string;
+      membership: Membership;
+      emailVerified: boolean;
+      phoneVerified: boolean;
+    };
+    referral_stats: ReferralStats;
+    assigned_tasks: Task[];
+    completed_tasks: Task[];
+    inprogress_tasks: Task[];
+  };
 }

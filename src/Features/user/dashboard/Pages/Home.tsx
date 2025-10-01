@@ -1,9 +1,10 @@
 
-import { UserCheck, CreditCard, Info, PlusCircle, Gift, Youtube, Twitter, Instagram, Smartphone } from 'lucide-react';
+import { UserCheck, CreditCard, Info, PlusCircle, Gift, Youtube, Twitter, Instagram, Smartphone, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getUserData } from '../../auth/Utils/authUtils';
 import { useGetProfile } from '../../auth/Hooks/useAuth';
 import { useRunTaskDistribution } from '../../tasks/Hooks/useTasks';
+import { useGetUserSubmissions } from '../../tasks/Hooks/useTaskSubmissions';
 import { useEffect } from 'react';
 
 
@@ -31,21 +32,31 @@ const Home = () => {
   const storedUser = getUserData();
 
   const { data: Tasks } = useRunTaskDistribution();
-
+  const { data: Submissions } = useGetUserSubmissions();
 
   useEffect(() => {
     console.log('Tasks',Tasks);
-  }, [Tasks]);
+    console.log('userProfile',userProfile);
+  }, [Tasks, userProfile]);
+
+  // Helper function to check if a task has been submitted
+  const isTaskSubmitted = (taskId: number) => {
+    if (!Submissions?.data?.submissions) return false;
+    return Submissions.data.submissions.some((submission: any) => submission.task_id === taskId);
+  };
+
+  // Filter out completed tasks
+  const availableTasks = Tasks?.data?.filter((task: any) => !isTaskSubmitted(task.id)) || [];
   
   // Use profile data if available, otherwise fall back to stored user data
-  const user = userProfile || storedUser;
+  const user = userProfile?.data?.user || storedUser;
   
   // Get first name from user name
   const firstName = user?.name ? user.name.split(' ')[0] : 'User';
   
-  // Example state for completed tasks
-  const tasksCompleted = 3;
-  const dailyGoal = 15;
+  // Get task completion data from profile
+  const tasksCompleted = user?.tasks_completed_today || 0;
+  const dailyGoal = user?.membership?.tasks_per_day || 5;
 
 
 
@@ -70,7 +81,7 @@ const Home = () => {
             <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-4 flex justify-between items-center shadow-lg">
           <div>
             <p className="text-text-muted text-sm">Current Balance</p>
-            <p className="text-text-primary font-bold text-xl">$350.00</p>
+            <p className="text-text-primary font-bold text-xl">${user?.account_balance || '0.00'}</p>
           </div>
           <button
             onClick={() => navigate('/v/recharge')}
@@ -143,24 +154,40 @@ const Home = () => {
       <div className="relative overflow-hidden rounded-2xl shadow-2xl mb-8">
         <div className="relative p-6">
           <h2 className="text-xl font-bold mb-4 text-cyan-400">Your Activities</h2>
-          <div className="space-y-4">
-            {Tasks?.data?.slice(0, 3).map((task: any) => (
-              <div
-                key={task.id}
-                onClick={() => navigate(`/v/task/${task.id}`)}
-                className="flex items-center bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl shadow-lg p-4 hover:from-cyan-500/10 hover:to-cyan-600/10 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl cursor-pointer border border-gray-700/50 hover:border-cyan-500/50"
-              >
-                <div className="w-12 h-12 bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl flex items-center justify-center group-hover:from-cyan-500/20 group-hover:to-cyan-600/20 transition-all duration-300">
-                  {getPlatformIcon(task.platform)}
+          
+          {availableTasks.length > 0 ? (
+            <div className="space-y-4">
+              {availableTasks.slice(0, 3).map((task: any) => (
+                <div
+                  key={task.id}
+                  onClick={() => navigate(`/v/task/${task.id}`)}
+                  className="flex items-center bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl shadow-lg p-4 hover:from-cyan-500/10 hover:to-cyan-600/10 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl cursor-pointer border border-gray-700/50 hover:border-cyan-500/50"
+                >
+                  <div className="w-12 h-12 bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl flex items-center justify-center group-hover:from-cyan-500/20 group-hover:to-cyan-600/20 transition-all duration-300">
+                    {getPlatformIcon(task.platform)}
+                  </div>
+                  <div className="ml-4 flex-1">
+                    <h3 className="text-lg font-semibold text-text-primary">{task.title}</h3>
+                    <p className="text-sm text-text-muted line-clamp-1">{task.description}</p>
+                  </div>
+                  <div className="text-cyan-400 font-bold text-lg">${task.benefit}</div>
                 </div>
-                <div className="ml-4 flex-1">
-                  <h3 className="text-lg font-semibold text-text-primary">{task.title}</h3>
-                  <p className="text-sm text-text-muted line-clamp-1">{task.description}</p>
-                </div>
-                <div className="text-cyan-400 font-bold text-lg">${task.benefit}</div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500/20 to-green-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle size={32} className="text-green-500" />
               </div>
-            ))}
-          </div>
+              <h3 className="text-lg font-semibold text-green-400 mb-2">All Activities Completed!</h3>
+              <p className="text-text-muted text-sm">
+                Great job! You've completed all available tasks for today.
+              </p>
+              <p className="text-text-muted text-xs mt-2">
+                Check back tomorrow for new tasks.
+              </p>
+            </div>
+          )}
         </div>
       </div>
 

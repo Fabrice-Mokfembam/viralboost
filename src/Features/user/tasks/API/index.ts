@@ -17,3 +17,6 @@ export const updateUserTask = async (taskId: string, updateData: any) => {
   const { data } = await apiClient.put(`/tasks/${taskId}/update`, updateData);
   return data;
 };
+
+// Re-export submission functions
+export * from './submissions';

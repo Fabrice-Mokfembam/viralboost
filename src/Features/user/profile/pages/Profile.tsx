@@ -9,7 +9,7 @@ const Profile = () => {
   const storedUser = getUserData();
   
   // Use profile data if available, otherwise fall back to stored user data
-  const user = userProfile || storedUser;
+  const user = userProfile?.data?.user || storedUser;
   
   // Get first name and last name from user name
   const nameParts = user?.name ? user.name.split(' ') : ['User'];
@@ -48,8 +48,16 @@ const Profile = () => {
             {/* User Avatar and Info */}
             <div className="flex items-center space-x-4 mb-6">
               <div className="relative">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg">
-                  {initials.toUpperCase()}
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg overflow-hidden">
+                  {user?.profile_image ? (
+                    <img 
+                      src={user.profile_image} 
+                      alt="Profile" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    initials.toUpperCase()
+                  )}
                 </div>
                 <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-bg-secondary flex items-center justify-center">
                   <div className="w-2 h-2 bg-white rounded-full"></div>

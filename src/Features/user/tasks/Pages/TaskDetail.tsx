@@ -1,14 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { useGetUserTaskDetails } from '../Hooks/useTasks';
+import type { CloudinaryUploadResponse } from '../../../../types/cloudinary';
+import { useCloudinaryUpload } from '../../../../Hooks/useCloudinaryUpload';
+import { useSubmitTaskProof } from '../Hooks/useTaskSubmissions';
+
 // import { useGetTaskById } from '../../../Admin/Hooks/useTasks';
 
 const TaskDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [uploadedImages, setUploadedImages] = useState<CloudinaryUploadResponse[]>([]);
 
   const { data: taskData, isLoading, error } = useGetUserTaskDetails(id || '');
+  const { uploadImage, isUploading, uploadProgress, error: uploadError } = useCloudinaryUpload();
+  const { mutate: submitTaskProof, isPending: isSubmitting, error: submitError, isSuccess: submitSuccess } = useSubmitTaskProof();
+  const navigate = useNavigate();
+  
 
   useEffect(() => {
     if (taskData) {
@@ -25,21 +34,65 @@ const TaskDetail: React.FC = () => {
   // Use real task data
   const task = taskData?.data || null;
 
-  const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const filesArray = Array.from(e.target.files);
-      setSelectedImages((prev) => [...prev, ...filesArray]);
+  const onImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      
+      try {
+        // Upload the image to Cloudinary
+        const uploadResponse = await uploadImage(file, 'default', {
+          tags: ['task-proof', `task-${id}`]
+        });
+        
+        // Add to uploaded images
+        setUploadedImages(prev => [...prev, uploadResponse]);
+        
+        // Also add to selected images for preview
+        setSelectedImages(prev => [...prev, file]);
+        
+        console.log('Image uploaded successfully:', uploadResponse.secure_url);
+      } catch (error) {
+        console.error('Upload failed:', error);
+        alert('Failed to upload image. Please try again.');
+      }
     }
   };
 
   const removeImage = (index: number) => {
     setSelectedImages((prev) => prev.filter((_, i) => i !== index));
+    setUploadedImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = () => {
-    alert(`Submitting ${selectedImages.length} images for task ID: ${id}`);
-    // TODO: submit logic here
+    if (uploadedImages.length === 0) {
+      alert('Please upload an image first');
+      return;
+    }
+
+    // Submit the first uploaded image (since we're only allowing one image)
+    const imageUrl = uploadedImages[0].secure_url;
+    
+    const submissionData = {
+      task_id: Number(id),
+      image_url: imageUrl,
+      description: 'Task completed'
+    };
+
+    console.log('=== SUBMITTING TASK PROOF ===');
+    console.log('Task ID:', id);
+    console.log('Image URL:', imageUrl);
+    console.log('Description:', 'Task completed');
+    console.log('============================');
+
+    submitTaskProof(submissionData);
   };
+
+  // Navigate to tasks page when submission is successful
+  useEffect(() => {
+    if (submitSuccess) {
+      navigate('/dashboard/tasks');
+    }
+  }, [submitSuccess, navigate]);
 
   if (isLoading) {
     return (
@@ -141,20 +194,50 @@ const TaskDetail: React.FC = () => {
 
       {/* Image Upload Section */}
       <section className="mb-8">
-        <h3 className="text-xl font-semibold text-cyan-400 mb-3">Upload Proof Images</h3>
+        <h3 className="text-xl font-semibold text-cyan-400 mb-3">Upload Proof Image</h3>
+        
+        {/* Upload Progress */}
+        {isUploading && (
+          <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="flex items-center space-x-3">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
+              <span className="text-blue-700 font-medium">Uploading image...</span>
+            </div>
+            {uploadProgress && (
+              <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${uploadProgress.percentage}%` }}
+                ></div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Upload Error */}
+        {uploadError && (
+          <div className="mb-4 p-4 bg-red-50 rounded-lg border border-red-200">
+            <p className="text-red-700 font-medium">Upload Error: {uploadError}</p>
+          </div>
+        )}
+
         <input
           type="file"
           id="uploadImages"
           className="hidden"
           accept="image/*"
-          multiple
           onChange={onImageChange}
+          disabled={isUploading}
         />
         <label
           htmlFor="uploadImages"
-          className="inline-block cursor-pointer bg-cyan-600 hover:bg-cyan-700 text-text-primary font-semibold px-6 py-3  shadow transition"
+          className={`inline-block cursor-pointer font-semibold px-6 py-3 shadow transition ${
+            isUploading 
+              ? 'bg-gray-400 cursor-not-allowed text-gray-600' 
+              : 'bg-cyan-600 hover:bg-cyan-700 text-text-primary'
+          }`}
         >
-          Select Images
+          {isUploading ? 'Uploading...' : 'Select Image'}
         </label>
 
         {/* Selected Images Section */}
@@ -185,17 +268,33 @@ const TaskDetail: React.FC = () => {
         )}
       </section>
 
+      {/* Submit Error */}
+      {submitError && (
+        <div className="mb-4 p-4 bg-red-50 rounded-lg border border-red-200">
+          <p className="text-red-700 font-medium">Submission Error: {submitError.message}</p>
+        </div>
+      )}
+
+      {/* Submit Success */}
+      {submitSuccess && (
+        <div className="mb-4 p-4 bg-green-50 rounded-lg border border-green-200">
+          <p className="text-green-700 font-medium">Task proof submitted successfully!</p>
+        </div>
+      )}
+
       {/* Submit Button */}
       <button
         onClick={handleSubmit}
-        disabled={selectedImages.length === 0}
-        className={`w-full py-4  font-bold text-lg transition ${
-          selectedImages.length === 0
+        disabled={uploadedImages.length === 0 || isUploading || isSubmitting}
+        className={`w-full py-4 font-bold text-lg transition ${
+          uploadedImages.length === 0 || isUploading || isSubmitting
             ? 'bg-bg-tertiary cursor-not-allowed text-text-muted'
             : 'bg-cyan-500 hover:bg-cyan-600 text-text-primary shadow-xl'
         }`}
       >
-        Submit Proof
+        {isUploading ? 'Uploading...' : 
+         isSubmitting ? 'Submitting...' : 
+         `Submit Proof (${uploadedImages.length} image${uploadedImages.length !== 1 ? 's' : ''})`}
       </button>
     </div>
   );

@@ -2,29 +2,13 @@ import { apiClient } from "../../../../Services";
 
 // Update user profile
 export const updateProfile = async (profileData: {
-  name: string;
-  email: string;
+  name?: string;
+  email?: string;
   phone?: string;
-  profile_image?: File;
+  profile_image?: string;
 }) => {
-  const formData = new FormData();
-  
-  formData.append('name', profileData.name);
-  formData.append('email', profileData.email);
-  
-  if (profileData.phone) {
-    formData.append('phone', profileData.phone);
-  }
-  
-  if (profileData.profile_image) {
-    formData.append('profile_image', profileData.profile_image);
-  }
-
-  const { data } = await apiClient.put('/profile', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+  // Send as JSON instead of FormData since we're sending strings
+  const { data } = await apiClient.put('/profile', profileData);
   return data;
 };
 
