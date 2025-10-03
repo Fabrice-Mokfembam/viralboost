@@ -122,7 +122,7 @@ const MembershipDetail: React.FC = () => {
         {/* Header */}
         <div className="max-w-4xl mx-auto mb-8">
           <button
-            onClick={() => navigate('/v/membership')}
+            onClick={() => navigate(-1)}
             className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 mb-6 transition-colors"
           >
             <ArrowLeft size={20} />

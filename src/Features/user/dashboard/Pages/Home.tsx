@@ -60,7 +60,7 @@ const Home = () => {
   const firstName = user?.name ? user.name.split(' ')[0] : 'User';
   
   // Get task completion data from profile
-  const tasksCompleted = user?.tasks_completed_today || 0;
+  const tasksCompleted = Submissions?.data?.submissions?.length || 0;
   const dailyGoal = user?.membership?.tasks_per_day || 5;
 
   const { data: account } = useAccount();
