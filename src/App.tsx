@@ -12,7 +12,7 @@ import Membership from './Features/user/dashboard/Pages/Membership.tsx';
 import Profile from './Features/user/profile/pages/Profile.tsx';
 import SinglePageLayout from './Features/user/dashboard/Components/SinglePageLayout.tsx';
 import TaskDetail from './Features/user/tasks/Pages/TaskDetail.tsx';
-import AccountDetails from './Features/user/dashboard/Pages/accountdetails.tsx';
+import AccountDetails from './Features/user/accounts/Pages/AccountDetails.tsx';
 import Withdraw from './Features/user/dashboard/Pages/withdraw.tsx';
 import Recharge from './Features/user/dashboard/Pages/recharge.tsx';
 import InviteFriends from './Features/user/dashboard/Pages/invitefriends.tsx';

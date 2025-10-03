@@ -1,15 +1,49 @@
 
 import { CreditCard, Gift, Repeat, UserPlus } from 'lucide-react';
+import { useAccount } from '../Hooks/useAccount';
+import { useNavigate } from 'react-router-dom';
 
 const AccountDetails = () => {
-  // Dummy data; replace with actual fetched user data
-  const balance = 350.0;
+  const navigate = useNavigate();
+  const { data: accountResponse, isLoading, error } = useAccount();
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-lg text-text-primary">Loading account details...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-red-500 text-lg">Error loading account details</div>
+      </div>
+    );
+  }
+
+  const account = accountResponse?.data;
+
+  if (!account) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-lg text-text-primary">No account data available</div>
+      </div>
+    );
+  }
+
+  // Use actual account data
+  const balance = parseFloat(account.balance);
+  const totalIncome = parseFloat(account.total_earned);
+  const referralIncome = parseFloat(account.referral_income);
+  const taskIncome = totalIncome - referralIncome; // Calculate task income as total - referral
   const incomeSources = {
-    referral: 120.0,
-    tasks: 200.0,
-    bonuses: 30.0,
+    referral: referralIncome,
+    tasks: taskIncome,
+    bonuses: parseFloat(account.total_bonus),
   };
-  const totalWithdrawals = 5;
+  const totalWithdrawals = parseFloat(account.total_withdrawals);
 
   return (
     <div className="min-h-screen bg-bg-main max-w-3xl mx-auto text-text-secondary">
@@ -19,6 +53,11 @@ const AccountDetails = () => {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Current Balance</h2>
           <p className="text-3xl font-bold text-text-primary">${balance.toFixed(2)}</p>
+        </div>
+
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-lg font-semibold">Total Income Earned</h2>
+          <p className="text-2xl font-bold text-green-500">${totalIncome.toFixed(2)}</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -52,7 +91,10 @@ const AccountDetails = () => {
           </div>
         </div>
 
-        <button className="mt-8 w-full bg-cyan-500 hover:bg-cyan-600 text-text-primary py-3 rounded-xl font-semibold shadow-lg transition">
+        <button 
+          onClick={() => navigate('/v/withdraw')}
+          className="mt-8 w-full bg-cyan-500 hover:bg-cyan-600 text-text-primary py-3 rounded-xl font-semibold shadow-lg transition"
+        >
           Withdraw Funds
         </button>
       </div>

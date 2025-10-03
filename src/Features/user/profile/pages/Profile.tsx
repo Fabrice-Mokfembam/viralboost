@@ -2,11 +2,13 @@ import { CreditCard, Repeat, Settings, User, Crown, Mail, ChevronRight, Gift, Ke
 import { useNavigate } from 'react-router-dom';
 import { getUserData } from '../../auth/Utils/authUtils';
 import { useGetProfile } from '../../auth/Hooks/useAuth';
+import { useAccount } from '../../accounts';
 
 const Profile = () => {
   const navigate = useNavigate();
   const { data: userProfile } = useGetProfile();
   const storedUser = getUserData();
+  const { data: account } = useAccount();
   
   // Use profile data if available, otherwise fall back to stored user data
   const user = userProfile?.data?.user || storedUser;
@@ -91,7 +93,7 @@ const Profile = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-cyan-300 text-sm font-medium mb-1">Current Balance</p>
-                  <p className="text-text-primary text-3xl font-bold">$350.00</p>
+                  <p className="text-text-primary text-3xl font-bold">${account?.data?.balance || '0.00'}</p>
                 </div>
                 <div className="w-12 h-12 bg-cyan-500/20 rounded-full flex items-center justify-center">
                   <TrendingUp size={24} className="text-cyan-400" />
@@ -190,7 +192,7 @@ const Profile = () => {
               </div>
               <div>
                 <p className="text-text-muted text-xs">Tasks Completed</p>
-                <p className="text-text-primary font-bold text-lg">127</p>
+                <p className="text-text-primary font-bold text-lg">{user?.tasks_completed_today || 0}</p>
               </div>
             </div>
           </div>
@@ -202,7 +204,7 @@ const Profile = () => {
               </div>
               <div>
                 <p className="text-text-muted text-xs">Total Earned</p>
-                <p className="text-text-primary font-bold text-lg">$1,250</p>
+                <p className="text-text-primary font-bold text-lg">${account?.data?.total_earned || '0.00'}</p>
               </div>
             </div>
           </div>

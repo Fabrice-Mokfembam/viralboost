@@ -6,6 +6,7 @@ import { useGetProfile } from '../../auth/Hooks/useAuth';
 import { useRunTaskDistribution } from '../../tasks/Hooks/useTasks';
 import { useGetUserSubmissions } from '../../tasks/Hooks/useTaskSubmissions';
 import { useEffect } from 'react';
+import { useAccount } from '../../accounts';
 
 
 // Function to get platform icon
@@ -58,6 +59,10 @@ const Home = () => {
   const tasksCompleted = user?.tasks_completed_today || 0;
   const dailyGoal = user?.membership?.tasks_per_day || 5;
 
+  const { data: account } = useAccount();
+
+  console.log('account',account);
+
 
 
 
@@ -81,7 +86,7 @@ const Home = () => {
             <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-4 flex justify-between items-center shadow-lg">
           <div>
             <p className="text-text-muted text-sm">Current Balance</p>
-            <p className="text-text-primary font-bold text-xl">${user?.account_balance || '0.00'}</p>
+            <p className="text-text-primary font-bold text-xl">${account?.data?.balance || '0.00'}</p>
           </div>
           <button
             onClick={() => navigate('/v/recharge')}
