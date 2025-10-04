@@ -12,17 +12,18 @@ import Membership from './Features/user/dashboard/Pages/Membership.tsx';
 import Profile from './Features/user/profile/pages/Profile.tsx';
 import SinglePageLayout from './Features/user/dashboard/Components/SinglePageLayout.tsx';
 import TaskDetail from './Features/user/tasks/Pages/TaskDetail.tsx';
-import AccountDetails from './Features/user/accounts/Pages/AccountDetails.tsx';
+import AccountDetails from './Features/user/accounts/Pages/accountdetails.tsx';
 import Withdraw from './Features/user/dashboard/Pages/withdraw.tsx';
 import Recharge from './Features/user/dashboard/Pages/recharge.tsx';
 import InviteFriends from './Features/user/dashboard/Pages/invitefriends.tsx';
 import HelpCenter from './Features/user/dashboard/Pages/helpcenter.tsx';
 import PrivacyPolicy from './Features/user/dashboard/Pages/privacypolicy.tsx';
 import CompanyAbout from './Features/user/dashboard/Pages/AboutCompany.tsx';
-import ReportProblem from './Features/user/dashboard/Pages/ReportProblem.tsx';
-import NewComplaint from './Features/user/dashboard/Pages/NewComplaint.tsx';
+import ReportProblem from './Features/user/complaints/pages/ReportProblem.tsx';
+import NewComplaint from './Features/user/complaints/pages/NewComplaint.tsx';
 import EditProfile from './Features/user/profile/pages/EditProfile.tsx';
 import ChangePassword from './Features/user/profile/pages/ChangePassword.tsx';
+import { MembershipDetail as UserMembershipDetail } from './Features/user/memberships';
 import ProtectedRoute from './Components/ProtectedRoute.tsx';
 import AuthRoute from './Components/AuthRoute.tsx';
 import { Bounce, ToastContainer } from 'react-toastify';
@@ -181,6 +182,10 @@ const router = createBrowserRouter([
       {
         path: "change-password",
         element: <ChangePassword />,
+      },
+      {
+        path: "membership/:id",
+        element: <UserMembershipDetail />,
       }
     ]
   },

@@ -47,7 +47,11 @@ const Home = () => {
   };
 
   // Filter out completed tasks
-  const availableTasks = Tasks?.data?.filter((task: any) => !isTaskSubmitted(task.id)) || [];
+  const availableTasks = Array.isArray(Tasks?.data) 
+    ? Tasks.data.filter((task: any) => !isTaskSubmitted(task.id))
+    : Array.isArray(Tasks?.data?.tasks) 
+      ? Tasks.data.tasks.filter((task: any) => !isTaskSubmitted(task.id))
+      : [];
   
   // Use profile data if available, otherwise fall back to stored user data
   const user = userProfile?.data?.user || storedUser;

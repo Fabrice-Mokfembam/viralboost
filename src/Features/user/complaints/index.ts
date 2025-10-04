@@ -1,10 +1,8 @@
 // Export API functions
-export * from './API';
+export * from './api';
 
 // Export hooks
-export * from './Hooks/useAccount';
+export * from './hooks/useComplaints';
 
 // Export types
 export * from './Types';
-
-

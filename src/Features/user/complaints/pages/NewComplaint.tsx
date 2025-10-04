@@ -1,16 +1,18 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Send, AlertTriangle } from 'lucide-react';
+import { useCreateComplaint } from '../hooks/useComplaints';
+
 
 const NewComplaint = () => {
   const navigate = useNavigate();
+  const createComplaintMutation = useCreateComplaint();
   const [formData, setFormData] = useState({
     contact: '',
     contactType: 'email', // 'email' or 'phone'
     severity: 'medium',
     description: ''
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -22,23 +24,32 @@ const NewComplaint = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    // Reset form
-    setFormData({
-      contact: '',
-      contactType: 'email',
-      severity: 'medium',
-      description: ''
-    });
-
-    setIsSubmitting(false);
     
-    // Navigate back to report problem page
-    navigate('/v/report-problem');
+    // Prepare the complaint data according to API requirements
+    const complaintData = {
+      contact_type: formData.contactType as 'email' | 'phone',
+      contact: formData.contact,
+      severity_level: formData.severity as 'low' | 'medium' | 'high',
+      description: formData.description
+    };
+
+    try {
+      await createComplaintMutation.mutateAsync(complaintData);
+      
+      // Reset form on success
+      setFormData({
+        contact: '',
+        contactType: 'email',
+        severity: 'medium',
+        description: ''
+      });
+      
+      // Navigate back to report problem page
+      navigate('/v/report-problem');
+    } catch (error) {
+      console.error('Failed to submit complaint:', error);
+      // Error handling is done in the mutation hook
+    }
   };
 
   const getSeverityColor = (severity: string) => {
@@ -171,14 +182,37 @@ const NewComplaint = () => {
           </div>
         </div>
 
+        {/* Error Message */}
+        {createComplaintMutation.isError && (
+          <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-4 text-center">
+            <p className="text-red-400 font-medium">
+              Failed to submit complaint. Please try again.
+            </p>
+            {createComplaintMutation.error && (
+              <p className="text-red-300 text-sm mt-1">
+                {createComplaintMutation.error.message || 'An error occurred'}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Success Message */}
+        {createComplaintMutation.isSuccess && (
+          <div className="bg-green-500/20 border border-green-500/50 rounded-xl p-4 text-center">
+            <p className="text-green-400 font-medium">
+              Complaint submitted successfully!
+            </p>
+          </div>
+        )}
+
         {/* Submit Button */}
         <div className="text-center">
           <button
             type="submit"
-            disabled={isSubmitting || !formData.contact || !formData.description}
+            disabled={createComplaintMutation.isPending || !formData.contact || !formData.description}
             className="bg-cyan-500 hover:bg-cyan-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-text-primary font-semibold py-3 px-8 rounded-lg shadow-lg flex items-center gap-2 mx-auto transition-colors"
           >
-            {isSubmitting ? (
+            {createComplaintMutation.isPending ? (
               <>
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                 Submitting...

@@ -126,3 +126,8 @@ Upon successful execution, the application will be available in your browser, us
 Supabase Credentials
 
 Viralboast123
+
+
+
+
+U
