@@ -1,19 +1,32 @@
 import  { useState } from 'react';
-import { CreditCard,  Wallet, Banknote } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import {ustd,bigcoin,Ethereum} from '../../../../assets/images'
 
 const rechargeMethods = [
-  { id: 'paypal', name: 'PayPal', icon: <Wallet size={28} /> },
-  { id: 'bank', name: 'Bank Transfer', icon: <Banknote size={28} /> },
-  { id: 'card', name: 'Debit/Credit Card', icon: <CreditCard size={28} /> },
+  { id: 'USDT', name: 'USDT', icon: <img src={ustd} alt="USDT" /> },
+  { id: 'Ethereum', name: 'Ethereum', icon: <img src={Ethereum} alt="Ethereum" /> },
+  { id: 'Bigcoin', name: 'Bigcoin', icon: <img src={bigcoin} alt="Bigcoin" /> },
+
 ];
 
 const Recharge = () => {
+  const navigate = useNavigate();
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const [amount, setAmount] = useState('');
 
   const handleRecharge = () => {
-    alert(`Recharge of $${amount} via ${selectedMethod} requested.`);
-    // Add actual recharge logic
+    if (!selectedMethod || !amount) {
+      alert('Please select a payment method and enter an amount');
+      return;
+    }
+    
+    // Navigate to payment page with method and amount
+    navigate('/v/payment', {
+      state: {
+        method: selectedMethod,
+        amount: amount
+      }
+    });
   };
 
   return (

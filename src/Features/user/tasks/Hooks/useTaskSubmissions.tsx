@@ -38,6 +38,7 @@ export const useSubmitTaskProof = () => {
     mutationFn: submitTaskProof,
     onSuccess: () => {
       // Invalidate related queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['user-submissions'] });
       queryClient.invalidateQueries({ queryKey: ['submission-stats'] });
       queryClient.invalidateQueries({ queryKey: ['user-submissions'] });

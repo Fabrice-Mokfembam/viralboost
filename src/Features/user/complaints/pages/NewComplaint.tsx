@@ -13,6 +13,7 @@ const NewComplaint = () => {
     severity: 'medium',
     description: ''
   });
+  const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({});
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -20,18 +21,32 @@ const NewComplaint = () => {
       ...prev,
       [name]: value
     }));
+    
+    // Clear validation errors for this field when user starts typing
+    if (validationErrors[name]) {
+      setValidationErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Clear previous validation errors
+    setValidationErrors({});
     
     // Prepare the complaint data according to API requirements
     const complaintData = {
       contact_type: formData.contactType as 'email' | 'phone',
       contact: formData.contact,
       severity_level: formData.severity as 'low' | 'medium' | 'high',
-      description: formData.description
+      description: formData.description.trim()
     };
+
+    console.log(complaintData);
 
     try {
       await createComplaintMutation.mutateAsync(complaintData);
@@ -46,9 +61,16 @@ const NewComplaint = () => {
       
       // Navigate back to report problem page
       navigate('/v/report-problem');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to submit complaint:', error);
-      // Error handling is done in the mutation hook
+      
+      // Handle validation errors from API response
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { data?: { errors?: Record<string, string[]> } } };
+        if (axiosError.response?.data?.errors) {
+          setValidationErrors(axiosError.response.data.errors);
+        }
+      }
     }
   };
 
@@ -63,6 +85,19 @@ const NewComplaint = () => {
       default:
         return 'text-gray-500';
     }
+  };
+
+  const getFieldError = (fieldName: string) => {
+    // Map form field names to API field names for error display
+    const fieldMapping: Record<string, string> = {
+      'contact': 'contact',
+      'contactType': 'contact_type',
+      'severity': 'severity_level',
+      'description': 'description'
+    };
+    
+    const apiFieldName = fieldMapping[fieldName] || fieldName;
+    return validationErrors[apiFieldName]?.[0] || null;
   };
 
   return (
@@ -122,14 +157,23 @@ const NewComplaint = () => {
               value={formData.contact}
               onChange={handleInputChange}
               placeholder={formData.contactType === 'email' ? 'Enter your email' : 'Enter your phone number'}
-              className="w-full px-4 py-3 bg-bg-tertiary border border-gray-600 rounded-lg text-text-primary focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className={`w-full px-4 py-3 bg-bg-tertiary border rounded-lg text-text-primary focus:outline-none focus:ring-1 ${
+                getFieldError('contact') 
+                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
+                  : 'border-gray-600 focus:border-cyan-500 focus:ring-cyan-500'
+              }`}
               required
             />
+            {getFieldError('contact') && (
+              <p className="text-red-400 text-sm mt-1">{getFieldError('contact')}</p>
+            )}
           </div>
         </div>
 
         {/* Severity */}
-        <div className="bg-bg-secondary rounded-xl p-6 shadow-md border border-cyan-500">
+        <div className={`bg-bg-secondary rounded-xl p-6 shadow-md border ${
+          getFieldError('severity') ? 'border-red-500' : 'border-cyan-500'
+        }`}>
           <h2 className="text-xl font-semibold text-text-primary mb-4">Severity Level</h2>
           
           <div className="space-y-3">
@@ -145,7 +189,7 @@ const NewComplaint = () => {
                   value={option.value}
                   checked={formData.severity === option.value}
                   onChange={handleInputChange}
-                  className="mt-1 text-cyan-500"
+                  className={`mt-1 ${getFieldError('severity') ? 'text-red-500' : 'text-cyan-500'}`}
                 />
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
@@ -159,10 +203,15 @@ const NewComplaint = () => {
               </label>
             ))}
           </div>
+          {getFieldError('severity') && (
+            <p className="text-red-400 text-sm mt-2">{getFieldError('severity')}</p>
+          )}
         </div>
 
         {/* Description */}
-        <div className="bg-bg-secondary rounded-xl p-6 shadow-md border border-cyan-500">
+        <div className={`bg-bg-secondary rounded-xl p-6 shadow-md border ${
+          getFieldError('description') ? 'border-red-500' : 'border-cyan-500'
+        }`}>
           <h2 className="text-xl font-semibold text-text-primary mb-4">Describe Your Problem</h2>
           
           <div>
@@ -173,17 +222,26 @@ const NewComplaint = () => {
               onChange={handleInputChange}
               placeholder="Please provide a detailed description of the problem you're experiencing. Include steps to reproduce the issue if applicable."
               rows={6}
-              className="w-full px-4 py-3 bg-bg-tertiary border border-gray-600 rounded-lg text-text-primary focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 resize-none"
+              className={`w-full px-4 py-3 bg-bg-tertiary border rounded-lg text-text-primary focus:outline-none focus:ring-1 resize-none ${
+                getFieldError('description') 
+                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
+                  : 'border-gray-600 focus:border-cyan-500 focus:ring-cyan-500'
+              }`}
               required
             />
-            <p className="text-sm text-text-muted mt-2">
-              {formData.description.length}/500 characters
-            </p>
+            <div className="flex justify-between items-center mt-2">
+              <p className="text-sm text-text-muted">
+                {formData.description.length}/500 characters
+              </p>
+              {getFieldError('description') && (
+                <p className="text-red-400 text-sm">{getFieldError('description')}</p>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Error Message */}
-        {createComplaintMutation.isError && (
+        {createComplaintMutation.isError && Object.keys(validationErrors).length === 0 && (
           <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-4 text-center">
             <p className="text-red-400 font-medium">
               Failed to submit complaint. Please try again.

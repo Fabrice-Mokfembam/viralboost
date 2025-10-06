@@ -13,8 +13,9 @@ import Profile from './Features/user/profile/pages/Profile.tsx';
 import SinglePageLayout from './Features/user/dashboard/Components/SinglePageLayout.tsx';
 import TaskDetail from './Features/user/tasks/Pages/TaskDetail.tsx';
 import AccountDetails from './Features/user/accounts/Pages/accountdetails.tsx';
-import Withdraw from './Features/user/dashboard/Pages/withdraw.tsx';
-import Recharge from './Features/user/dashboard/Pages/recharge.tsx';
+import Withdraw from './Features/user/Payments/pages/withdraw.tsx';
+import Recharge from './Features/user/Payments/pages/recharge.tsx';
+import PaymentPage from './Features/user/Payments/pages/PaymentPage.tsx';
 import InviteFriends from './Features/user/dashboard/Pages/invitefriends.tsx';
 import HelpCenter from './Features/user/dashboard/Pages/helpcenter.tsx';
 import PrivacyPolicy from './Features/user/dashboard/Pages/privacypolicy.tsx';
@@ -154,6 +155,10 @@ const router = createBrowserRouter([
       {
         path: "recharge",
         element: <Recharge />,
+      },
+      {
+        path: "payment",
+        element: <PaymentPage />,
       },
       {
         path: "invitefriends",

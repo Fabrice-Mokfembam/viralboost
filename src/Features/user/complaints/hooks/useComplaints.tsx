@@ -5,7 +5,7 @@ import type { CreateComplaintPayload, UpdateComplaintPayload } from "../Types";
 // Hook to get all complaints with pagination
 export const useComplaints = (page: number = 1, perPage: number = 20) => {
   return useQuery({
-    queryKey: ["complaints", page, perPage],
+    queryKey: ["complaints"],
     queryFn: () => getComplaints(page, perPage),
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 2,
@@ -15,7 +15,7 @@ export const useComplaints = (page: number = 1, perPage: number = 20) => {
 // Hook to get a specific complaint
 export const useComplaint = (complaintId: number) => {
   return useQuery({
-    queryKey: ["complaint", complaintId],
+    queryKey: ["complaints"],
     queryFn: () => getComplaint(complaintId),
     enabled: !!complaintId, // Only run query if complaintId is provided
     staleTime: 5 * 60 * 1000, // 5 minutes
