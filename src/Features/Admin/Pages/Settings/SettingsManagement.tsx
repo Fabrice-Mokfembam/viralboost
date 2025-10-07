@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Save, RefreshCw, Shield, DollarSign, Users, Bell, Globe, Database } from 'lucide-react';
+import { Save, RefreshCw, DollarSign, Globe, Bitcoin, CreditCard, Coins } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { useAdminPaymentDetails, useUpdatePaymentDetails } from './Hooks';
 
 interface SettingsData {
   // General Settings
@@ -14,29 +15,6 @@ interface SettingsData {
   minimumPayoutThreshold: number;
   maximumPayoutAmount: number;
   withdrawalProcessingFee: number;
-  
-  // User Settings
-  allowUserRegistration: boolean;
-  requireEmailVerification: boolean;
-  requirePhoneVerification: boolean;
-  maxDailyTasksPerUser: number;
-  
-  // Notification Settings
-  emailNotifications: boolean;
-  smsNotifications: boolean;
-  pushNotifications: boolean;
-  adminEmailNotifications: boolean;
-  
-  // Security Settings
-  sessionTimeout: number;
-  maxLoginAttempts: number;
-  twoFactorAuth: boolean;
-  passwordMinLength: number;
-  
-  // API Settings
-  apiRateLimit: number;
-  apiKeyExpiration: number;
-  enableApiLogging: boolean;
 }
 
 const SettingsManagement: React.FC = () => {
@@ -51,47 +29,78 @@ const SettingsManagement: React.FC = () => {
     pointsToCurrencyRate: 0.01,
     minimumPayoutThreshold: 10.00,
     maximumPayoutAmount: 1000.00,
-    withdrawalProcessingFee: 2.50,
-    
-    // User Settings
-    allowUserRegistration: true,
-    requireEmailVerification: true,
-    requirePhoneVerification: false,
-    maxDailyTasksPerUser: 50,
-    
-    // Notification Settings
-    emailNotifications: true,
-    smsNotifications: false,
-    pushNotifications: true,
-    adminEmailNotifications: true,
-    
-    // Security Settings
-    sessionTimeout: 24,
-    maxLoginAttempts: 5,
-    twoFactorAuth: false,
-    passwordMinLength: 8,
-    
-    // API Settings
-    apiRateLimit: 1000,
-    apiKeyExpiration: 30,
-    enableApiLogging: true
+    withdrawalProcessingFee: 2.50
+  });
+
+  // Payment Details hooks
+  const { data: paymentDetailsResponse, isLoading: paymentDetailsLoading, error: paymentDetailsError } = useAdminPaymentDetails();
+  const updatePaymentDetailsMutation = useUpdatePaymentDetails();
+
+  // Get the first payment details record (assuming there's only one active set)
+  const paymentDetails = paymentDetailsResponse?.data?.[0];
+  
+  // Payment details form state
+  const [paymentFormData, setPaymentFormData] = useState({
+    bitcoin_address: '',
+    ethereum_address: '',
+    usdt_address: ''
   });
 
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('general');
 
+  // Initialize payment form data when payment details are loaded
+  React.useEffect(() => {
+    if (paymentDetails) {
+      setPaymentFormData({
+        bitcoin_address: paymentDetails.bitcoin_address || '',
+        ethereum_address: paymentDetails.ethereum_address || '',
+        usdt_address: paymentDetails.usdt_address || ''
+      });
+    }
+  }, [paymentDetails]);
+
   const handleInputChange = (field: keyof SettingsData, value: string | number | boolean) => {
     setSettings(prev => ({ ...prev, [field]: value }));
   };
 
+  const handlePaymentInputChange = (field: keyof typeof paymentFormData, value: string) => {
+    setPaymentFormData(prev => ({ ...prev, [field]: value }));
+  };
+
   const handleSave = async () => {
-    setIsSaving(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      toast.success('Settings saved successfully!');
-      setIsSaving(false);
-    }, 1500);
+    if (activeTab === 'financial') {
+      // Save payment details
+      if (!paymentDetails?.id) {
+        toast.error('No payment details found to update');
+        return;
+      }
+
+      if (!paymentFormData.bitcoin_address || !paymentFormData.ethereum_address || !paymentFormData.usdt_address) {
+        toast.error('Please fill in all payment address fields');
+        return;
+      }
+
+      try {
+        await updatePaymentDetailsMutation.mutateAsync({
+          id: paymentDetails.id,
+          payload: paymentFormData
+        });
+        toast.success('Payment details updated successfully!');
+      } catch (err) {
+        console.error('Payment details update error:', err);
+        toast.error('Failed to update payment details');
+      }
+    } else {
+      // Save general settings
+      setIsSaving(true);
+      
+      // Simulate API call
+      setTimeout(() => {
+        toast.success('Settings saved successfully!');
+        setIsSaving(false);
+      }, 1500);
+    }
   };
 
   const handleReset = () => {
@@ -101,11 +110,7 @@ const SettingsManagement: React.FC = () => {
 
   const tabs = [
     { id: 'general', label: 'General', icon: Globe },
-    { id: 'financial', label: 'Financial', icon: DollarSign },
-    { id: 'users', label: 'Users', icon: Users },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'security', label: 'Security', icon: Shield },
-    { id: 'api', label: 'API', icon: Database }
+    { id: 'financial', label: 'Financial', icon: DollarSign }
   ];
 
   const renderGeneralSettings = () => (
@@ -156,248 +161,105 @@ const SettingsManagement: React.FC = () => {
     </div>
   );
 
-  const renderFinancialSettings = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-text-primary mb-2">Points to Currency Rate ($)</label>
-          <input
-            type="number"
-            step="0.01"
-            value={settings.pointsToCurrencyRate}
-            onChange={(e) => handleInputChange('pointsToCurrencyRate', parseFloat(e.target.value))}
-            className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
-          />
+  const renderFinancialSettings = () => {
+    if (paymentDetailsLoading) {
+      return (
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-500"></div>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-text-primary mb-2">Minimum Payout Threshold ($)</label>
-          <input
-            type="number"
-            step="0.01"
-            value={settings.minimumPayoutThreshold}
-            onChange={(e) => handleInputChange('minimumPayoutThreshold', parseFloat(e.target.value))}
-            className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-text-primary mb-2">Maximum Payout Amount ($)</label>
-          <input
-            type="number"
-            step="0.01"
-            value={settings.maximumPayoutAmount}
-            onChange={(e) => handleInputChange('maximumPayoutAmount', parseFloat(e.target.value))}
-            className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-text-primary mb-2">Withdrawal Processing Fee ($)</label>
-          <input
-            type="number"
-            step="0.01"
-            value={settings.withdrawalProcessingFee}
-            onChange={(e) => handleInputChange('withdrawalProcessingFee', parseFloat(e.target.value))}
-            className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
-          />
-        </div>
-      </div>
-    </div>
-  );
+      );
+    }
 
-  const renderUserSettings = () => (
-    <div className="space-y-6">
-      <div className="space-y-4">
-        <div className="flex items-center space-x-3">
-          <input
-            type="checkbox"
-            id="allowUserRegistration"
-            checked={settings.allowUserRegistration}
-            onChange={(e) => handleInputChange('allowUserRegistration', e.target.checked)}
-            className="w-4 h-4 text-accent-cyan bg-bg-main border-border rounded focus:ring-accent-cyan"
-          />
-          <label htmlFor="allowUserRegistration" className="text-sm font-medium text-text-primary">
-            Allow User Registration
-          </label>
+    if (paymentDetailsError) {
+      return (
+        <div className="text-center py-12">
+          <p className="text-red-400">Error loading payment details</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors"
+          >
+            Retry
+          </button>
         </div>
-        
-        <div className="flex items-center space-x-3">
-          <input
-            type="checkbox"
-            id="requireEmailVerification"
-            checked={settings.requireEmailVerification}
-            onChange={(e) => handleInputChange('requireEmailVerification', e.target.checked)}
-            className="w-4 h-4 text-accent-cyan bg-bg-main border-border rounded focus:ring-accent-cyan"
-          />
-          <label htmlFor="requireEmailVerification" className="text-sm font-medium text-text-primary">
-            Require Email Verification
-          </label>
-        </div>
-        
-        <div className="flex items-center space-x-3">
-          <input
-            type="checkbox"
-            id="requirePhoneVerification"
-            checked={settings.requirePhoneVerification}
-            onChange={(e) => handleInputChange('requirePhoneVerification', e.target.checked)}
-            className="w-4 h-4 text-accent-cyan bg-bg-main border-border rounded focus:ring-accent-cyan"
-          />
-          <label htmlFor="requirePhoneVerification" className="text-sm font-medium text-text-primary">
-            Require Phone Verification
-          </label>
-        </div>
-      </div>
+      );
+    }
 
-      <div>
-        <label className="block text-sm font-medium text-text-primary mb-2">Max Daily Tasks Per User</label>
-        <input
-          type="number"
-          value={settings.maxDailyTasksPerUser}
-          onChange={(e) => handleInputChange('maxDailyTasksPerUser', parseInt(e.target.value))}
-          className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
-        />
-      </div>
-    </div>
-  );
-
-  const renderNotificationSettings = () => (
-    <div className="space-y-4">
-      <div className="flex items-center space-x-3">
-        <input
-          type="checkbox"
-          id="emailNotifications"
-          checked={settings.emailNotifications}
-          onChange={(e) => handleInputChange('emailNotifications', e.target.checked)}
-          className="w-4 h-4 text-accent-cyan bg-bg-main border-border rounded focus:ring-accent-cyan"
-        />
-        <label htmlFor="emailNotifications" className="text-sm font-medium text-text-primary">
-          Email Notifications
-        </label>
-      </div>
-      
-      <div className="flex items-center space-x-3">
-        <input
-          type="checkbox"
-          id="smsNotifications"
-          checked={settings.smsNotifications}
-          onChange={(e) => handleInputChange('smsNotifications', e.target.checked)}
-          className="w-4 h-4 text-accent-cyan bg-bg-main border-border rounded focus:ring-accent-cyan"
-        />
-        <label htmlFor="smsNotifications" className="text-sm font-medium text-text-primary">
-          SMS Notifications
-        </label>
-      </div>
-      
-      <div className="flex items-center space-x-3">
-        <input
-          type="checkbox"
-          id="pushNotifications"
-          checked={settings.pushNotifications}
-          onChange={(e) => handleInputChange('pushNotifications', e.target.checked)}
-          className="w-4 h-4 text-accent-cyan bg-bg-main border-border rounded focus:ring-accent-cyan"
-        />
-        <label htmlFor="pushNotifications" className="text-sm font-medium text-text-primary">
-          Push Notifications
-        </label>
-      </div>
-      
-      <div className="flex items-center space-x-3">
-        <input
-          type="checkbox"
-          id="adminEmailNotifications"
-          checked={settings.adminEmailNotifications}
-          onChange={(e) => handleInputChange('adminEmailNotifications', e.target.checked)}
-          className="w-4 h-4 text-accent-cyan bg-bg-main border-border rounded focus:ring-accent-cyan"
-        />
-        <label htmlFor="adminEmailNotifications" className="text-sm font-medium text-text-primary">
-          Admin Email Notifications
-        </label>
-      </div>
-    </div>
-  );
-
-  const renderSecuritySettings = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-text-primary mb-2">Session Timeout (hours)</label>
-          <input
-            type="number"
-            value={settings.sessionTimeout}
-            onChange={(e) => handleInputChange('sessionTimeout', parseInt(e.target.value))}
-            className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
-          />
+    if (!paymentDetails) {
+      return (
+        <div className="text-center py-12">
+          <div className="w-16 h-16 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <CreditCard size={32} className="text-gray-500" />
+          </div>
+          <h3 className="text-text-primary font-semibold mb-2">No Payment Details Found</h3>
+          <p className="text-text-muted text-sm">
+            Payment details need to be created first before they can be managed here.
+          </p>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-text-primary mb-2">Max Login Attempts</label>
-          <input
-            type="number"
-            value={settings.maxLoginAttempts}
-            onChange={(e) => handleInputChange('maxLoginAttempts', parseInt(e.target.value))}
-            className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-text-primary mb-2">Password Min Length</label>
-          <input
-            type="number"
-            value={settings.passwordMinLength}
-            onChange={(e) => handleInputChange('passwordMinLength', parseInt(e.target.value))}
-            className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
-          />
+      );
+    }
+
+    return (
+      <div className="space-y-6">
+        <div className="bg-bg-tertiary rounded-lg p-4 border border-gray-600/50">
+          <h3 className="text-lg font-semibold text-text-primary mb-4">Payment Addresses</h3>
+          <p className="text-text-muted text-sm mb-6">
+            Update the cryptocurrency addresses used for payments and withdrawals.
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-2">
+                <div className="flex items-center gap-2">
+                  <Bitcoin size={16} className="text-orange-500" />
+                  Bitcoin Address
+                </div>
+              </label>
+              <input
+                type="text"
+                value={paymentFormData.bitcoin_address}
+                onChange={(e) => handlePaymentInputChange('bitcoin_address', e.target.value)}
+                placeholder="Enter Bitcoin address"
+                className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-2">
+                <div className="flex items-center gap-2">
+                  <CreditCard size={16} className="text-blue-500" />
+                  Ethereum Address
+                </div>
+              </label>
+              <input
+                type="text"
+                value={paymentFormData.ethereum_address}
+                onChange={(e) => handlePaymentInputChange('ethereum_address', e.target.value)}
+                placeholder="Enter Ethereum address"
+                className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-2">
+                <div className="flex items-center gap-2">
+                  <Coins size={16} className="text-green-500" />
+                  USDT Address
+                </div>
+              </label>
+              <input
+                type="text"
+                value={paymentFormData.usdt_address}
+                onChange={(e) => handlePaymentInputChange('usdt_address', e.target.value)}
+                placeholder="Enter USDT address"
+                className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
+              />
+            </div>
+          </div>
         </div>
       </div>
+    );
+  };
 
-      <div className="flex items-center space-x-3">
-        <input
-          type="checkbox"
-          id="twoFactorAuth"
-          checked={settings.twoFactorAuth}
-          onChange={(e) => handleInputChange('twoFactorAuth', e.target.checked)}
-          className="w-4 h-4 text-accent-cyan bg-bg-main border-border rounded focus:ring-accent-cyan"
-        />
-        <label htmlFor="twoFactorAuth" className="text-sm font-medium text-text-primary">
-          Enable Two-Factor Authentication
-        </label>
-      </div>
-    </div>
-  );
-
-  const renderApiSettings = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-text-primary mb-2">API Rate Limit (requests/hour)</label>
-          <input
-            type="number"
-            value={settings.apiRateLimit}
-            onChange={(e) => handleInputChange('apiRateLimit', parseInt(e.target.value))}
-            className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-text-primary mb-2">API Key Expiration (days)</label>
-          <input
-            type="number"
-            value={settings.apiKeyExpiration}
-            onChange={(e) => handleInputChange('apiKeyExpiration', parseInt(e.target.value))}
-            className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
-          />
-        </div>
-      </div>
-
-      <div className="flex items-center space-x-3">
-        <input
-          type="checkbox"
-          id="enableApiLogging"
-          checked={settings.enableApiLogging}
-          onChange={(e) => handleInputChange('enableApiLogging', e.target.checked)}
-          className="w-4 h-4 text-accent-cyan bg-bg-main border-border rounded focus:ring-accent-cyan"
-        />
-        <label htmlFor="enableApiLogging" className="text-sm font-medium text-text-primary">
-          Enable API Logging
-        </label>
-      </div>
-    </div>
-  );
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -405,14 +267,6 @@ const SettingsManagement: React.FC = () => {
         return renderGeneralSettings();
       case 'financial':
         return renderFinancialSettings();
-      case 'users':
-        return renderUserSettings();
-      case 'notifications':
-        return renderNotificationSettings();
-      case 'security':
-        return renderSecuritySettings();
-      case 'api':
-        return renderApiSettings();
       default:
         return renderGeneralSettings();
     }
@@ -438,11 +292,11 @@ const SettingsManagement: React.FC = () => {
           </button>
           <button
             onClick={handleSave}
-            disabled={isSaving}
+            disabled={isSaving || updatePaymentDetailsMutation.isPending}
             className="flex items-center gap-2 px-4 py-2 bg-accent-cyan text-text-primary rounded-lg hover:bg-cyan-600 transition-colors disabled:opacity-50"
           >
             <Save size={16} />
-            {isSaving ? 'Saving...' : 'Save Changes'}
+            {isSaving || updatePaymentDetailsMutation.isPending ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { CreditCard, Repeat, Settings, User, Crown, Mail, ChevronRight, Gift, Key, HelpCircle, Star, TrendingUp } from 'lucide-react';
+import { CreditCard, Repeat, Settings, User, Crown, Mail, ChevronRight, Gift, Key, HelpCircle, Star, TrendingUp, Receipt } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getUserData } from '../../auth/Utils/authUtils';
 import { useGetProfile } from '../../auth/Hooks/useAuth';
@@ -37,6 +37,12 @@ const Profile = () => {
       icon: <HelpCircle size={20} className="text-green-400" />, 
       description: 'Get support and answers',
       action: () => navigate('/v/helpcenter')
+    },
+    { 
+      name: 'Account Details', 
+      icon: <Settings size={20} className="text-purple-400" />, 
+      description: 'View your account information',
+      action: () => navigate('/v/accountdetails')
     }
   ];
 
@@ -128,14 +134,14 @@ const Profile = () => {
               </button>
               
               <button
-                onClick={() => navigate('/v/accountdetails')}
+                onClick={() => navigate('/v/transactions')}
                 className="group bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 rounded-xl p-4 shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
               >
                 <div className="flex flex-col items-center space-y-2">
                   <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                    <Settings size={20} className="text-white" />
+                    <Receipt size={20} className="text-white" />
                   </div>
-                  <span className="text-white text-sm font-semibold">Settings</span>
+                  <span className="text-white text-sm font-semibold">Transactions</span>
                 </div>
               </button>
               

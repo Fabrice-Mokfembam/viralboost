@@ -5,6 +5,7 @@ import { ImageUpload } from '../../../../Components/ImageUpload';
 import { useCloudinaryUpload } from '../../../../Hooks/useCloudinaryUpload';
 import { useCreatePayment } from '../hooks/usePayments';
 import type { CreatePaymentPayload } from '../Types';
+import { usePaymentDetails } from '../../../Admin/Pages/Settings/Hooks';
 
 interface PaymentMethodConfig {
   id: string;
@@ -19,14 +20,22 @@ const PaymentPage = () => {
   const location = useLocation();
   const { error: uploadError } = useCloudinaryUpload();
   const createPaymentMutation = useCreatePayment();
+  const { data: paymentDetails, isLoading: paymentDetailsLoading, error: paymentDetailsError } = usePaymentDetails();
+
+  console.log('paymentDetails', paymentDetails);
   
   // Get payment method and amount from location state
   const { method, amount } = location.state || { method: 'USDT', amount: '0' };
+
+  console.log('method', method);
   
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [copiedAddress, setCopiedAddress] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  // Get the first payment details record from the array
+  const firstPaymentDetails = paymentDetails?.data && Array.isArray(paymentDetails.data) ? paymentDetails.data[0] : null;
 
   // Payment method configurations
   const paymentMethods: Record<string, PaymentMethodConfig> = {
@@ -34,48 +43,57 @@ const PaymentPage = () => {
       id: 'USDT',
       name: 'USDT (Tether)',
       icon: <Coins size={24} className="text-green-500" />,
-      address: 'TQn9Y2khEsLJW1ChVWFMSMeRDow5KcbLSE', // Example address
+      address: firstPaymentDetails?.usdt_address || 'TQn9Y2khEsLJW1ChVWFMSMeRDow5KcbLSE', // Use real address or fallback
       instructions: [
         'Open your USDT wallet app (Trust Wallet, MetaMask, etc.)',
-        'Select USDT (TRC20 network recommended)',
-        'Copy the payment address below',
-        'Paste the address in your wallet',
-        'Enter the exact amount: $' + amount,
-        'Complete the transaction',
-        'Take a screenshot of the transaction confirmation',
-        'Upload the screenshot as proof of payment'
+        'Select USDT and ensure you\'re on TRC20 network',
+        'Tap "Send" or "Transfer" in your wallet',
+        'Copy the TRC20 address provided below',
+        'Paste the address in the recipient field',
+        'Enter exactly $' + amount + ' USDT (1:1 USD ratio)',
+        'Double-check the network is TRC20 before confirming',
+        'Complete the transaction and wait for confirmation',
+        'Take a screenshot showing the transaction hash',
+        'Upload the screenshot as payment proof'
       ]
     },
     Ethereum: {
       id: 'Ethereum',
       name: 'Ethereum (ETH)',
       icon: <CreditCard size={24} className="text-blue-500" />,
-      address: '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6', // Example address
+      address: firstPaymentDetails?.ethereum_address || '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6', // Use real address or fallback
       instructions: [
-        'Open your Ethereum wallet app (MetaMask, Trust Wallet, etc.)',
-        'Select Ethereum (ETH)',
-        'Copy the payment address below',
-        'Paste the address in your wallet',
-        'Enter the exact amount: $' + amount + ' worth of ETH',
-        'Complete the transaction',
-        'Take a screenshot of the transaction confirmation',
-        'Upload the screenshot as proof of payment'
+        'Open your Ethereum wallet (MetaMask, Trust Wallet, etc.)',
+        'Switch to Ethereum Mainnet network',
+        'Click "Send" and select ETH as the token',
+        'Copy the Ethereum address provided below',
+        'Paste the address in the recipient field',
+        'Enter the ETH amount equivalent to $' + amount + ' USD',
+        'Check current ETH price and adjust amount accordingly',
+        'Review gas fees and confirm the transaction',
+        'Wait for blockchain confirmation (may take 1-5 minutes)',
+        'Screenshot the transaction details with hash',
+        'Upload the screenshot as payment proof'
       ]
     },
-    Bigcoin: {
-      id: 'Bigcoin',
-      name: 'Bigcoin',
+    Bitcoin: {
+      id: 'Bitcoin',
+      name: 'Bitcoin (BTC)',
       icon: <Smartphone size={24} className="text-orange-500" />,
-      address: 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh', // Example address
+      address: firstPaymentDetails?.bitcoin_address || 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh', // Use real address or fallback
       instructions: [
-        'Open your Bigcoin wallet app',
-        'Select Bigcoin (BTC)',
-        'Copy the payment address below',
-        'Paste the address in your wallet',
-        'Enter the exact amount: $' + amount + ' worth of BTC',
-        'Complete the transaction',
-        'Take a screenshot of the transaction confirmation',
-        'Upload the screenshot as proof of payment'
+        'Open your Bitcoin wallet app (Electrum, Exodus, etc.)',
+        'Select Bitcoin (BTC) from your wallet',
+        'Click "Send Bitcoin" or "Transfer"',
+        'Copy the Bitcoin address provided below',
+        'Paste the address in the recipient field',
+        'Enter the BTC amount equivalent to $' + amount + ' USD',
+        'Check current Bitcoin price and calculate exact BTC amount',
+        'Set transaction fee (choose appropriate speed)',
+        'Review all details carefully before confirming',
+        'Complete the transaction and wait for network confirmation',
+        'Screenshot the transaction with Bitcoin transaction ID',
+        'Upload the screenshot as payment proof'
       ]
     }
   };
@@ -152,6 +170,44 @@ const PaymentPage = () => {
           <p className="text-sm text-text-muted">
             Redirecting to recharge page...
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Loading state for payment details
+  if (paymentDetailsLoading) {
+    return (
+      <div className="min-h-screen bg-bg-main flex items-center justify-center p-6">
+        <div className="bg-bg-secondary rounded-2xl p-8 max-w-md w-full text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
+          <h2 className="text-xl font-bold text-text-primary mb-2">Loading Payment Details</h2>
+          <p className="text-text-muted">
+            Please wait while we fetch the payment addresses...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state for payment details
+  if (paymentDetailsError) {
+    return (
+      <div className="min-h-screen bg-bg-main flex items-center justify-center p-6">
+        <div className="bg-bg-secondary rounded-2xl p-8 max-w-md w-full text-center border border-red-500/50">
+          <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertCircle size={32} className="text-red-500" />
+          </div>
+          <h2 className="text-xl font-bold text-text-primary mb-2">Error Loading Payment Details</h2>
+          <p className="text-text-muted mb-4">
+            Unable to load payment addresses. Please try again.
+          </p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors"
+          >
+            Retry
+          </button>
         </div>
       </div>
     );
