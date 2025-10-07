@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '../Hooks/useAdminAuth';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 
 interface AdminSidebarProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface AdminSidebarProps {
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose, currentPath }) => {
   const { logout } = useAdminAuth();
   const navigate = useNavigate();
+  const [transactionsOpen, setTransactionsOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -84,12 +86,23 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose, currentPat
     },
     {
       name: 'Transactions',
-      href: '/admin/dashboard/transactions',
+      href: '#',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
         </svg>
       ),
+      hasSubmenu: true,
+      submenu: [
+        {
+          name: 'Payments',
+          href: '/admin/dashboard/transactions',
+        },
+        {
+          name: 'Withdrawals',
+          href: '/admin/dashboard/withdrawals',
+        },
+      ],
     },
     {
       name: 'Reports',
@@ -142,7 +155,56 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose, currentPat
           {/* Navigation */}
           <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
             {navigation.map((item) => {
-              const isActive = currentPath === item.href;
+              const isActive = currentPath === item.href || (item.submenu && item.submenu.some(sub => currentPath === sub.href));
+              const isTransactionsActive = item.name === 'Transactions' && (currentPath.includes('/transactions') || currentPath.includes('/withdrawals'));
+              
+              if (item.hasSubmenu) {
+                return (
+                  <div key={item.name}>
+                    <button
+                      onClick={() => setTransactionsOpen(!transactionsOpen)}
+                      className={`
+                        flex items-center justify-between w-full px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
+                        ${isTransactionsActive 
+                          ? 'bg-accent-cyan text-white' 
+                          : 'text-text-secondary hover:bg-bg-tertiary hover:text-text-primary'
+                        }
+                      `}
+                    >
+                      <div className="flex items-center">
+                        <span className="mr-3">{item.icon}</span>
+                        {item.name}
+                      </div>
+                      {transactionsOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                    </button>
+                    
+                    {transactionsOpen && (
+                      <div className="ml-8 mt-2 space-y-1">
+                        {item.submenu?.map((subItem) => {
+                          const isSubActive = currentPath === subItem.href;
+                          return (
+                            <Link
+                              key={subItem.name}
+                              to={subItem.href}
+                              className={`
+                                flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200
+                                ${isSubActive 
+                                  ? 'bg-accent-cyan text-white' 
+                                  : 'text-text-secondary hover:bg-bg-tertiary hover:text-text-primary'
+                                }
+                              `}
+                              onClick={onClose}
+                            >
+                              {subItem.name}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+              
               return (
                 <Link
                   key={item.name}

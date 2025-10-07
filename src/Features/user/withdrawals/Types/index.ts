@@ -1,20 +1,18 @@
-// Payment model types
-export interface Payment {
+// Withdrawal model types
+export interface Withdrawal {
   id: number;
   uuid: string;
   user_uuid: string;
-  picture_path: string;
-  amount: string;
-  description?: string;
-  is_approved: boolean;
-  conversion_amount: string;
-  platform: 'Bitcoin' | 'USDT' | 'Ethereum';
+  withdrawal_amount: string;
+  platform?: string;
+  picture_path?: string;
+  is_completed: boolean;
   created_at: string;
   updated_at: string;
-  user?: PaymentUser;
+  user?: WithdrawalUser;
 }
 
-export interface PaymentUser {
+export interface WithdrawalUser {
   uuid: string;
   name: string;
   email: string;
@@ -44,7 +42,7 @@ export interface PaginationLinks {
 
 export interface PaginationInfo {
   current_page: number;
-  data: Payment[];
+  data: Withdrawal[];
   first_page_url: string;
   from: number;
   last_page: number;
@@ -59,57 +57,78 @@ export interface PaginationInfo {
 }
 
 // Request payload types
-export interface CreatePaymentPayload {
-  amount: number;
-  description?: string;
-  picture_path: string;
-  conversion_amount?: number;
-  platform: 'Bitcoin' | 'USDT' | 'Ethereum';
+export interface CreateWithdrawalPayload {
+  withdrawal_amount: number;
+  platform?: string;
+  picture_path?: string;
 }
 
-export interface GetPaymentsQueryParams {
-  is_approved?: boolean;
+export interface UpdateWithdrawalPayload {
+  withdrawal_amount?: number;
+  platform?: string;
+  picture_path?: string;
+}
+
+export interface GetWithdrawalsQueryParams {
+  is_completed?: boolean;
+  platform?: string;
+  page?: number;
+}
+
+export interface GetAdminWithdrawalsQueryParams {
+  is_completed?: boolean;
+  platform?: string;
+  user_uuid?: string;
   min_amount?: number;
-  platform?: 'Bitcoin' | 'USDT' | 'Ethereum';
   page?: number;
 }
 
 // API Response types
-export interface GetPaymentsResponse {
+export interface GetWithdrawalsResponse {
   success: boolean;
   data: PaginationInfo;
   message: string;
 }
 
-export interface CreatePaymentResponse {
+export interface CreateWithdrawalResponse {
   success: boolean;
-  data: Payment;
+  data: Withdrawal;
   message: string;
 }
 
-export interface GetPaymentResponse {
+export interface GetWithdrawalResponse {
   success: boolean;
-  data: Payment;
+  data: Withdrawal;
   message: string;
 }
 
-export interface DeletePaymentResponse {
+export interface DeleteWithdrawalResponse {
   success: boolean;
   message: string;
 }
 
-export interface ApprovePaymentResponse {
+export interface CompleteWithdrawalResponse {
   success: boolean;
   data: {
-    payment: Payment;
+    withdrawal: Withdrawal;
     account: Account;
   };
   message: string;
 }
 
-// Error response type
-export interface PaymentErrorResponse {
+export interface UpdateWithdrawalResponse {
+  success: boolean;
+  data: Withdrawal;
+  message: string;
+}
+
+// Error response types
+export interface WithdrawalErrorResponse {
   success: false;
   message: string;
   errors?: Record<string, string[]>;
+  current_balance?: string;
+  requested_amount?: string;
+  user_balance?: string;
+  withdrawal_amount?: string;
 }

@@ -1,55 +1,55 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { createPayment, getPayments, getPayment, updatePayment, deletePayment, getUserPayments } from "../api";
-import type { CreatePaymentPayload, UpdatePaymentPayload } from "../Types";
+import { 
+  getPayments, 
+  createPayment, 
+  getPayment, 
+  deletePayment, 
+  approvePayment 
+} from "../api";
+import type { 
+  CreatePaymentPayload, 
+  GetPaymentsQueryParams 
+} from "../Types";
 
 // Query Keys
-export const PAYMENT_QUERY_KEYS = {
-  payments: ['payments'] as const,
-  paymentById: (id: number) => ['payments', id] as const,
-  userPayments: (page: number, perPage: number) => ['user-payments', page, perPage] as const,
+export const paymentKeys = {
+  all: ['payments'] as const,
+  lists: () => [...paymentKeys.all, 'list'] as const,
+  list: (params?: GetPaymentsQueryParams) => [...paymentKeys.lists(), params] as const,
+  details: () => [...paymentKeys.all, 'detail'] as const,
+  detail: (uuid: string) => [...paymentKeys.details(), uuid] as const,
 };
 
-// Hook to get all payments with pagination
-export const usePayments = (page: number = 1, perPage: number = 20) => {
+// GET /api/v1/payments - List Payments
+export const usePayments = (params?: GetPaymentsQueryParams) => {
   return useQuery({
-    queryKey: PAYMENT_QUERY_KEYS.payments,
-    queryFn: () => getPayments(page, perPage),
+    queryKey: paymentKeys.list(params),
+    queryFn: () => getPayments(params),
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    retry: 2,
+  });
+};
+
+// GET /api/v1/payments/{uuid} - Get Single Payment
+export const usePayment = (uuid: string) => {
+  return useQuery({
+    queryKey: paymentKeys.detail(uuid),
+    queryFn: () => getPayment(uuid),
+    enabled: !!uuid,
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 2,
   });
 };
 
-// Hook to get user's payments
-export const useUserPayments = (page: number = 1, perPage: number = 20) => {
-  return useQuery({
-    queryKey: PAYMENT_QUERY_KEYS.userPayments(page, perPage),
-    queryFn: () => getUserPayments(page, perPage),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: 2,
-  });
-};
-
-// Hook to get a specific payment
-export const usePayment = (paymentId: number) => {
-  return useQuery({
-    queryKey: PAYMENT_QUERY_KEYS.paymentById(paymentId),
-    queryFn: () => getPayment(paymentId),
-    enabled: !!paymentId, // Only run query if paymentId is provided
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: 2,
-  });
-};
-
-// Hook to create a new payment
+// POST /api/v1/payments - Create Payment
 export const useCreatePayment = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
     mutationFn: (paymentData: CreatePaymentPayload) => createPayment(paymentData),
     onSuccess: () => {
-      // Invalidate and refetch payments data
-      queryClient.invalidateQueries({ queryKey: PAYMENT_QUERY_KEYS.payments });
-      queryClient.invalidateQueries({ queryKey: ['user-payments'] });
+      // Invalidate payments list to refetch
+      queryClient.invalidateQueries({ queryKey: paymentKeys.lists() });
     },
     onError: (error) => {
       console.error("Failed to create payment:", error);
@@ -57,39 +57,37 @@ export const useCreatePayment = () => {
   });
 };
 
-// Hook to update a payment
-export const useUpdatePayment = () => {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: ({ paymentId, updateData }: { paymentId: number; updateData: UpdatePaymentPayload }) => 
-      updatePayment(paymentId, updateData),
-    onSuccess: (_, { paymentId }) => {
-      // Invalidate and refetch payments data
-      queryClient.invalidateQueries({ queryKey: PAYMENT_QUERY_KEYS.payments });
-      queryClient.invalidateQueries({ queryKey: ['user-payments'] });
-      // Update specific payment cache
-      queryClient.invalidateQueries({ queryKey: PAYMENT_QUERY_KEYS.paymentById(paymentId) });
-    },
-    onError: (error) => {
-      console.error("Failed to update payment:", error);
-    },
-  });
-};
-
-// Hook to delete a payment
+// DELETE /api/v1/payments/{uuid} - Delete Payment
 export const useDeletePayment = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (paymentId: number) => deletePayment(paymentId),
-    onSuccess: () => {
-      // Invalidate and refetch payments data
-      queryClient.invalidateQueries({ queryKey: PAYMENT_QUERY_KEYS.payments });
-      queryClient.invalidateQueries({ queryKey: ['user-payments'] });
+    mutationFn: (uuid: string) => deletePayment(uuid),
+    onSuccess: (_, uuid) => {
+      // Invalidate payments list and specific payment detail
+      queryClient.invalidateQueries({ queryKey: paymentKeys.lists() });
+      queryClient.removeQueries({ queryKey: paymentKeys.detail(uuid) });
     },
     onError: (error) => {
       console.error("Failed to delete payment:", error);
+    },
+  });
+};
+
+// POST /api/v1/payments/{uuid}/approve - Approve Payment
+export const useApprovePayment = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (uuid: string) => approvePayment(uuid),
+    onSuccess: (_, uuid) => {
+      // Invalidate payments list, specific payment detail, and account data
+      queryClient.invalidateQueries({ queryKey: paymentKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: paymentKeys.detail(uuid) });
+      queryClient.invalidateQueries({ queryKey: ["user-account"] });
+    },
+    onError: (error) => {
+      console.error("Failed to approve payment:", error);
     },
   });
 };

@@ -115,7 +115,7 @@ const PaymentPage = () => {
       amount: amount,
       description: `Payment of $${amount} via ${method}`,
       conversion_amount: amount, // Assuming 1:1 conversion for now
-      conversion_currency: 'USD'
+      platform: method as 'Bitcoin' | 'USDT' | 'Ethereum'
     };
 
     // Console log the values to be submitted

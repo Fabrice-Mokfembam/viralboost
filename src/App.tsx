@@ -45,6 +45,9 @@ import TaskAdminDetail from './Features/Admin/Pages/Tasks/TaskDetail.tsx';
 import ComplaintsManagement from './Features/Admin/Pages/Complaints/ComplaintsManagement.tsx';
 import NotificationsManagement from './Features/Admin/Pages/Notifications/NotificationsManagement.tsx';
 import TransactionsManagement from './Features/Admin/Pages/Transactions/TransactionsManagement.tsx';
+import PaymentDetail from './Features/Admin/Pages/Transactions/PaymentDetail.tsx';
+import WithdrawalsManagement from './Features/Admin/Pages/Transactions/WithdrawalsManagement.tsx';
+import WithdrawalDetail from './Features/Admin/Pages/Transactions/WithdrawalDetail.tsx';
 import ReportsManagement from './Features/Admin/Pages/Reports/ReportsManagement.tsx';
 import SettingsManagement from './Features/Admin/Pages/Settings/SettingsManagement.tsx';
 import MembershipManagement from './Features/Admin/Pages/Membership/MembershipManagement.tsx';
@@ -267,6 +270,18 @@ const router = createBrowserRouter([
       {
         path: "transactions",
         element: <TransactionsManagement />,
+      },
+      {
+        path: "payments/:uuid",
+        element: <PaymentDetail />,
+      },
+      {
+        path: "withdrawals",
+        element: <WithdrawalsManagement />,
+      },
+      {
+        path: "withdrawals/:uuid",
+        element: <WithdrawalDetail />,
       },
       {
         path: "reports",

@@ -1,77 +1,77 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, CheckCircle, Trash2, DollarSign, Calendar, User } from 'lucide-react';
-import { useAdminPayments, useDeleteAdminPayment, useApproveAdminPayment } from '../../Hooks/usePayments';
+import { useAdminWithdrawals, useDeleteAdminWithdrawal, useCompleteAdminWithdrawal } from '../../Hooks/useWithdrawals';
 import { toast } from 'react-toastify';
-import type { Payment, GetPaymentsQueryParams } from '../../../user/Payments/Types';
+import type { Withdrawal, GetAdminWithdrawalsQueryParams } from '../../../user/withdrawals/Types';
 
-const TransactionsManagement: React.FC = () => {
+const WithdrawalsManagement: React.FC = () => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-  const [filters, setFilters] = useState<GetPaymentsQueryParams>({});
-  const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; payment: Payment | null }>({ show: false, payment: null });
-  const [approveConfirm, setApproveConfirm] = useState<{ show: boolean; payment: Payment | null }>({ show: false, payment: null });
+  const [filters, setFilters] = useState<GetAdminWithdrawalsQueryParams>({});
+  const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; withdrawal: Withdrawal | null }>({ show: false, withdrawal: null });
+  const [completeConfirm, setCompleteConfirm] = useState<{ show: boolean; withdrawal: Withdrawal | null }>({ show: false, withdrawal: null });
 
-  const { data: paymentsResponse, isLoading, error } = useAdminPayments({ ...filters, page: currentPage });
-  const { mutate: deletePayment, isPending: isDeleting } = useDeleteAdminPayment();
-  const { mutate: approvePayment, isPending: isApproving } = useApproveAdminPayment();
+  const { data: withdrawalsResponse, isLoading, error } = useAdminWithdrawals({ ...filters, page: currentPage });
+  const { mutate: deleteWithdrawal, isPending: isDeleting } = useDeleteAdminWithdrawal();
+  const { mutate: completeWithdrawal, isPending: isCompleting } = useCompleteAdminWithdrawal();
 
-  const payments = paymentsResponse?.data?.data || [];
-  const pagination = paymentsResponse?.data;
+  const withdrawals = withdrawalsResponse?.data?.data || [];
+  const pagination = withdrawalsResponse?.data;
 
-  const handleFilterChange = (key: keyof GetPaymentsQueryParams, value: string) => {
+  const handleFilterChange = (key: keyof GetAdminWithdrawalsQueryParams, value: string) => {
     setFilters({ ...filters, [key]: value || undefined });
     setCurrentPage(1);
   };
 
-  const handleViewPayment = (uuid: string) => {
-    navigate(`/admin/dashboard/payments/${uuid}`);
+  const handleViewWithdrawal = (uuid: string) => {
+    navigate(`/admin/dashboard/withdrawals/${uuid}`);
   };
 
-  const handleDeletePayment = (payment: Payment) => {
-    setDeleteConfirm({ show: true, payment });
+  const handleDeleteWithdrawal = (withdrawal: Withdrawal) => {
+    setDeleteConfirm({ show: true, withdrawal });
   };
 
-  const handleApprovePayment = (payment: Payment) => {
-    setApproveConfirm({ show: true, payment });
+  const handleCompleteWithdrawal = (withdrawal: Withdrawal) => {
+    setCompleteConfirm({ show: true, withdrawal });
   };
 
   const confirmDelete = () => {
-    if (deleteConfirm.payment) {
-      deletePayment(deleteConfirm.payment.uuid, {
+    if (deleteConfirm.withdrawal) {
+      deleteWithdrawal(deleteConfirm.withdrawal.uuid, {
         onSuccess: () => {
-          toast.success('Payment deleted successfully');
-          setDeleteConfirm({ show: false, payment: null });
+          toast.success('Withdrawal deleted successfully');
+          setDeleteConfirm({ show: false, withdrawal: null });
         },
         onError: () => {
-          toast.error('Failed to delete payment');
+          toast.error('Failed to delete withdrawal');
         }
       });
     }
   };
 
-  const confirmApprove = () => {
-    if (approveConfirm.payment) {
-      approvePayment(approveConfirm.payment.uuid, {
+  const confirmComplete = () => {
+    if (completeConfirm.withdrawal) {
+      completeWithdrawal(completeConfirm.withdrawal.uuid, {
         onSuccess: () => {
-          toast.success('Payment approved successfully');
-          setApproveConfirm({ show: false, payment: null });
+          toast.success('Withdrawal completed successfully');
+          setCompleteConfirm({ show: false, withdrawal: null });
         },
         onError: () => {
-          toast.error('Failed to approve payment');
+          toast.error('Failed to complete withdrawal');
         }
       });
     }
   };
 
-  const getStatusBadge = (isApproved: boolean) => {
+  const getStatusBadge = (isCompleted: boolean) => {
     return (
       <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-        isApproved 
+        isCompleted 
           ? 'bg-green-100 text-green-800' 
           : 'bg-yellow-100 text-yellow-800'
       }`}>
-        {isApproved ? 'Approved' : 'Pending'}
+        {isCompleted ? 'Completed' : 'Pending'}
       </span>
     );
   };
@@ -90,27 +90,27 @@ const TransactionsManagement: React.FC = () => {
     <div className="space-y-6">
       {/* Page Header */}
         <div>
-        <h1 className="text-2xl font-bold text-text-primary">Payment Transactions</h1>
+        <h1 className="text-2xl font-bold text-text-primary">Withdrawal Requests</h1>
           <p className="text-text-secondary mt-1">
-          Monitor and manage all user payment transactions
+          Monitor and manage all user withdrawal requests
         </p>
       </div>
 
       {/* Filters */}
       <div className="bg-bg-secondary rounded-lg p-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div>
             <label className="block text-sm font-medium text-text-primary mb-2">
               Status
             </label>
             <select
-              value={filters.is_approved?.toString() || ''}
-              onChange={(e) => handleFilterChange('is_approved', e.target.value)}
+              value={filters.is_completed?.toString() || ''}
+              onChange={(e) => handleFilterChange('is_completed', e.target.value)}
               className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
             >
               <option value="">All Statuses</option>
               <option value="false">Pending</option>
-              <option value="true">Approved</option>
+              <option value="true">Completed</option>
             </select>
           </div>
           
@@ -127,6 +127,8 @@ const TransactionsManagement: React.FC = () => {
               <option value="Bitcoin">Bitcoin</option>
               <option value="USDT">USDT</option>
               <option value="Ethereum">Ethereum</option>
+              <option value="PayPal">PayPal</option>
+              <option value="Bank Transfer">Bank Transfer</option>
             </select>
           </div>
           
@@ -139,6 +141,19 @@ const TransactionsManagement: React.FC = () => {
               value={filters.min_amount || ''}
               onChange={(e) => handleFilterChange('min_amount', e.target.value)}
               placeholder="Minimum amount"
+              className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-text-primary mb-2">
+              User UUID
+            </label>
+            <input
+              type="text"
+              value={filters.user_uuid || ''}
+              onChange={(e) => handleFilterChange('user_uuid', e.target.value)}
+              placeholder="User UUID"
               className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
             />
           </div>
@@ -157,7 +172,7 @@ const TransactionsManagement: React.FC = () => {
         </div>
       </div>
 
-      {/* Payments Table */}
+      {/* Withdrawals Table */}
       <div className="bg-bg-secondary rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-border">
@@ -170,13 +185,10 @@ const TransactionsManagement: React.FC = () => {
                   Amount
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                  Proof
+                  Platform
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                   Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                  Platform
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                   Date
@@ -189,28 +201,28 @@ const TransactionsManagement: React.FC = () => {
             <tbody className="bg-bg-secondary divide-y divide-border">
               {isLoading ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-text-secondary">
+                  <td colSpan={6} className="px-6 py-8 text-center text-text-secondary">
                     <div className="flex items-center justify-center">
                       <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-accent-cyan"></div>
-                      <span className="ml-2">Loading payments...</span>
+                      <span className="ml-2">Loading withdrawals...</span>
                     </div>
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-red-500">
-                    Error loading payments. Please try again.
+                  <td colSpan={6} className="px-6 py-8 text-center text-red-500">
+                    Error loading withdrawals. Please try again.
                   </td>
                 </tr>
-              ) : payments.length === 0 ? (
+              ) : withdrawals.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-text-secondary">
-                    No payments found.
+                  <td colSpan={6} className="px-6 py-8 text-center text-text-secondary">
+                    No withdrawals found.
                   </td>
                 </tr>
               ) : (
-                payments.map((payment: Payment) => (
-                  <tr key={payment.uuid} className="hover:bg-bg-tertiary">
+                withdrawals.map((withdrawal: Withdrawal) => (
+                  <tr key={withdrawal.uuid} className="hover:bg-bg-tertiary">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
@@ -220,7 +232,10 @@ const TransactionsManagement: React.FC = () => {
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-text-primary">
-                            {payment.user?.name || 'Unknown User'}
+                            {withdrawal.user?.name || 'Unknown User'}
+                          </div>
+                          <div className="text-sm text-text-secondary">
+                            {withdrawal.user?.email || 'No email'}
                           </div>
                         </div>
                       </div>
@@ -229,64 +244,48 @@ const TransactionsManagement: React.FC = () => {
                       <div className="flex items-center">
                         <DollarSign size={16} className="text-green-500 mr-1" />
                         <span className="text-sm font-medium text-text-primary">
-                          ${payment.amount}
+                          ${withdrawal.withdrawal_amount}
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        {payment.picture_path ? (
-                          <img
-                            src={payment.picture_path}
-                            alt="Payment proof"
-                            className="h-12 w-12 rounded-lg object-cover cursor-pointer hover:opacity-80"
-                            onClick={() => window.open(payment.picture_path, '_blank')}
-                          />
-                        ) : (
-                          <div className="h-12 w-12 rounded-lg bg-gray-200 flex items-center justify-center">
-                            <span className="text-xs text-gray-500">No Image</span>
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {getStatusBadge(payment.is_approved)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
                       <span className="text-sm text-text-primary">
-                        {payment.platform || 'N/A'}
+                        {withdrawal.platform || 'N/A'}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {getStatusBadge(withdrawal.is_completed)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <Calendar size={14} className="text-text-muted mr-1" />
                         <span className="text-sm text-text-secondary">
-                          {formatDate(payment.created_at)}
+                          {formatDate(withdrawal.created_at)}
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
                         <button 
-                          onClick={() => handleViewPayment(payment.uuid)}
+                          onClick={() => handleViewWithdrawal(withdrawal.uuid)}
                           className="text-accent-cyan hover:text-accent-cyan-hover disabled:opacity-50"
-                          disabled={isDeleting || isApproving}
+                          disabled={isDeleting || isCompleting}
                         >
                           <Eye size={16} />
                         </button>
-                        {!payment.is_approved && (
+                        {!withdrawal.is_completed && (
                           <>
                             <button 
-                              onClick={() => handleApprovePayment(payment)}
+                              onClick={() => handleCompleteWithdrawal(withdrawal)}
                               className="text-green-600 hover:text-green-700 disabled:opacity-50"
-                              disabled={isDeleting || isApproving}
+                              disabled={isDeleting || isCompleting}
                             >
                               <CheckCircle size={16} />
                             </button>
                             <button 
-                              onClick={() => handleDeletePayment(payment)}
+                              onClick={() => handleDeleteWithdrawal(withdrawal)}
                               className="text-red-600 hover:text-red-700 disabled:opacity-50"
-                              disabled={isDeleting || isApproving}
+                              disabled={isDeleting || isCompleting}
                             >
                               <Trash2 size={16} />
                             </button>
@@ -358,17 +357,17 @@ const TransactionsManagement: React.FC = () => {
       {deleteConfirm.show && (
         <div 
           className="fixed inset-0 bg-black/20 flex items-center justify-center z-50"
-          onClick={isDeleting ? undefined : () => setDeleteConfirm({ show: false, payment: null })}
+          onClick={isDeleting ? undefined : () => setDeleteConfirm({ show: false, withdrawal: null })}
         >
           <div 
             className="bg-bg-secondary rounded-lg p-6 max-w-md w-full mx-4"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-lg font-semibold text-text-primary mb-4">
-              Confirm Payment Deletion
+              Confirm Withdrawal Deletion
             </h3>
             <p className="text-text-secondary mb-4">
-              Are you sure you want to delete this payment of <strong>${deleteConfirm.payment?.amount}</strong> from <strong>{deleteConfirm.payment?.user?.name}</strong>?
+              Are you sure you want to delete this withdrawal of <strong>${deleteConfirm.withdrawal?.withdrawal_amount}</strong> from <strong>{deleteConfirm.withdrawal?.user?.name}</strong>?
             </p>
             <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
               <p className="text-sm text-red-800">
@@ -377,7 +376,7 @@ const TransactionsManagement: React.FC = () => {
             </div>
             <div className="flex space-x-3">
               <button
-                onClick={() => setDeleteConfirm({ show: false, payment: null })}
+                onClick={() => setDeleteConfirm({ show: false, withdrawal: null })}
                 className="flex-1 px-4 py-2 text-text-secondary hover:text-text-primary border border-border rounded-lg hover:bg-bg-tertiary transition-colors duration-200 disabled:opacity-50"
                 disabled={isDeleting}
               >
@@ -394,7 +393,7 @@ const TransactionsManagement: React.FC = () => {
                     Deleting...
                   </>
                 ) : (
-                  'Delete Payment'
+                  'Delete Withdrawal'
                 )}
               </button>
             </div>
@@ -402,47 +401,47 @@ const TransactionsManagement: React.FC = () => {
         </div>
       )}
 
-      {/* Approve Confirmation Modal */}
-      {approveConfirm.show && (
+      {/* Complete Confirmation Modal */}
+      {completeConfirm.show && (
         <div 
           className="fixed inset-0 bg-black/20 flex items-center justify-center z-50"
-          onClick={isApproving ? undefined : () => setApproveConfirm({ show: false, payment: null })}
+          onClick={isCompleting ? undefined : () => setCompleteConfirm({ show: false, withdrawal: null })}
         >
           <div 
             className="bg-bg-secondary rounded-lg p-6 max-w-md w-full mx-4"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-lg font-semibold text-text-primary mb-4">
-              Confirm Payment Approval
+              Confirm Withdrawal Completion
             </h3>
             <p className="text-text-secondary mb-4">
-              Are you sure you want to approve this payment of <strong>${approveConfirm.payment?.amount}</strong> from <strong>{approveConfirm.payment?.user?.name}</strong>?
+              Are you sure you want to complete this withdrawal of <strong>${completeConfirm.withdrawal?.withdrawal_amount}</strong> from <strong>{completeConfirm.withdrawal?.user?.name}</strong>?
             </p>
             <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
               <p className="text-sm text-green-800">
-                <strong>Note:</strong> This will add ${approveConfirm.payment?.amount} to the user's account balance.
+                <strong>Note:</strong> This will deduct ${completeConfirm.withdrawal?.withdrawal_amount} from the user's account balance.
               </p>
             </div>
             <div className="flex space-x-3">
               <button
-                onClick={() => setApproveConfirm({ show: false, payment: null })}
+                onClick={() => setCompleteConfirm({ show: false, withdrawal: null })}
                 className="flex-1 px-4 py-2 text-text-secondary hover:text-text-primary border border-border rounded-lg hover:bg-bg-tertiary transition-colors duration-200 disabled:opacity-50"
-                disabled={isApproving}
+                disabled={isCompleting}
               >
                 Cancel
               </button>
               <button
-                onClick={confirmApprove}
+                onClick={confirmComplete}
                 className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                disabled={isApproving}
+                disabled={isCompleting}
               >
-                {isApproving ? (
+                {isCompleting ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Approving...
+                    Completing...
                   </>
                 ) : (
-                  'Approve Payment'
+                  'Complete Withdrawal'
                 )}
               </button>
             </div>
@@ -453,5 +452,4 @@ const TransactionsManagement: React.FC = () => {
   );
 };
 
-export default TransactionsManagement;
-
+export default WithdrawalsManagement;

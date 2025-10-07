@@ -5,7 +5,7 @@ import {ustd,bigcoin,Ethereum} from '../../../../assets/images'
 const rechargeMethods = [
   { id: 'USDT', name: 'USDT', icon: <img src={ustd} alt="USDT" /> },
   { id: 'Ethereum', name: 'Ethereum', icon: <img src={Ethereum} alt="Ethereum" /> },
-  { id: 'Bigcoin', name: 'Bigcoin', icon: <img src={bigcoin} alt="Bigcoin" /> },
+  { id: 'Bitcoin', name: 'Bitcoin', icon: <img src={bigcoin} alt="Bitcoin" /> },
 
 ];
 
@@ -17,6 +17,12 @@ const Recharge = () => {
   const handleRecharge = () => {
     if (!selectedMethod || !amount) {
       alert('Please select a payment method and enter an amount');
+      return;
+    }
+    
+    const amountValue = parseFloat(amount);
+    if (amountValue < 10) {
+      alert('Minimum recharge amount is $10');
       return;
     }
     
@@ -37,12 +43,14 @@ const Recharge = () => {
         <label className="block mb-2 font-semibold text-text-primary">Amount to Recharge</label>
         <input
           type="number"
-          min="1"
+          min="10"
+          step="0.01"
           className="w-full p-3 rounded-lg bg-bg-tertiary text-text-primary focus:outline-none focus:ring-2 focus:ring-cyan-500"
-          placeholder="Enter amount"
+          placeholder="Enter amount (minimum $10)"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
         />
+        <p className="text-sm text-text-muted mt-1">Minimum recharge amount is $10</p>
       </div>
 
       <div>
@@ -66,10 +74,10 @@ const Recharge = () => {
       </div>
 
       <button
-        disabled={!amount || !selectedMethod}
+        disabled={!amount || !selectedMethod || parseFloat(amount) < 10}
         onClick={handleRecharge}
         className={`mt-8 w-full py-3 rounded-xl font-semibold transition ${
-          amount && selectedMethod
+          amount && selectedMethod && parseFloat(amount) >= 10
             ? 'bg-cyan-500 hover:bg-cyan-600 text-text-primary shadow-lg'
             : 'bg-bg-tertiary text-gray-500 cursor-not-allowed'
         }`}
