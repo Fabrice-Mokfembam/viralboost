@@ -15,7 +15,8 @@ const PaymentDetailsManagement: React.FC = () => {
   const [formData, setFormData] = useState({
     bitcoin_address: '',
     ethereum_address: '',
-    usdt_address: ''
+    usdt_address_TRC20: '',
+    usdt_address_ERC20: ''
   });
 
   // Hooks
@@ -31,7 +32,7 @@ const PaymentDetailsManagement: React.FC = () => {
   };
 
   const handleCreate = async () => {
-    if (!formData.bitcoin_address || !formData.ethereum_address || !formData.usdt_address) {
+    if (!formData.bitcoin_address || !formData.ethereum_address || !formData.usdt_address_TRC20 || !formData.usdt_address_ERC20) {
       toast.error('Please fill in all address fields');
       return;
     }
@@ -40,14 +41,14 @@ const PaymentDetailsManagement: React.FC = () => {
       await createMutation.mutateAsync(formData);
       toast.success('Payment details created successfully!');
       setIsCreating(false);
-      setFormData({ bitcoin_address: '', ethereum_address: '', usdt_address: '' });
-    } catch (error) {
+      setFormData({ bitcoin_address: '', ethereum_address: '', usdt_address_TRC20: '', usdt_address_ERC20: '' });
+    } catch {
       toast.error('Failed to create payment details');
     }
   };
 
   const handleUpdate = async (id: number) => {
-    if (!formData.bitcoin_address || !formData.ethereum_address || !formData.usdt_address) {
+    if (!formData.bitcoin_address || !formData.ethereum_address || !formData.usdt_address_TRC20 || !formData.usdt_address_ERC20) {
       toast.error('Please fill in all address fields');
       return;
     }
@@ -56,8 +57,8 @@ const PaymentDetailsManagement: React.FC = () => {
       await updateMutation.mutateAsync({ id, payload: formData });
       toast.success('Payment details updated successfully!');
       setEditingId(null);
-      setFormData({ bitcoin_address: '', ethereum_address: '', usdt_address: '' });
-    } catch (error) {
+      setFormData({ bitcoin_address: '', ethereum_address: '', usdt_address_TRC20: '', usdt_address_ERC20: '' });
+    } catch {
       toast.error('Failed to update payment details');
     }
   };
@@ -67,7 +68,7 @@ const PaymentDetailsManagement: React.FC = () => {
       try {
         await deleteMutation.mutateAsync(id);
         toast.success('Payment details deleted successfully!');
-      } catch (error) {
+      } catch {
         toast.error('Failed to delete payment details');
       }
     }
@@ -78,14 +79,15 @@ const PaymentDetailsManagement: React.FC = () => {
     setFormData({
       bitcoin_address: details.bitcoin_address,
       ethereum_address: details.ethereum_address,
-      usdt_address: details.usdt_address
+      usdt_address_TRC20: details.usdt_address_TRC20,
+      usdt_address_ERC20: details.usdt_address_ERC20
     });
   };
 
   const handleCancel = () => {
     setIsCreating(false);
     setEditingId(null);
-    setFormData({ bitcoin_address: '', ethereum_address: '', usdt_address: '' });
+    setFormData({ bitcoin_address: '', ethereum_address: '', usdt_address_TRC20: '', usdt_address_ERC20: '' });
   };
 
   if (isLoading) {
@@ -125,7 +127,7 @@ const PaymentDetailsManagement: React.FC = () => {
       {isCreating && (
         <div className="bg-bg-secondary rounded-lg p-6 border border-gray-700/50">
           <h3 className="text-lg font-semibold text-text-primary mb-4">Create Payment Details</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-text-primary mb-2">
                 <div className="flex items-center gap-2">
@@ -160,14 +162,29 @@ const PaymentDetailsManagement: React.FC = () => {
               <label className="block text-sm font-medium text-text-primary mb-2">
                 <div className="flex items-center gap-2">
                   <Coins size={16} className="text-green-500" />
-                  USDT Address
+                  USDT Address (TRC20)
                 </div>
               </label>
               <input
                 type="text"
-                value={formData.usdt_address}
-                onChange={(e) => handleInputChange('usdt_address', e.target.value)}
-                placeholder="Enter USDT address"
+                value={formData.usdt_address_TRC20}
+                onChange={(e) => handleInputChange('usdt_address_TRC20', e.target.value)}
+                placeholder="Enter USDT TRC20 address"
+                className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-2">
+                <div className="flex items-center gap-2">
+                  <Coins size={16} className="text-green-500" />
+                  USDT Address (ERC20)
+                </div>
+              </label>
+              <input
+                type="text"
+                value={formData.usdt_address_ERC20}
+                onChange={(e) => handleInputChange('usdt_address_ERC20', e.target.value)}
+                placeholder="Enter USDT ERC20 address"
                 className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
               />
             </div>
@@ -200,7 +217,7 @@ const PaymentDetailsManagement: React.FC = () => {
               // Edit Form
               <div>
                 <h3 className="text-lg font-semibold text-text-primary mb-4">Edit Payment Details</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-text-primary mb-2">
                       <div className="flex items-center gap-2">
@@ -233,13 +250,27 @@ const PaymentDetailsManagement: React.FC = () => {
                     <label className="block text-sm font-medium text-text-primary mb-2">
                       <div className="flex items-center gap-2">
                         <Coins size={16} className="text-green-500" />
-                        USDT Address
+                        USDT Address (TRC20)
                       </div>
                     </label>
                     <input
                       type="text"
-                      value={formData.usdt_address}
-                      onChange={(e) => handleInputChange('usdt_address', e.target.value)}
+                      value={formData.usdt_address_TRC20}
+                      onChange={(e) => handleInputChange('usdt_address_TRC20', e.target.value)}
+                      className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-text-primary mb-2">
+                      <div className="flex items-center gap-2">
+                        <Coins size={16} className="text-green-500" />
+                        USDT Address (ERC20)
+                      </div>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.usdt_address_ERC20}
+                      onChange={(e) => handleInputChange('usdt_address_ERC20', e.target.value)}
                       className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
                     />
                   </div>
@@ -290,7 +321,7 @@ const PaymentDetailsManagement: React.FC = () => {
                     </button>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="bg-bg-tertiary rounded-lg p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <Bitcoin size={16} className="text-orange-500" />
@@ -308,9 +339,16 @@ const PaymentDetailsManagement: React.FC = () => {
                   <div className="bg-bg-tertiary rounded-lg p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <Coins size={16} className="text-green-500" />
-                      <span className="text-sm font-medium text-text-primary">USDT</span>
+                      <span className="text-sm font-medium text-text-primary">USDT (TRC20)</span>
                     </div>
-                    <p className="text-text-muted text-sm font-mono break-all">{details.usdt_address}</p>
+                    <p className="text-text-muted text-sm font-mono break-all">{details.usdt_address_TRC20}</p>
+                  </div>
+                  <div className="bg-bg-tertiary rounded-lg p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Coins size={16} className="text-green-500" />
+                      <span className="text-sm font-medium text-text-primary">USDT (ERC20)</span>
+                    </div>
+                    <p className="text-text-muted text-sm font-mono break-all">{details.usdt_address_ERC20}</p>
                   </div>
                 </div>
               </div>

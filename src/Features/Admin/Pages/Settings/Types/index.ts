@@ -3,7 +3,8 @@ export interface PaymentDetails {
   id: number;
   bitcoin_address: string;
   ethereum_address: string;
-  usdt_address: string;
+  usdt_address_TRC20: string;
+  usdt_address_ERC20: string;
   created_at: string;
   updated_at: string;
 }
@@ -12,13 +13,15 @@ export interface PaymentDetails {
 export interface CreatePaymentDetailsPayload {
   bitcoin_address: string;
   ethereum_address: string;
-  usdt_address: string;
+  usdt_address_TRC20: string;
+  usdt_address_ERC20: string;
 }
 
 export interface UpdatePaymentDetailsPayload {
   bitcoin_address?: string;
   ethereum_address?: string;
-  usdt_address?: string;
+  usdt_address_TRC20?: string;
+  usdt_address_ERC20?: string;
 }
 
 // API Response types

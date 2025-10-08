@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useResendVerification, useVerify } from '../Hooks/useAuth';
 import { toast } from 'react-toastify';
 import { Loader2 } from 'lucide-react';
+import { getAuthErrorMessage } from '../Utils/errorUtils';
 
 const EmailVerification: React.FC = () => {
   const [code, setCode] = useState<string[]>(new Array(6).fill(''));
@@ -76,11 +77,7 @@ const EmailVerification: React.FC = () => {
           navigate('/');
         },
         onError: (error: unknown) => {
-          const errorMessage = error && typeof error === 'object' && 'response' in error && 
-            error.response && typeof error.response === 'object' && 'data' in error.response &&
-            error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data
-            ? (error.response.data as { message: string }).message
-            : 'Verification failed. Please try again.';
+          const errorMessage = getAuthErrorMessage(error);
           toast.error(errorMessage);
         }
       }
@@ -99,11 +96,7 @@ const EmailVerification: React.FC = () => {
           setCanResend(false);
         },
         onError: (error: unknown) => {
-          const errorMessage = error && typeof error === 'object' && 'response' in error && 
-            error.response && typeof error.response === 'object' && 'data' in error.response &&
-            error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data
-            ? (error.response.data as { message: string }).message
-            : 'Failed to resend code. Please try again.';
+          const errorMessage = getAuthErrorMessage(error);
           toast.error(errorMessage);
         }
       }

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
 import { useLogin } from '../Hooks/useAuth';
 import { toast } from 'react-toastify';
+import { getAuthErrorMessage, parseAuthError, formatLoginError } from '../Utils/errorUtils';
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -12,9 +13,10 @@ const Login: React.FC = () => {
   });
   const navigate = useNavigate();
   const [isPhoneLogin, setIsPhoneLogin] = useState(true);
+  const [loginError, setLoginError] = useState<string>('');
   
   // Auth hook
-  const { mutate: login, isPending, error } = useLogin();
+  const { mutate: login, isPending } = useLogin();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -22,6 +24,11 @@ const Login: React.FC = () => {
       ...prev,
       [name]: value
     }));
+    
+    // Clear error when user starts typing
+    if (loginError) {
+      setLoginError('');
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -49,10 +56,11 @@ const Login: React.FC = () => {
         navigate('/dashboard');
       },
       onError: (error: unknown) => {
-        const errorMessage = error && typeof error === 'object' && 'response' in error 
-          ? (error as { response?: { data?: { message?: string } } }).response?.data?.message 
-          : 'Login failed. Please check your credentials.';
-        toast.error(errorMessage || 'Login failed. Please check your credentials.');
+        const parsedError = parseAuthError(error);
+        const errorMessage = parsedError ? formatLoginError(parsedError) : getAuthErrorMessage(error);
+        
+        setLoginError(errorMessage);
+        toast.error(errorMessage);
       }
     });
     // navigate('/dashboard');
@@ -127,20 +135,18 @@ const Login: React.FC = () => {
               </div>
             </div>
 
-            {error && (
+            {loginError && (
               <div className="rounded-md bg-red-50 p-4">
                 <div className="flex">
                   <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                    </svg>
+                    <AlertCircle className="h-5 w-5 text-red-400" />
                   </div>
                   <div className="ml-3">
                     <h3 className="text-sm font-medium text-red-800">
                       Login failed
                     </h3>
                     <div className="mt-2 text-sm text-red-700">
-                      {error.message || 'An error occurred during login. Please try again.'}
+                      {loginError}
                     </div>
                   </div>
                 </div>

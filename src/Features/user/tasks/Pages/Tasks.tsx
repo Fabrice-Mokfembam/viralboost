@@ -27,39 +27,75 @@ const Tasks = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('undone');
   
-  const { data: Tasks } = useRunTaskDistribution();
-
-  const { data: Submissions } = useGetUserSubmissions();
+  const { data: Tasks, isLoading: tasksLoading, error: tasksError } = useRunTaskDistribution();
+  const { data: Submissions, isLoading: submissionsLoading } = useGetUserSubmissions();
 
   useEffect(() => {
     if (Submissions?.data) {
-      console.log(Submissions.data.submissions
-      );
+      console.log(Submissions.data.submissions);
     }
   }, [Submissions]);
+
+  // Show loading state
+  if (tasksLoading || submissionsLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-bg-main via-bg-secondary to-bg-main flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
+          <p className="text-text-muted text-lg">Loading tasks...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (tasksError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-bg-main via-bg-secondary to-bg-main flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-400 text-lg font-medium mb-2">Error loading tasks</p>
+          <p className="text-text-muted">Please try refreshing the page</p>
+        </div>
+      </div>
+    );
+  }
 
   // Helper function to check if a task has been submitted
   const isTaskSubmitted = (taskId: number) => {
     if (!Submissions?.data?.submissions) return false;
-    return Submissions.data.submissions.some((submission: any) => submission.task_id === taskId);
+    return Submissions.data.submissions.some((submission: { task_id: number }) => submission.task_id === taskId);
   };
 
   // Filter tasks based on active tab and submission status
   const getFilteredTasks = () => {
-    if (!Tasks?.data) return [];
+    // Handle different possible data structures
+    let tasksArray = [];
+    
+    if (Tasks?.data) {
+      // Check if data is an array or has a tasks property
+      if (Array.isArray(Tasks.data)) {
+        tasksArray = Tasks.data;
+      } else if (Tasks.data.tasks && Array.isArray(Tasks.data.tasks)) {
+        tasksArray = Tasks.data.tasks;
+      }
+    }
+    
+    if (!Array.isArray(tasksArray) || tasksArray.length === 0) {
+      return [];
+    }
     
     switch (activeTab) {
       case 'undone':
         // Show tasks that haven't been submitted yet
-        return Tasks.data.filter((task: any) => !isTaskSubmitted(task.id));
+        return tasksArray.filter((task: { id: number }) => !isTaskSubmitted(task.id));
       case 'in-progress':
         // Show tasks that are pending (this might be empty based on your logic)
-        return Tasks.data.filter((task: any) => task.task_status === 'pending' && !isTaskSubmitted(task.id));
+        return tasksArray.filter((task: { id: number; task_status: string }) => task.task_status === 'pending' && !isTaskSubmitted(task.id));
       case 'completed':
         // Show tasks that have been submitted
-        return Tasks.data.filter((task: any) => isTaskSubmitted(task.id));
+        return tasksArray.filter((task: { id: number }) => isTaskSubmitted(task.id));
       default:
-        return Tasks.data;
+        return tasksArray;
     }
   };
 
@@ -127,7 +163,7 @@ const Tasks = () => {
       {/* Tasks List */}
       <div className="space-y-4">
         {filteredTasks.length > 0 ? (
-          filteredTasks.map((task: any) => {
+          filteredTasks.map((task: { id: number; title: string; benefit: string; category: string; platform: string }) => {
             const isCompleted = isTaskSubmitted(task.id);
             
             return (

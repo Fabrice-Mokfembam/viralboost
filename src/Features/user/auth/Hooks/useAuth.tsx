@@ -2,11 +2,20 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { authApi } from '../API';
 import { storeAuthData, clearAuthData } from '../Utils/authUtils';
 import type { ForgotPasswordRequest, LoginRequest, RegisterRequest, ResendVerificationRequest, ResetPasswordRequest, ValidateResetTokenRequest, VerifyRequest } from '../../../../data';
+import { parseAuthError } from '../Utils/errorUtils';
 
 
 export const useRegister = () => {
   return useMutation({
     mutationFn: (data: RegisterRequest) => authApi.register(data),
+    onError: (error) => {
+      // Parse and format the error for better handling
+      const parsedError = parseAuthError(error);
+      if (parsedError) {
+        // The error is already parsed and can be handled by the component
+        console.log('Registration error:', parsedError);
+      }
+    },
   });
 };
 
@@ -20,6 +29,14 @@ export const useLogin = () => {
         // Store authentication data using utility function
         storeAuthData(data);
         queryClient.setQueryData(['user'], data.user);
+      }
+    },
+    onError: (error) => {
+      // Parse and format the error for better handling
+      const parsedError = parseAuthError(error);
+      if (parsedError) {
+        // The error is already parsed and can be handled by the component
+        console.log('Login error:', parsedError);
       }
     },
   });
@@ -65,6 +82,17 @@ export const useLogout = () => {
       clearAuthData();
       queryClient.setQueryData(['user'], null);
       queryClient.clear();
+    },
+    onError: (error) => {
+      // Parse and format the error for better handling
+      const parsedError = parseAuthError(error);
+      if (parsedError) {
+        console.log('Logout error:', parsedError);
+        // Even if logout fails on server, clear local data
+        clearAuthData();
+        queryClient.setQueryData(['user'], null);
+        queryClient.clear();
+      }
     },
   });
 };

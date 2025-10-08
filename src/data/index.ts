@@ -175,3 +175,36 @@ export interface ProfileResponse {
     inprogress_tasks: Task[];
   };
 }
+
+// Authentication Error Types
+export interface AuthErrorResponse {
+  message: string;
+}
+
+export interface LoginErrorResponse {
+  success: false;
+  message: string;
+  error: 'InvalidCredentials' | 'AccountDeactivated' | 'EmailNotVerified';
+}
+
+export interface RegistrationErrorResponse {
+  success: false;
+  message: string;
+  errors?: {
+    email?: string[];
+    phone?: string[];
+    [key: string]: string[] | undefined;
+  };
+}
+
+export interface AdminErrorResponse {
+  success: false;
+  message: string;
+  error: 'InsufficientPermissions';
+}
+
+export type AuthError = 
+  | AuthErrorResponse 
+  | LoginErrorResponse 
+  | RegistrationErrorResponse 
+  | AdminErrorResponse;

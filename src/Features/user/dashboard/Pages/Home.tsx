@@ -32,8 +32,9 @@ const Home = () => {
   const { data: userProfile } = useGetProfile();
   const storedUser = getUserData();
 
-  const { data: Tasks } = useRunTaskDistribution();
-  const { data: Submissions } = useGetUserSubmissions();
+  const { data: Tasks, isLoading: tasksLoading } = useRunTaskDistribution();
+  const { data: Submissions, isLoading: submissionsLoading } = useGetUserSubmissions();
+  const { data: accountData, isLoading: accountLoading } = useAccount();
 
   useEffect(() => {
     console.log('Tasks',Tasks);
@@ -43,14 +44,14 @@ const Home = () => {
   // Helper function to check if a task has been submitted
   const isTaskSubmitted = (taskId: number) => {
     if (!Submissions?.data?.submissions) return false;
-    return Submissions.data.submissions.some((submission: any) => submission.task_id === taskId);
+    return Submissions.data.submissions.some((submission: { task_id: number }) => submission.task_id === taskId);
   };
 
   // Filter out completed tasks
   const availableTasks = Array.isArray(Tasks?.data) 
-    ? Tasks.data.filter((task: any) => !isTaskSubmitted(task.id))
+    ? Tasks.data.filter((task: { id: number }) => !isTaskSubmitted(task.id))
     : Array.isArray(Tasks?.data?.tasks) 
-      ? Tasks.data.tasks.filter((task: any) => !isTaskSubmitted(task.id))
+      ? Tasks.data.tasks.filter((task: { id: number }) => !isTaskSubmitted(task.id))
       : [];
   
   // Use profile data if available, otherwise fall back to stored user data
@@ -63,9 +64,40 @@ const Home = () => {
   const tasksCompleted = Submissions?.data?.submissions?.length || 0;
   const dailyGoal = user?.membership?.tasks_per_day || 5;
 
-  const { data: account } = useAccount();
+  console.log('account',accountData);
 
-  console.log('account',account);
+  // Skeleton component for balance
+  const BalanceSkeleton = () => (
+    <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-4 flex justify-between items-center shadow-lg">
+      <div>
+        <div className="h-4 bg-gray-700 rounded w-24 mb-2 animate-pulse"></div>
+        <div className="h-6 bg-gray-700 rounded w-16 animate-pulse"></div>
+      </div>
+      <div className="h-10 bg-gray-700 rounded-lg w-20 animate-pulse"></div>
+    </div>
+  );
+
+  // Skeleton component for progress bar
+  const ProgressSkeleton = () => (
+    <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-4">
+      <div className="bg-gray-800 rounded-full overflow-hidden h-5 mb-2">
+        <div className="h-full bg-gray-700 animate-pulse w-1/3"></div>
+      </div>
+      <div className="h-4 bg-gray-700 rounded w-32 animate-pulse"></div>
+    </div>
+  );
+
+  // Skeleton component for activity items
+  const ActivitySkeleton = () => (
+    <div className="flex items-center bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl shadow-lg p-4 border border-gray-700/50">
+      <div className="w-12 h-12 bg-gray-700 rounded-xl animate-pulse"></div>
+      <div className="ml-4 flex-1">
+        <div className="h-5 bg-gray-700 rounded w-3/4 mb-2 animate-pulse"></div>
+        <div className="h-4 bg-gray-700 rounded w-1/2 animate-pulse"></div>
+      </div>
+      <div className="h-6 bg-gray-700 rounded w-12 animate-pulse"></div>
+    </div>
+  );
 
 
 
@@ -87,19 +119,23 @@ const Home = () => {
         {/* Balance & Top-up */}
         <div className="relative overflow-hidden rounded-2xl shadow-2xl mb-8">
           <div className="relative p-6">
-            <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-4 flex justify-between items-center shadow-lg">
-          <div>
-            <p className="text-text-muted text-sm">Current Balance</p>
-            <p className="text-text-primary font-bold text-xl">${account?.data?.balance || '0.00'}</p>
-          </div>
-          <button
-            onClick={() => navigate('/v/recharge')}
-            className="flex items-center bg-cyan-500 hover:bg-cyan-600 text-text-primary rounded-lg py-2 px-4 font-semibold shadow"
-          >
-            <PlusCircle size={20} className="mr-2" />
-            Top Up
-          </button>
-            </div>
+            {accountLoading ? (
+              <BalanceSkeleton />
+            ) : (
+              <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-4 flex justify-between items-center shadow-lg">
+                <div>
+                  <p className="text-text-muted text-sm">Current Balance</p>
+                  <p className="text-text-primary font-bold text-xl">${accountData?.data?.balance || '0.00'}</p>
+                </div>
+                <button
+                  onClick={() => navigate('/v/recharge')}
+                  className="flex items-center bg-cyan-500 hover:bg-cyan-600 text-text-primary rounded-lg py-2 px-4 font-semibold shadow"
+                >
+                  <PlusCircle size={20} className="mr-2" />
+                  Top Up
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -145,17 +181,21 @@ const Home = () => {
       <div className="relative overflow-hidden rounded-2xl shadow-2xl mb-8">
         <div className="relative p-6">
           <h2 className="text-xl font-bold mb-4 text-cyan-400">Today's Progress</h2>
-          <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-4">
-            <div className="bg-gray-800 rounded-full overflow-hidden h-5 mb-2 shadow-inner">
-              <div
-                className="bg-gradient-to-r from-cyan-500 to-cyan-600 h-full transition-all"
-                style={{ width: `${(tasksCompleted / dailyGoal) * 100}%` }}
-              />
+          {submissionsLoading ? (
+            <ProgressSkeleton />
+          ) : (
+            <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-4">
+              <div className="bg-gray-800 rounded-full overflow-hidden h-5 mb-2 shadow-inner">
+                <div
+                  className="bg-gradient-to-r from-cyan-500 to-cyan-600 h-full transition-all"
+                  style={{ width: `${(tasksCompleted / dailyGoal) * 100}%` }}
+                />
+              </div>
+              <p className="text-text-muted text-sm">
+                {tasksCompleted} / {dailyGoal} Tasks Completed
+              </p>
             </div>
-            <p className="text-text-muted text-sm">
-              {tasksCompleted} / {dailyGoal} Tasks Completed
-            </p>
-          </div>
+          )}
         </div>
       </div>
 
@@ -164,9 +204,15 @@ const Home = () => {
         <div className="relative p-6">
           <h2 className="text-xl font-bold mb-4 text-cyan-400">Your Activities</h2>
           
-          {availableTasks.length > 0 ? (
+          {tasksLoading || submissionsLoading ? (
             <div className="space-y-4">
-              {availableTasks.slice(0, 3).map((task: any) => (
+              <ActivitySkeleton />
+              <ActivitySkeleton />
+              <ActivitySkeleton />
+            </div>
+          ) : availableTasks.length > 0 ? (
+            <div className="space-y-4">
+              {availableTasks.slice(0, 3).map((task: { id: number; title: string; description: string; platform: string; benefit: string }) => (
                 <div
                   key={task.id}
                   onClick={() => navigate(`/v/task/${task.id}`)}

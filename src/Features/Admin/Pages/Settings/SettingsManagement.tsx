@@ -43,7 +43,8 @@ const SettingsManagement: React.FC = () => {
   const [paymentFormData, setPaymentFormData] = useState({
     bitcoin_address: '',
     ethereum_address: '',
-    usdt_address: ''
+    usdt_address_TRC20: '',
+    usdt_address_ERC20: ''
   });
 
   const [isSaving, setIsSaving] = useState(false);
@@ -55,7 +56,8 @@ const SettingsManagement: React.FC = () => {
       setPaymentFormData({
         bitcoin_address: paymentDetails.bitcoin_address || '',
         ethereum_address: paymentDetails.ethereum_address || '',
-        usdt_address: paymentDetails.usdt_address || ''
+        usdt_address_TRC20: paymentDetails.usdt_address_TRC20 || '',
+        usdt_address_ERC20: paymentDetails.usdt_address_ERC20 || ''
       });
     }
   }, [paymentDetails]);
@@ -76,7 +78,7 @@ const SettingsManagement: React.FC = () => {
         return;
       }
 
-      if (!paymentFormData.bitcoin_address || !paymentFormData.ethereum_address || !paymentFormData.usdt_address) {
+      if (!paymentFormData.bitcoin_address || !paymentFormData.ethereum_address || !paymentFormData.usdt_address_TRC20 || !paymentFormData.usdt_address_ERC20) {
         toast.error('Please fill in all payment address fields');
         return;
       }
@@ -206,7 +208,7 @@ const SettingsManagement: React.FC = () => {
             Update the cryptocurrency addresses used for payments and withdrawals.
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-text-primary mb-2">
                 <div className="flex items-center gap-2">
@@ -238,21 +240,48 @@ const SettingsManagement: React.FC = () => {
                 className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
               />
             </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
-                <div className="flex items-center gap-2">
-                  <Coins size={16} className="text-green-500" />
-                  USDT Address
-                </div>
-              </label>
-              <input
-                type="text"
-                value={paymentFormData.usdt_address}
-                onChange={(e) => handlePaymentInputChange('usdt_address', e.target.value)}
-                placeholder="Enter USDT address"
-                className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
-              />
+          </div>
+
+          {/* USDT Addresses Section */}
+          <div className="mt-6">
+            <h4 className="text-md font-semibold text-text-primary mb-4 flex items-center gap-2">
+              <Coins size={18} className="text-green-500" />
+              USDT Addresses
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-text-primary mb-2">
+                  <div className="flex items-center gap-2">
+                    <Coins size={16} className="text-green-500" />
+                    USDT TRC20 Address
+                  </div>
+                </label>
+                <input
+                  type="text"
+                  value={paymentFormData.usdt_address_TRC20}
+                  onChange={(e) => handlePaymentInputChange('usdt_address_TRC20', e.target.value)}
+                  placeholder="Enter USDT TRC20 address"
+                  className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
+                />
+                <p className="text-xs text-text-muted mt-1">Tron network USDT address</p>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-text-primary mb-2">
+                  <div className="flex items-center gap-2">
+                    <Coins size={16} className="text-green-500" />
+                    USDT ERC20 Address
+                  </div>
+                </label>
+                <input
+                  type="text"
+                  value={paymentFormData.usdt_address_ERC20}
+                  onChange={(e) => handlePaymentInputChange('usdt_address_ERC20', e.target.value)}
+                  placeholder="Enter USDT ERC20 address"
+                  className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
+                />
+                <p className="text-xs text-text-muted mt-1">Ethereum network USDT address</p>
+              </div>
             </div>
           </div>
         </div>

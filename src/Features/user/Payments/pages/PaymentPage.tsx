@@ -43,15 +43,25 @@ const PaymentPage = () => {
       id: 'USDT',
       name: 'USDT (Tether)',
       icon: <Coins size={24} className="text-green-500" />,
-      address: firstPaymentDetails?.usdt_address || 'TQn9Y2khEsLJW1ChVWFMSMeRDow5KcbLSE', // Use real address or fallback
+      address: firstPaymentDetails?.usdt_address_TRC20 || 'TQn9Y2khEsLJW1ChVWFMSMeRDow5KcbLSE', // Use TRC20 address as primary
       instructions: [
+        '⚠️ IMPORTANT: USDT TRC20 Instructions (Tron Network)',
         'Open your USDT wallet app (Trust Wallet, MetaMask, etc.)',
-        'Select USDT and ensure you\'re on TRC20 network',
+        'Select USDT and ensure you\'re on TRC20 network (Tron)',
         'Tap "Send" or "Transfer" in your wallet',
         'Copy the TRC20 address provided below',
         'Paste the address in the recipient field',
         'Enter exactly $' + amount + ' USDT (1:1 USD ratio)',
-        'Double-check the network is TRC20 before confirming',
+        '⚠️ CRITICAL: Double-check the network is TRC20 before confirming',
+        '⚠️ WARNING: Transactions are irreversible - verify address carefully',
+        'Complete the transaction and wait for confirmation',
+        'Take a screenshot showing the transaction hash',
+        '',
+        '🔄 Alternative: USDT ERC20 Instructions (Ethereum Network)',
+        'If you prefer ERC20, switch to Ethereum network in your wallet',
+        'Copy the ERC20 address provided below',
+        '⚠️ WARNING: ERC20 has higher gas fees than TRC20',
+        '⚠️ CRITICAL: Ensure you\'re on the correct network (ERC20 vs TRC20)',
         'Complete the transaction and wait for confirmation',
         'Take a screenshot showing the transaction hash',
         'Upload the screenshot as payment proof'
@@ -236,61 +246,201 @@ const PaymentPage = () => {
           <h2 className="text-xl font-semibold text-text-primary">Payment Instructions</h2>
         </div>
         
-        <div className="space-y-3">
-          {currentMethod.instructions.map((instruction, index) => (
-            <div key={index} className="flex items-start gap-3">
-              <div className="w-6 h-6 bg-cyan-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-cyan-400 text-sm font-bold">{index + 1}</span>
+        {method === 'USDT' ? (
+          <div className="space-y-6">
+            {/* TRC20 Instructions */}
+            <div>
+              <h3 className="text-lg font-semibold text-green-400 mb-3 flex items-center gap-2">
+                <Coins size={20} className="text-green-500" />
+                USDT TRC20 Instructions (Tron Network)
+              </h3>
+              <div className="space-y-3 mb-4">
+                {[
+                  'Open your USDT wallet app (Trust Wallet, MetaMask, etc.)',
+                  'Select USDT and ensure you\'re on TRC20 network (Tron)',
+                  'Tap "Send" or "Transfer" in your wallet',
+                  'Copy the TRC20 address provided below',
+                  'Paste the address in the recipient field',
+                  'Enter exactly $' + amount + ' USDT (1:1 USD ratio)',
+                  '⚠️ CRITICAL: Double-check the network is TRC20 before confirming',
+                  '⚠️ WARNING: Transactions are irreversible - verify address carefully',
+                  'Complete the transaction and wait for confirmation',
+                  'Take a screenshot showing the transaction hash'
+                ].map((instruction, index) => (
+                  <div key={index} className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-green-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-green-400 text-sm font-bold">{index + 1}</span>
+                    </div>
+                    <p className="text-text-secondary text-sm leading-relaxed">{instruction}</p>
+                  </div>
+                ))}
               </div>
-              <p className="text-text-secondary text-sm leading-relaxed">{instruction}</p>
+              
+              {/* TRC20 Address */}
+              <div className="bg-green-500/10 rounded-lg p-4 border border-green-500/30 mb-4">
+                <div className="flex items-center justify-between gap-4 mb-2">
+                  <div className="flex items-center gap-2">
+                    <Coins size={16} className="text-green-500" />
+                    <span className="text-green-400 font-medium">USDT TRC20 Address (Recommended)</span>
+                  </div>
+                  <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">Lower Fees</span>
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-green-300 mb-1">Tron Network Address:</p>
+                    <p className="text-green-100 font-mono text-sm break-all">
+                      {firstPaymentDetails?.usdt_address_TRC20 || 'TRC20 address not available'}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(firstPaymentDetails?.usdt_address_TRC20 || '');
+                      setCopiedAddress(true);
+                      setTimeout(() => setCopiedAddress(false), 2000);
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors flex-shrink-0"
+                  >
+                    {copiedAddress ? (
+                      <>
+                        <Check size={16} />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={16} />
+                        Copy TRC20
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
             </div>
-          ))}
-        </div>
+
+            {/* ERC20 Instructions */}
+            <div>
+              <h3 className="text-lg font-semibold text-blue-400 mb-3 flex items-center gap-2">
+                <Coins size={20} className="text-blue-500" />
+                USDT ERC20 Instructions (Ethereum Network)
+              </h3>
+              <div className="space-y-3 mb-4">
+                {[
+                  'If you prefer ERC20, switch to Ethereum network in your wallet',
+                  'Copy the ERC20 address provided below',
+                  '⚠️ WARNING: ERC20 has higher gas fees than TRC20',
+                  '⚠️ CRITICAL: Ensure you\'re on the correct network (ERC20 vs TRC20)',
+                  'Complete the transaction and wait for confirmation',
+                  'Take a screenshot showing the transaction hash',
+                  'Upload the screenshot as payment proof'
+                ].map((instruction, index) => (
+                  <div key={index} className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-blue-400 text-sm font-bold">{index + 1}</span>
+                    </div>
+                    <p className="text-text-secondary text-sm leading-relaxed">{instruction}</p>
+                  </div>
+                ))}
+              </div>
+              
+              {/* ERC20 Address */}
+              <div className="bg-blue-500/10 rounded-lg p-4 border border-blue-500/30">
+                <div className="flex items-center justify-between gap-4 mb-2">
+                  <div className="flex items-center gap-2">
+                    <Coins size={16} className="text-blue-500" />
+                    <span className="text-blue-400 font-medium">USDT ERC20 Address (Alternative)</span>
+                  </div>
+                  <span className="text-xs bg-orange-500/20 text-orange-400 px-2 py-1 rounded">Higher Fees</span>
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-blue-300 mb-1">Ethereum Network Address:</p>
+                    <p className="text-blue-100 font-mono text-sm break-all">
+                      {firstPaymentDetails?.usdt_address_ERC20 || 'ERC20 address not available'}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(firstPaymentDetails?.usdt_address_ERC20 || '');
+                      setCopiedAddress(true);
+                      setTimeout(() => setCopiedAddress(false), 2000);
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors flex-shrink-0"
+                  >
+                    {copiedAddress ? (
+                      <>
+                        <Check size={16} />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={16} />
+                        Copy ERC20
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* Other payment methods (Bitcoin, Ethereum) */
+          <div className="space-y-3">
+            {currentMethod.instructions.map((instruction, index) => (
+              <div key={index} className="flex items-start gap-3">
+                <div className="w-6 h-6 bg-cyan-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-cyan-400 text-sm font-bold">{index + 1}</span>
+                </div>
+                <p className="text-text-secondary text-sm leading-relaxed">{instruction}</p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Payment Address */}
-      <div className="bg-bg-secondary rounded-xl p-6 shadow-md border border-cyan-500 mb-6">
-        <h2 className="text-xl font-semibold text-text-primary mb-4">Payment Address</h2>
-        
-        <div className="bg-bg-tertiary rounded-lg p-4 border border-gray-600">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <p className="text-xs text-text-muted mb-1">Copy this address to your wallet:</p>
-              <p className="text-text-primary font-mono text-sm break-all">
-                {currentMethod.address}
-              </p>
-            </div>
-            <button
-              onClick={handleCopyAddress}
-              className="flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-text-primary rounded-lg transition-colors flex-shrink-0"
-            >
-              {copiedAddress ? (
-                <>
-                  <Check size={16} />
-                  Copied!
-                </>
-              ) : (
-                <>
-                  <Copy size={16} />
-                  Copy
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-        
-        <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-          <div className="flex items-start gap-2">
-            <AlertCircle size={16} className="text-yellow-500 mt-0.5 flex-shrink-0" />
-            <div className="text-sm">
-              <p className="text-yellow-400 font-medium mb-1">Important:</p>
-              <p className="text-yellow-300">
-                Make sure to send the exact amount: <span className="font-bold">${amount}</span>
-              </p>
+      {/* Payment Address - Only for non-USDT methods */}
+      {method !== 'USDT' && (
+        <div className="bg-bg-secondary rounded-xl p-6 shadow-md border border-cyan-500 mb-6">
+          <h2 className="text-xl font-semibold text-text-primary mb-4">Payment Address</h2>
+          
+          <div className="bg-bg-tertiary rounded-lg p-4 border border-gray-600">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-text-muted mb-1">Copy this address to your wallet:</p>
+                <p className="text-text-primary font-mono text-sm break-all">
+                  {currentMethod.address}
+                </p>
+              </div>
+              <button
+                onClick={handleCopyAddress}
+                className="flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-text-primary rounded-lg transition-colors flex-shrink-0"
+              >
+                {copiedAddress ? (
+                  <>
+                    <Check size={16} />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy size={16} />
+                    Copy
+                  </>
+                )}
+              </button>
             </div>
           </div>
+          
+          <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+            <div className="flex items-start gap-2">
+              <AlertCircle size={16} className="text-yellow-500 mt-0.5 flex-shrink-0" />
+              <div className="text-sm">
+                <p className="text-yellow-400 font-medium mb-1">Important:</p>
+                <p className="text-yellow-300">
+                  Make sure to send the exact amount: <span className="font-bold">${amount}</span>
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Payment Proof Upload */}
       <div className="bg-bg-secondary rounded-xl p-6 shadow-md border border-cyan-500 mb-6">

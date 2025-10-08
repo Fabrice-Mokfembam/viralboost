@@ -4,13 +4,20 @@ import { Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import { useRegister } from '../Hooks/useAuth';
 import { toast } from 'react-toastify';
 import { getReferralCodeFromUrl } from '../Utils/referralUtils';
+import { 
+  getAuthErrorMessage, 
+  parseAuthError, 
+  formatRegistrationError, 
+
+} from '../Utils/errorUtils';
 
 const Signup: React.FC = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isPhoneLogin, setIsPhoneLogin] = useState(true);
-  const { mutate: register, isPending, error } = useRegister();
+  const [registrationError, setRegistrationError] = useState<string>('');
+  const { mutate: register, isPending} = useRegister();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -28,6 +35,8 @@ const Signup: React.FC = () => {
     phonenumber: '',
     email: ''
   });
+
+  const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
 
   const [touched, setTouched] = useState({
     name: false,
@@ -58,6 +67,16 @@ const Signup: React.FC = () => {
     // Clear error when user starts typing
     if (errors[name as keyof typeof errors]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+    
+    // Clear server error for this field
+    if (serverErrors[name]) {
+      setServerErrors(prev => ({ ...prev, [name]: '' }));
+    }
+    
+    // Clear registration error
+    if (registrationError) {
+      setRegistrationError('');
     }
 
     // Validate in real-time if the field has been touched
@@ -232,12 +251,23 @@ const Signup: React.FC = () => {
           });
         },
         onError: (error: unknown) => {
-          const errorMessage = error && typeof error === 'object' && 'response' in error && 
-            error.response && typeof error.response === 'object' && 'data' in error.response &&
-            error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data
-            ? (error.response.data as { message: string }).message
-            : 'Registration failed. Please try again.';
-          toast.error(errorMessage);
+          const parsedError = parseAuthError(error);
+          
+          if (parsedError) {
+            const { message, fieldErrors } = formatRegistrationError(parsedError);
+            
+            setRegistrationError(message);
+            toast.error(message);
+            
+            // Set server field errors
+            if (fieldErrors) {
+              setServerErrors(fieldErrors);
+            }
+          } else {
+            const errorMessage = getAuthErrorMessage(error);
+            setRegistrationError(errorMessage);
+            toast.error(errorMessage);
+          }
         }
       });
     }
@@ -313,12 +343,12 @@ const Signup: React.FC = () => {
                   className="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-700 placeholder-gray-500 text-text-primary rounded-t-md focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm bg-bg-tertiary"
                   placeholder="Full Name"
                 />
-                {touched.name && errors.name && (
-                  <div className="mt-1 flex items-center text-red-500 text-xs">
-                    <AlertCircle size={14} className="mr-1" />
-                    {errors.name}
-                  </div>
-                )}
+                  {(touched.name && errors.name) || serverErrors.name ? (
+                    <div className="mt-1 flex items-center text-red-500 text-xs">
+                      <AlertCircle size={14} className="mr-1" />
+                      {serverErrors.name || errors.name}
+                    </div>
+                  ) : null}
               </div>
               
               {isPhoneLogin ? (
@@ -335,12 +365,12 @@ const Signup: React.FC = () => {
                     className={`appearance-none rounded-none relative block w-full px-3 py-3 border placeholder-gray-500 text-text-primary focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm bg-bg-tertiary ${getPhoneInputClass()}`}
                     placeholder="Phone Number (e.g., +1234567890)"
                   />
-                  {touched.phonenumber && errors.phonenumber && (
+                  {(touched.phonenumber && errors.phonenumber) || serverErrors.phone ? (
                     <div className="mt-1 flex items-center text-red-500 text-xs">
                       <AlertCircle size={14} className="mr-1" />
-                      {errors.phonenumber}
+                      {serverErrors.phone || errors.phonenumber}
                     </div>
-                  )}
+                  ) : null}
                 </div>
               ) : (
                 <div className="mt-4">
@@ -356,12 +386,12 @@ const Signup: React.FC = () => {
                     className={`appearance-none rounded-none relative block w-full px-3 py-3 border placeholder-gray-500 text-text-primary focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm bg-bg-tertiary ${getEmailInputClass()}`}
                     placeholder="Email address"
                   />
-                  {touched.email && errors.email && (
+                  {(touched.email && errors.email) || serverErrors.email ? (
                     <div className="mt-1 flex items-center text-red-500 text-xs">
                       <AlertCircle size={14} className="mr-1" />
-                      {errors.email}
+                      {serverErrors.email || errors.email}
                     </div>
-                  )}
+                  ) : null}
                 </div>
               )}
               
@@ -439,7 +469,7 @@ const Signup: React.FC = () => {
               </div>
             </div>
 
-            {error && (
+            {registrationError && (
               <div className="rounded-md bg-red-50 p-4">
                 <div className="flex">
                   <div className="flex-shrink-0">
@@ -450,7 +480,7 @@ const Signup: React.FC = () => {
                       Registration failed
                     </h3>
                     <div className="mt-2 text-sm text-red-700">
-                      {error.message || 'An error occurred during registration. Please try again.'}
+                      {registrationError}
                     </div>
                   </div>
                 </div>
