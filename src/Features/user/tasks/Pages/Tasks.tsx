@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { useRunTaskDistribution } from '../../tasks/Hooks/useTasks';
 import { useEffect, useState } from 'react';
 import { useGetUserSubmissions } from '../../tasks/Hooks/useTaskSubmissions';
+import { useGetProfile } from '../../auth/Hooks/useAuth';
+import { getUserData } from '../../auth/Utils/authUtils';
 
 // Function to get platform icon
 const getPlatformIcon = (platform: string) => {
@@ -29,6 +31,12 @@ const Tasks = () => {
   
   const { data: Tasks, isLoading: tasksLoading, error: tasksError } = useRunTaskDistribution();
   const { data: Submissions, isLoading: submissionsLoading } = useGetUserSubmissions();
+  const { data: userProfile } = useGetProfile();
+  const storedUser = getUserData();
+
+  // Use profile data if available, otherwise fall back to stored user data
+  const user = userProfile?.data?.user || storedUser;
+  const memberShipData = user?.membership;
 
   useEffect(() => {
     if (Submissions?.data) {
@@ -192,7 +200,7 @@ const Tasks = () => {
                         </div>
                         <div>
                           <div className="text-text-primary font-semibold text-lg">{task.title}</div>
-                          <div className="text-cyan-400 text-sm font-bold">Earn ${task.benefit}</div>
+                          <div className="text-cyan-400 text-sm font-bold">Earn ${memberShipData?.benefit_amount_per_task}</div>
                           <div className="text-xs text-text-muted mt-1">{task.category}</div>
                         </div>
                       </div>

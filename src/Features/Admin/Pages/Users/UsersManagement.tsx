@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { UserFilters } from '../../Types';
-import { useGetUsers, useDeactivateUser, useActivateUser } from '../../Hooks/useUsers';
+import { useGetUsers, useDeactivateUser, useActivateUser, useDeleteUser } from '../../Hooks/useUsers';
 import { toast } from 'react-toastify';
 
 interface UserWithMembership {
@@ -29,6 +29,7 @@ const UsersManagement: React.FC = () => {
   
   const { mutate: deactivateUser, isPending: isDeactivating } = useDeactivateUser();
   const { mutate: activateUser, isPending: isActivating } = useActivateUser();
+  const { mutate: deleteUser, isPending: isDeleting } = useDeleteUser();
 
   const { data: usersResponse, isLoading, error } = useGetUsers(currentPage, 15, searchTerm);
   
@@ -69,13 +70,16 @@ const UsersManagement: React.FC = () => {
 
   const confirmDelete = () => {
     if (deleteConfirm.user) {
-      deactivateUser(deleteConfirm.user.uuid, {
-        onSuccess: () => {
-          toast.success('User deactivated successfully');
+      console.log('Attempting to delete user:', deleteConfirm.user.uuid, deleteConfirm.user.username);
+      deleteUser(deleteConfirm.user.uuid, {
+        onSuccess: (data) => {
+          console.log('Delete success response:', data);
+          toast.success('User deleted successfully');
           setDeleteConfirm({ show: false, user: null });
         },
-        onError: () => {
-          toast.error('Failed to deactivate user');
+        onError: (error) => {
+          console.error('Delete error:', error);
+          toast.error('Failed to delete user');
         }
       });
     }
@@ -306,16 +310,16 @@ const UsersManagement: React.FC = () => {
                       <button 
                         onClick={() => handleViewUser(user.uuid)}
                         className="text-accent-cyan hover:text-accent-cyan-hover disabled:opacity-50"
-                        disabled={isDeactivating || isActivating}
+                        disabled={isDeleting || isActivating}
                       >
                         View
                       </button>
                       <button 
                         onClick={() => handleDeleteUser(user)}
                         className="text-red-600 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={isDeactivating || isActivating}
+                        disabled={isDeleting || isActivating}
                       >
-                        {isDeactivating ? 'Deleting...' : 'Delete'}
+                        {isDeleting ? 'Deleting...' : 'Delete'}
                       </button>
                       <button 
                         onClick={() => handleSuspendUser(user)}
@@ -324,7 +328,7 @@ const UsersManagement: React.FC = () => {
                             ? "text-yellow-600 hover:text-yellow-700" 
                             : "text-green-600 hover:text-green-700"
                         }`}
-                        disabled={isDeactivating || isActivating}
+                        disabled={isDeleting || isActivating}
                       >
                         {isDeactivating ? 'Processing...' : 
                          isActivating ? 'Activating...' :
@@ -400,7 +404,7 @@ const UsersManagement: React.FC = () => {
       {deleteConfirm.show && (
         <div 
           className="fixed inset-0 bg-black/20 flex items-center justify-center z-50"
-          onClick={isDeactivating ? undefined : () => setDeleteConfirm({ show: false, user: null })}
+          onClick={isDeleting ? undefined : () => setDeleteConfirm({ show: false, user: null })}
         >
           <div 
             className="bg-bg-secondary rounded-lg p-6 max-w-md w-full mx-4"
@@ -410,34 +414,34 @@ const UsersManagement: React.FC = () => {
               Confirm User Deletion
             </h3>
             <p className="text-text-secondary mb-4">
-              Are you sure you want to deactivate user <strong>{deleteConfirm.user?.username}</strong>? 
-              This action will prevent them from accessing their account.
+              Are you sure you want to <strong>permanently delete</strong> user <strong>{deleteConfirm.user?.username}</strong>? 
+              This action cannot be undone and will remove all user data.
             </p>
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
-              <p className="text-sm text-yellow-800">
-                <strong>Reason:</strong> Spam activity
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+              <p className="text-sm text-red-800">
+                <strong>Warning:</strong> This action is irreversible. All user data will be permanently removed.
               </p>
             </div>
             <div className="flex space-x-3">
               <button
                 onClick={() => setDeleteConfirm({ show: false, user: null })}
                 className="flex-1 px-4 py-2 text-text-secondary hover:text-text-primary border border-border rounded-lg hover:bg-bg-tertiary transition-colors duration-200 disabled:opacity-50"
-                disabled={isDeactivating}
+                disabled={isDeleting}
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDelete}
                 className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                disabled={isDeactivating}
+                disabled={isDeleting}
               >
-                {isDeactivating ? (
+                {isDeleting ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Deactivating...
+                    Deleting...
                   </>
                 ) : (
-                  'Deactivate User'
+                  'Delete User'
                 )}
               </button>
             </div>

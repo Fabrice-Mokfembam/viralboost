@@ -63,6 +63,7 @@ const Home = () => {
   // Get task completion data from profile
   const tasksCompleted = Submissions?.data?.submissions?.length || 0;
   const dailyGoal = user?.membership?.tasks_per_day || 5;
+  const memberShipData = user?.membership;
 
   console.log('account',accountData);
 
@@ -225,7 +226,7 @@ const Home = () => {
                     <h3 className="text-lg font-semibold text-text-primary">{task.title}</h3>
                     <p className="text-sm text-text-muted line-clamp-1">{task.description}</p>
                   </div>
-                  <div className="text-cyan-400 font-bold text-lg">${task.benefit}</div>
+                  <div className="text-cyan-400 font-bold text-lg">${memberShipData?.benefit_amount_per_task}</div>
                 </div>
               ))}
             </div>

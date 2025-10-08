@@ -36,3 +36,14 @@ export const activateUser = async (uuid: string) => {
   const { data } = await apiClient.post(`/admin/users/${uuid}/activate`);
   return data;
 };
+
+// Delete user
+export const deleteUser = async (uuid: string) => {
+  const { data } = await apiClient.delete(`/admin/users/${uuid}`, {
+    data: {
+      confirmation: "DELETE",
+      reason: "Admin deleting user account"
+    }
+  });
+  return data;
+};

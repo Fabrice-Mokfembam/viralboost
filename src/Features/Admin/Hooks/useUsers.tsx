@@ -4,7 +4,8 @@ import {
   getUserStats, 
   getUserById, 
   deactivateUser, 
-  activateUser 
+  activateUser,
+  deleteUser
 } from "../API/users";
 
 export const useGetUsers = (page = 1, limit = 20, search = '') => {
@@ -57,6 +58,37 @@ export const useActivateUser = () => {
     },
     onError: (error) => {
       console.error("Failed to activate user:", error);
+    },
+  });
+};
+
+export const useDeleteUser = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (uuid: string) => deleteUser(uuid),
+    onSuccess: (data, uuid) => {
+      console.log('User deleted successfully:', uuid, data);
+      // Remove the specific user from cache instead of invalidating all
+      queryClient.setQueriesData(
+        { queryKey: ["admin-users"] },
+        (oldData: unknown) => {
+          const data = oldData as { data?: { users?: Array<{ uuid: string }> } };
+          if (!data?.data?.users) return oldData;
+          return {
+            ...data,
+            data: {
+              ...data.data,
+              users: data.data.users.filter((user) => user.uuid !== uuid)
+            }
+          };
+        }
+      );
+      // Invalidate stats to refetch
+      queryClient.invalidateQueries({ queryKey: ["admin-user-stats"] });
+    },
+    onError: (error) => {
+      console.error("Failed to delete user:", error);
     },
   });
 };

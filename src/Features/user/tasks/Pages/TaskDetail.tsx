@@ -5,6 +5,8 @@ import { useGetUserTaskDetails } from '../Hooks/useTasks';
 import type { CloudinaryUploadResponse } from '../../../../types/cloudinary';
 import { useCloudinaryUpload } from '../../../../Hooks/useCloudinaryUpload';
 import { useSubmitTaskProof } from '../Hooks/useTaskSubmissions';
+import { useGetProfile } from '../../auth/Hooks/useAuth';
+import { getUserData } from '../../auth/Utils/authUtils';
 
 // import { useGetTaskById } from '../../../Admin/Hooks/useTasks';
 
@@ -16,7 +18,13 @@ const TaskDetail: React.FC = () => {
   const { data: taskData, isLoading, error } = useGetUserTaskDetails(id || '');
   const { uploadImage, isUploading, uploadProgress, error: uploadError } = useCloudinaryUpload();
   const { mutate: submitTaskProof, isPending: isSubmitting, error: submitError, isSuccess: submitSuccess } = useSubmitTaskProof();
+  const { data: userProfile } = useGetProfile();
+  const storedUser = getUserData();
   const navigate = useNavigate();
+  
+  // Use profile data if available, otherwise fall back to stored user data
+  const user = userProfile?.data?.user || storedUser;
+  const memberShipData = user?.membership;
   
 
   useEffect(() => {
@@ -131,7 +139,7 @@ const TaskDetail: React.FC = () => {
       {/* Task Info Box */}
       <section className="bg-bg-secondary rounded-2xl p-6 shadow-xl border border-cyan-600 mb-8">
         <h2 className="text-2xl font-bold text-text-primary mb-2">{task.title}</h2>
-        <p className="text-cyan-400 font-semibold mb-2">Reward: ${task.benefit}</p>
+        <p className="text-cyan-400 font-semibold mb-2">Reward: ${memberShipData?.benefit_amount_per_task}</p>
         <p className="text-text-secondary mb-4">{task.description}</p>
 
         {/* Task Details */}
