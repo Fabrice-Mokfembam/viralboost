@@ -46,3 +46,29 @@ export interface GetMyMembershipResponse {
     daily_progress: DailyProgress;
   };
 }
+
+// Membership purchase types
+export interface PurchaseMembershipPayload {
+  user_uuid: string;
+  membership_id: number;
+  membership_name: string;
+}
+
+export interface PurchaseMembershipResponse {
+  success: boolean;
+  message: string;
+  data: {
+    id: number;
+    user_uuid: string;
+    membership_id: number;
+    membership_name: string;
+    purchase_date: string;
+    status: string;
+  };
+}
+
+export interface PurchaseMembershipErrorResponse {
+  success: false;
+  message: string;
+  errors?: Record<string, string[]>;
+}

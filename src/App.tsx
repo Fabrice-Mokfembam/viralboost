@@ -8,7 +8,7 @@ import ResetPassword from './Features/user/auth/Pages/ResetPassword.tsx';
 import DashboardLayout from './Features/user/dashboard/Components/DashboardLayout.tsx';
 import Home from './Features/user/dashboard/Pages/Home.tsx';
 import Tasks from './Features/user/dashboard/Pages/Tasks.tsx';
-import Membership from './Features/user/dashboard/Pages/Membership.tsx';
+import Membership from './Features/user/memberships/pages/Membership.tsx';
 import Profile from './Features/user/profile/pages/Profile.tsx';
 import SinglePageLayout from './Features/user/dashboard/Components/SinglePageLayout.tsx';
 import TaskDetail from './Features/user/tasks/Pages/TaskDetail.tsx';

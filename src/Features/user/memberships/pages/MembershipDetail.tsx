@@ -1,25 +1,67 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Crown, Star, Users, CheckCircle, Zap, Shield, CreditCard, Calendar, Target,  TrendingUp, Gift } from 'lucide-react';
-import { useMemberships, useMyMembership } from '../hooks/useMemberships';
+import { ArrowLeft, Crown, Star, Users, CheckCircle, Zap, Shield, CreditCard, Calendar, Target,  TrendingUp, Gift, AlertCircle, Loader2 } from 'lucide-react';
+import { useMemberships, useMyMembership, usePurchaseMembership } from '../hooks/useMemberships';
+import { useAccount } from '../../accounts/Hooks/useAccount';
+import { useGetProfile } from '../../auth/Hooks/useAuth';
+import { getUserData } from '../../auth/Utils/authUtils';
 
 const MembershipDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: membershipsResponse, isLoading, error } = useMemberships();
   const { data: myMembershipResponse } = useMyMembership();
+  const { data: accountResponse, isLoading: accountLoading } = useAccount();
+  const { data: userProfile } = useGetProfile();
+  const purchaseMembershipMutation = usePurchaseMembership();
 
   const memberships = membershipsResponse?.data?.memberships || [];
   const membership = memberships.find(m => m.id === parseInt(id || '0'));
   const currentMembershipId = myMembershipResponse?.data?.membership?.id;
   const isCurrent = membership?.id === currentMembershipId;
   
+  // Get user data and balance
+  const storedUser = getUserData();
+  const user = userProfile?.data?.user || storedUser;
+  const userBalance = parseFloat(accountResponse?.data?.balance || '0');
+  const membershipPrice = parseFloat(membership?.price || '0');
+  const canAfford = userBalance >= membershipPrice;
+  
   // Extract subscription and daily progress data for current membership
   const subscription = myMembershipResponse?.data?.subscription;
   const dailyProgress = myMembershipResponse?.data?.daily_progress;
 
+  // Handle membership purchase
+  const handlePurchase = async () => {
+    if (!membership || !user?.uuid) {
+      alert('Unable to process purchase. Please try again.');
+      return;
+    }
+
+    if (!canAfford) {
+      alert('Insufficient balance to purchase this membership');
+      return;
+    }
+
+    try {
+      await purchaseMembershipMutation.mutateAsync({
+        user_uuid: user.uuid,
+        membership_id: membership.id,
+        membership_name: membership.membership_name
+      });
+      
+      alert('Membership purchased successfully!');
+    } catch (error: unknown) {
+      console.error('Purchase error:', error);
+      const errorMessage = error && typeof error === 'object' && 'response' in error 
+        ? (error as { response?: { data?: { message?: string } } })?.response?.data?.message 
+        : 'Failed to purchase membership. Please try again.';
+      alert(errorMessage);
+    }
+  };
+
   // Helper function to get membership styling based on membership ID (random colors)
-  const getMembershipStyling = (membership: any) => {
+  const getMembershipStyling = (membership: { id: number }) => {
     const membershipId = membership.id;
     
     // Define color schemes for different membership IDs
@@ -148,6 +190,71 @@ const MembershipDetail: React.FC = () => {
           </div>
         </div>
 
+        {/* Balance and Purchase Info */}
+        <div className="max-w-4xl mx-auto mb-8">
+          <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-2xl p-6 border border-cyan-500/20">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Current Balance */}
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <TrendingUp size={20} className="text-cyan-400" />
+                  <span className="text-text-muted text-sm font-medium">Current Balance</span>
+                </div>
+                <p className="text-2xl font-bold text-text-primary">
+                  ${accountLoading ? '...' : userBalance.toFixed(2)}
+                </p>
+              </div>
+
+              {/* Membership Price */}
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <CreditCard size={20} className="text-purple-400" />
+                  <span className="text-text-muted text-sm font-medium">Membership Price</span>
+                </div>
+                <p className="text-2xl font-bold text-text-primary">
+                  ${membershipPrice.toFixed(2)}
+                </p>
+              </div>
+
+              {/* Purchase Status */}
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  {canAfford ? (
+                    <CheckCircle size={20} className="text-green-400" />
+                  ) : (
+                    <AlertCircle size={20} className="text-red-400" />
+                  )}
+                  <span className="text-text-muted text-sm font-medium">Purchase Status</span>
+                </div>
+                <p className={`text-lg font-bold ${canAfford ? 'text-green-400' : 'text-red-400'}`}>
+                  {canAfford ? 'Can Purchase' : 'Insufficient Balance'}
+                </p>
+              </div>
+            </div>
+
+            {/* Insufficient Balance Warning */}
+            {!canAfford && !isCurrent && (
+              <div className="mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <AlertCircle size={20} className="text-red-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-red-400 font-medium mb-1">Insufficient Balance</p>
+                    <p className="text-red-300 text-sm">
+                      You need ${(membershipPrice - userBalance).toFixed(2)} more to purchase this membership. 
+                      <button 
+                        onClick={() => navigate('/v/recharge')}
+                        className="underline hover:text-red-200 ml-1"
+                      >
+                        Add funds
+                      </button>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Main Content */}
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -190,12 +297,19 @@ const MembershipDetail: React.FC = () => {
 
                 {/* Purchase Button */}
                 <button
-                  className={`w-full bg-gradient-to-r ${styling.buttonColor} text-white py-4 rounded-2xl font-bold text-lg shadow-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex items-center justify-center gap-2 group`}
+                  onClick={isCurrent ? undefined : handlePurchase}
+                  disabled={isCurrent || purchaseMembershipMutation.isPending || accountLoading}
+                  className={`w-full bg-gradient-to-r ${styling.buttonColor} text-white py-4 rounded-2xl font-bold text-lg shadow-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
                 >
                   {isCurrent ? (
                     <>
                       <CheckCircle size={20} />
                       Current Plan
+                    </>
+                  ) : purchaseMembershipMutation.isPending ? (
+                    <>
+                      <Loader2 size={20} className="animate-spin" />
+                      Processing...
                     </>
                   ) : (
                     <>
