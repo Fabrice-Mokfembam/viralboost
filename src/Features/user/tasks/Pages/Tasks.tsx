@@ -40,9 +40,12 @@ const Tasks = () => {
 
   useEffect(() => {
     if (Submissions?.data) {
-      console.log(Submissions.data.submissions);
+      console.log('Submissions data:', Submissions.data.submissions);
     }
-  }, [Submissions]);
+    if (Tasks?.data) {
+      console.log('Tasks data:', Tasks.data);
+    }
+  }, [Submissions, Tasks]);
 
   // Show loading state
   if (tasksLoading || submissionsLoading) {
@@ -71,7 +74,9 @@ const Tasks = () => {
   // Helper function to check if a task has been submitted
   const isTaskSubmitted = (taskId: number) => {
     if (!Submissions?.data?.submissions) return false;
-    return Submissions.data.submissions.some((submission: { task_id: number }) => submission.task_id === taskId);
+    const isSubmitted = Submissions.data.submissions.some((submission: { task_id: number }) => submission.task_id === taskId);
+    console.log(`Task ${taskId} submitted:`, isSubmitted);
+    return isSubmitted;
   };
 
   // Filter tasks based on active tab and submission status
@@ -92,16 +97,29 @@ const Tasks = () => {
       return [];
     }
     
+    console.log('Active tab:', activeTab);
+    console.log('Total tasks:', tasksArray.length);
+    console.log('Submissions:', Submissions?.data?.submissions);
+    
     switch (activeTab) {
-      case 'undone':
+      case 'undone': {
         // Show tasks that haven't been submitted yet
-        return tasksArray.filter((task: { id: number }) => !isTaskSubmitted(task.id));
-      case 'in-progress':
+        const undoneTasks = tasksArray.filter((task: { id: number }) => !isTaskSubmitted(task.id));
+        console.log('Undone tasks:', undoneTasks.length);
+        return undoneTasks;
+      }
+      case 'in-progress': {
         // Show tasks that are pending (this might be empty based on your logic)
-        return tasksArray.filter((task: { id: number; task_status: string }) => task.task_status === 'pending' && !isTaskSubmitted(task.id));
-      case 'completed':
+        const inProgressTasks = tasksArray.filter((task: { id: number; task_status: string }) => task.task_status === 'pending' && !isTaskSubmitted(task.id));
+        console.log('In progress tasks:', inProgressTasks.length);
+        return inProgressTasks;
+      }
+      case 'completed': {
         // Show tasks that have been submitted
-        return tasksArray.filter((task: { id: number }) => isTaskSubmitted(task.id));
+        const completedTasks = tasksArray.filter((task: { id: number }) => isTaskSubmitted(task.id));
+        console.log('Completed tasks:', completedTasks.length);
+        return completedTasks;
+      }
       default:
         return tasksArray;
     }

@@ -80,7 +80,7 @@ const Login: React.FC = () => {
             Boost
           </h2>
           <h3 className="mt-2 text-center text-2xl font-bold text-text-primary">
-            Welcome Back, Thiago
+            Welcome Back
           </h3>
         </div>
         <div className="bg-bg-main p-8 rounded-lg shadow-lg">
@@ -181,4 +181,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default Login; 

@@ -12,13 +12,15 @@ const dummyComplaints: Complaint[] = [
       username: 'john_doe',
       email: 'john.doe@example.com',
       phone: '+1234567890',
-            membershipTier: { id: 1, membership_name: 'Basic', description: 'Basic membership', tasks_per_day: 5, max_tasks: 10, benefit_amount_per_task: 0, price: 0,  is_active: 1, created_at: '2024-01-01', updated_at: '2024-01-01' },
+      membershipTier: { id: 1, membership_name: 'Basic', description: 'Basic membership', tasks_per_day: 5, max_tasks: 10, benefit_amount_per_task: 0, price: 0,  is_active: 1, created_at: '2024-01-01', updated_at: '2024-01-01' },
       totalPointsEarned: 1250,
       accountStatus: 'active',
       registrationDate: '2024-01-01',
       lastActive: '2024-01-15',
       isEmailVerified: true,
-      isPhoneVerified: true
+      isPhoneVerified: true,
+      tasks_completed_today: 3,
+      last_task_reset_date: '2024-01-15'
     },
     userEmail: 'john.doe@example.com',
     title: 'Task completion not credited',
@@ -44,7 +46,9 @@ const dummyComplaints: Complaint[] = [
       registrationDate: '2024-01-05',
       lastActive: '2024-01-14',
       isEmailVerified: true,
-      isPhoneVerified: true
+      isPhoneVerified: true,
+      tasks_completed_today: 8,
+      last_task_reset_date: '2024-01-14'
     },
     userEmail: 'jane.smith@example.com',
     title: 'Withdrawal taking too long',
@@ -71,7 +75,9 @@ const dummyComplaints: Complaint[] = [
       registrationDate: '2024-01-08',
       lastActive: '2024-01-13',
       isEmailVerified: true,
-      isPhoneVerified: false
+      isPhoneVerified: false,
+      tasks_completed_today: 2,
+      last_task_reset_date: '2024-01-13'
     },
     userEmail: 'mike.wilson@example.com',
     title: 'App crashes frequently',
@@ -97,7 +103,9 @@ const dummyComplaints: Complaint[] = [
       registrationDate: '2024-01-02',
       lastActive: '2024-01-15',
       isEmailVerified: true,
-      isPhoneVerified: true
+      isPhoneVerified: true,
+      tasks_completed_today: 25,
+      last_task_reset_date: '2024-01-15'
     },
     userEmail: 'sarah.jones@example.com',
     title: 'Premium features not working',
