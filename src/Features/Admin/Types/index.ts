@@ -24,6 +24,8 @@ export interface User {
   profilePicture?: string;
   isEmailVerified: boolean;
   isPhoneVerified: boolean;
+  tasks_completed_today: number;
+  last_task_reset_date: string | null;
 }
 
 export interface Task {

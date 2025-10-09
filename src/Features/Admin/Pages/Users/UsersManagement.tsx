@@ -18,6 +18,8 @@ interface UserWithMembership {
   registrationDate: string;
   username: string;
   profilePicture: string | null;
+  tasks_completed_today: number;
+  last_task_reset_date: string | null;
 }
 
 const UsersManagement: React.FC = () => {

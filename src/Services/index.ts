@@ -3,7 +3,8 @@ import { getAuthToken, clearAuthData } from '../Features/user/auth/Utils/authUti
 import { getAdminToken, clearAdminData } from '../Features/Admin/Utils/adminUtils';
 
 const apiClient: AxiosInstance = axios.create({
-  baseURL: 'https://viral.logisticcargoexpres.com/api/v1',
+  baseURL: 'http://127.0.0.1:8000/api/v1',
+ // baseURL: 'https://viral.logisticcargoexpres.com/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },
