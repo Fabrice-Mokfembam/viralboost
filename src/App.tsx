@@ -44,7 +44,6 @@ import AdminProtectedRoute from './Features/Admin/Components/AdminProtectedRoute
 import TaskEdit from './Features/Admin/Pages/Tasks/TaskEdit.tsx';
 import TaskAdminDetail from './Features/Admin/Pages/Tasks/TaskDetail.tsx';
 import ComplaintsManagement from './Features/Admin/Pages/Complaints/ComplaintsManagement.tsx';
-import NotificationsManagement from './Features/Admin/Pages/Notifications/NotificationsManagement.tsx';
 import TransactionsManagement from './Features/Admin/Pages/Transactions/TransactionsManagement.tsx';
 import PaymentDetail from './Features/Admin/Pages/Transactions/PaymentDetail.tsx';
 import WithdrawalsManagement from './Features/Admin/Pages/Transactions/WithdrawalsManagement.tsx';
@@ -267,10 +266,6 @@ const router = createBrowserRouter([
       {
         path: "complaints",
         element: <ComplaintsManagement />,
-      },
-      {
-        path: "notifications",
-        element: <NotificationsManagement />,
       },
       {
         path: "transactions",

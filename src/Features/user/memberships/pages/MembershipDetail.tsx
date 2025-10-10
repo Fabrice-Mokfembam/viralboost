@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Crown, Star, Users, CheckCircle, Zap, Shield, CreditCard, Calendar, Target,  TrendingUp, Gift, AlertCircle, Loader2 } from 'lucide-react';
-import { useMemberships, useMyMembership, usePurchaseMembership } from '../hooks/useMemberships';
+import { useMemberships, usePurchaseMembership } from '../hooks/useMemberships';
 import { useAccount } from '../../accounts/Hooks/useAccount';
 import { useGetProfile } from '../../auth/Hooks/useAuth';
 import { getUserData } from '../../auth/Utils/authUtils';
@@ -10,26 +10,23 @@ const MembershipDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: membershipsResponse, isLoading, error } = useMemberships();
-  const { data: myMembershipResponse } = useMyMembership();
   const { data: accountResponse, isLoading: accountLoading } = useAccount();
   const { data: userProfile } = useGetProfile();
   const purchaseMembershipMutation = usePurchaseMembership();
 
   const memberships = membershipsResponse?.data?.memberships || [];
   const membership = memberships.find(m => m.id === parseInt(id || '0'));
-  const currentMembershipId = myMembershipResponse?.data?.membership?.id;
-  const isCurrent = membership?.id === currentMembershipId;
   
   // Get user data and balance
   const storedUser = getUserData();
   const user = userProfile?.data?.user || storedUser;
+  const currentMembershipId = user?.membership?.id;
+  const isCurrent = membership?.id === currentMembershipId;
+  
   const userBalance = parseFloat(accountResponse?.data?.balance || '0');
   const membershipPrice = parseFloat(membership?.price || '0');
   const canAfford = userBalance >= membershipPrice;
-  
-  // Extract subscription and daily progress data for current membership
-  const subscription = myMembershipResponse?.data?.subscription;
-  const dailyProgress = myMembershipResponse?.data?.daily_progress;
+  const isFreeMembership = membershipPrice === 0;
 
   // Handle membership purchase
   const handlePurchase = async () => {
@@ -163,23 +160,26 @@ const MembershipDetail: React.FC = () => {
       <div className="relative z-10 pt-8 pb-20 px-4">
         {/* Header */}
         <div className="max-w-4xl mx-auto mb-8">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 mb-6 transition-colors"
-          >
-            <ArrowLeft size={20} />
-            Back to Memberships
-          </button>
+          <div className="flex items-center justify-between mb-6">
+            <button
+              onClick={() => navigate(-1)}
+              className="w-10 h-10 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 rounded-xl flex items-center justify-center shadow-lg transition-all duration-300 transform hover:scale-105"
+            >
+              <ArrowLeft size={20} className="text-white" />
+            </button>
+            <h1 className="text-2xl font-bold text-text-primary">Membership Details</h1>
+            <div className="w-10 h-10"></div> {/* Spacer for center alignment */}
+          </div>
           
           <div className="text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-full border border-cyan-500/30 mb-6">
               {styling.icon}
-              <span className="text-cyan-300 font-semibold text-sm">Membership Details</span>
+              <span className="text-cyan-300 font-semibold text-sm">Premium Membership</span>
             </div>
             
-            <h1 className="text-4xl font-bold text-text-primary mb-4 bg-gradient-to-r from-text-primary to-cyan-400 bg-clip-text text-transparent">
+            <h2 className="text-4xl font-bold text-text-primary mb-4 bg-gradient-to-r from-text-primary to-cyan-400 bg-clip-text text-transparent">
               {membership.membership_name}
-            </h1>
+            </h2>
             
             {isCurrent && (
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-full border border-green-500/30 mb-6">
@@ -190,70 +190,79 @@ const MembershipDetail: React.FC = () => {
           </div>
         </div>
 
-        {/* Balance and Purchase Info */}
-        <div className="max-w-4xl mx-auto mb-8">
-          <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-2xl p-6 border border-cyan-500/20">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Current Balance */}
-              <div className="text-center">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <TrendingUp size={20} className="text-cyan-400" />
-                  <span className="text-text-muted text-sm font-medium">Current Balance</span>
-                </div>
-                <p className="text-2xl font-bold text-text-primary">
-                  ${accountLoading ? '...' : userBalance.toFixed(2)}
-                </p>
+        {/* Balance and Purchase Info - Only show for paid memberships */}
+        {!isFreeMembership && (
+          <div className="max-w-4xl mx-auto mb-8">
+            <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary rounded-3xl p-8 shadow-2xl border border-cyan-500/20">
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold text-text-primary mb-2">Purchase Information</h3>
+                <p className="text-text-muted">Review your balance and purchase eligibility</p>
               </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {/* Current Balance */}
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-cyan-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <TrendingUp size={24} className="text-cyan-400" />
+                  </div>
+                  <p className="text-text-muted text-sm font-medium mb-2">Current Balance</p>
+                  <p className="text-3xl font-bold text-text-primary">
+                    ${accountLoading ? '...' : userBalance.toFixed(2)}
+                  </p>
+                </div>
 
-              {/* Membership Price */}
-              <div className="text-center">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <CreditCard size={20} className="text-purple-400" />
-                  <span className="text-text-muted text-sm font-medium">Membership Price</span>
+                {/* Membership Price */}
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-purple-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <CreditCard size={24} className="text-purple-400" />
+                  </div>
+                  <p className="text-text-muted text-sm font-medium mb-2">Membership Price</p>
+                  <p className="text-3xl font-bold text-text-primary">
+                    ${membershipPrice.toFixed(2)}
+                  </p>
                 </div>
-                <p className="text-2xl font-bold text-text-primary">
-                  ${membershipPrice.toFixed(2)}
-                </p>
-              </div>
 
-              {/* Purchase Status */}
-              <div className="text-center">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  {canAfford ? (
-                    <CheckCircle size={20} className="text-green-400" />
-                  ) : (
-                    <AlertCircle size={20} className="text-red-400" />
-                  )}
-                  <span className="text-text-muted text-sm font-medium">Purchase Status</span>
+                {/* Purchase Status */}
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-green-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    {canAfford ? (
+                      <CheckCircle size={24} className="text-green-400" />
+                    ) : (
+                      <AlertCircle size={24} className="text-red-400" />
+                    )}
+                  </div>
+                  <p className="text-text-muted text-sm font-medium mb-2">Purchase Status</p>
+                  <p className={`text-xl font-bold ${canAfford ? 'text-green-400' : 'text-red-400'}`}>
+                    {canAfford ? 'Can Purchase' : 'Insufficient Balance'}
+                  </p>
                 </div>
-                <p className={`text-lg font-bold ${canAfford ? 'text-green-400' : 'text-red-400'}`}>
-                  {canAfford ? 'Can Purchase' : 'Insufficient Balance'}
-                </p>
               </div>
-            </div>
 
             {/* Insufficient Balance Warning */}
             {!canAfford && !isCurrent && (
-              <div className="mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
-                <div className="flex items-start gap-3">
-                  <AlertCircle size={20} className="text-red-400 mt-0.5 flex-shrink-0" />
+              <div className="mt-8 p-6 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-2xl border border-red-500/20">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <AlertCircle size={24} className="text-red-400" />
+                  </div>
                   <div>
-                    <p className="text-red-400 font-medium mb-1">Insufficient Balance</p>
-                    <p className="text-red-300 text-sm">
-                      You need ${(membershipPrice - userBalance).toFixed(2)} more to purchase this membership. 
-                      <button 
-                        onClick={() => navigate('/v/recharge')}
-                        className="underline hover:text-red-200 ml-1"
-                      >
-                        Add funds
-                      </button>
+                    <h4 className="text-red-400 font-semibold text-lg mb-2">Insufficient Balance</h4>
+                    <p className="text-red-300 mb-3">
+                      You need <span className="font-bold">${(membershipPrice - userBalance).toFixed(2)}</span> more to purchase this membership.
                     </p>
+                    <button 
+                      onClick={() => navigate('/v/recharge')}
+                      className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105"
+                    >
+                      Add Funds
+                    </button>
                   </div>
                 </div>
               </div>
             )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Main Content */}
         <div className="max-w-4xl mx-auto">
@@ -279,11 +288,13 @@ const MembershipDetail: React.FC = () => {
                   <div className="mb-6">
                     <div className="flex items-center justify-center gap-2">
                       <span className={`${styling.textColor} text-5xl font-bold`}>
-                        ${membership.price}
+                        {isFreeMembership ? 'Free' : `$${membership.price}`}
                       </span>
-                      <span className={`${styling.textColor} text-xl opacity-80`}>
-                        / membership
-                      </span>
+                      {!isFreeMembership && (
+                        <span className={`${styling.textColor} text-xl opacity-80`}>
+                          / membership
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -295,164 +306,127 @@ const MembershipDetail: React.FC = () => {
                   </p>
                 </div>
 
-                {/* Purchase Button */}
-                <button
-                  onClick={isCurrent ? undefined : handlePurchase}
-                  disabled={isCurrent || purchaseMembershipMutation.isPending || accountLoading}
-                  className={`w-full bg-gradient-to-r ${styling.buttonColor} text-white py-4 rounded-2xl font-bold text-lg shadow-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
-                >
-                  {isCurrent ? (
-                    <>
-                      <CheckCircle size={20} />
-                      Current Plan
-                    </>
-                  ) : purchaseMembershipMutation.isPending ? (
-                    <>
-                      <Loader2 size={20} className="animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard size={20} />
-                      Purchase Now
-                    </>
-                  )}
-                </button>
+                {/* Purchase Button - Only show if not free membership */}
+                {!isFreeMembership && (
+                  <button
+                    onClick={isCurrent ? undefined : handlePurchase}
+                    disabled={isCurrent || purchaseMembershipMutation.isPending || accountLoading}
+                    className={`w-full bg-gradient-to-r ${styling.buttonColor} text-white py-4 rounded-2xl font-bold text-lg shadow-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
+                  >
+                    {isCurrent ? (
+                      <>
+                        <CheckCircle size={20} />
+                        Current Plan
+                      </>
+                    ) : purchaseMembershipMutation.isPending ? (
+                      <>
+                        <Loader2 size={20} className="animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard size={20} />
+                        Purchase Now
+                      </>
+                    )}
+                  </button>
+                )}
+
+                {/* Free Membership Message */}
+                {isFreeMembership && (
+                  <div className="w-full bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 text-green-400 py-4 rounded-2xl font-bold text-lg text-center">
+                    <CheckCircle size={20} className="inline mr-2" />
+                    Free Membership - No Purchase Required
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Features & Benefits */}
             <div className="space-y-6">
               {/* Key Features */}
-              <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary rounded-2xl p-6 border border-cyan-500/20">
-                <h3 className="text-text-primary font-bold text-xl mb-4 flex items-center gap-2">
-                  <Target size={20} className="text-cyan-400" />
-                  Key Features
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-cyan-500/20 rounded-lg flex items-center justify-center">
-                      <Calendar size={16} className="text-cyan-400" />
+              <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary rounded-3xl p-8 shadow-2xl border border-cyan-500/20">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center">
+                    <Target size={24} className="text-cyan-400" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-text-primary">Key Features</h3>
+                </div>
+                <div className="space-y-6">
+                  <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-bg-tertiary to-bg-secondary rounded-2xl border border-cyan-500/20">
+                    <div className="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center">
+                      <Calendar size={20} className="text-cyan-400" />
                     </div>
                     <div>
-                      <p className="text-text-primary font-medium">{membership.tasks_per_day} Tasks Per Day</p>
-                      <p className="text-text-muted text-sm">Daily task limit for this membership</p>
+                      <p className="text-text-primary font-semibold text-lg">{membership.tasks_per_day} Tasks Per Day</p>
+                      <p className="text-text-muted">Daily task limit for this membership</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
-                      <Zap size={16} className="text-green-400" />
+                  <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-bg-tertiary to-bg-secondary rounded-2xl border border-green-500/20">
+                    <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
+                      <Zap size={20} className="text-green-400" />
                     </div>
                     <div>
-                      <p className="text-text-primary font-medium">Max {membership.max_tasks} Total Tasks</p>
-                      <p className="text-text-muted text-sm">Maximum tasks available in this plan</p>
+                      <p className="text-text-primary font-semibold text-lg">Max {membership.max_tasks} Total Tasks</p>
+                      <p className="text-text-muted">Maximum tasks available in this plan</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                      <Star size={16} className="text-purple-400" />
+                  <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-bg-tertiary to-bg-secondary rounded-2xl border border-purple-500/20">
+                    <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
+                      <Star size={20} className="text-purple-400" />
                     </div>
                     <div>
-                      <p className="text-text-primary font-medium">${membership.benefit_amount_per_task} Per Task</p>
-                      <p className="text-text-muted text-sm">Earnings per completed task</p>
+                      <p className="text-text-primary font-semibold text-lg">${membership.benefit_amount_per_task} Per Task</p>
+                      <p className="text-text-muted">Earnings per completed task</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Benefits */}
-              <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary rounded-2xl p-6 border border-cyan-500/20">
-                <h3 className="text-text-primary font-bold text-xl mb-4 flex items-center gap-2">
-                  <Shield size={20} className="text-green-400" />
-                  Benefits Included
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-green-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <CheckCircle size={14} className="text-green-400" />
+              <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary rounded-3xl p-8 shadow-2xl border border-green-500/20">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
+                    <Shield size={24} className="text-green-400" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-text-primary">Benefits Included</h3>
+                </div>
+                <div className="p-6 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl border border-green-500/20">
+                  <div className="flex items-start gap-4">
+                    <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <CheckCircle size={16} className="text-green-400" />
                     </div>
-                    <p className="text-text-secondary text-sm leading-relaxed">
+                    <p className="text-text-secondary leading-relaxed text-lg">
                       {membership.description}
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* Current Membership Status (only show if this is the user's current membership) */}
-              {isCurrent && subscription && dailyProgress && (
+                  {/* Current Membership Status (only show if this is the user's current membership) */}
+                  {isCurrent && (
                 <>
-                  {/* Subscription Status */}
-                  <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary rounded-2xl p-6 border border-green-500/20">
-                    <h3 className="text-text-primary font-bold text-xl mb-4 flex items-center gap-2">
-                      <Calendar size={20} className="text-green-400" />
-                      Subscription Status
-                    </h3>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-text-muted">Status:</span>
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          subscription.is_active 
-                            ? 'bg-green-500/20 text-green-400' 
-                            : 'bg-red-500/20 text-red-400'
-                        }`}>
-                          {subscription.is_active ? 'Active' : 'Inactive'}
-                        </span>
+                  {/* Current Membership Info */}
+                  <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary rounded-3xl p-8 shadow-2xl border border-green-500/20">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
+                        <CheckCircle size={24} className="text-green-400" />
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-text-muted">Started:</span>
-                        <span className="text-text-primary">
-                          {new Date(subscription.started_at).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-text-muted">Expires:</span>
-                        <span className="text-text-primary">
-                          {new Date(subscription.expires_at).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-text-muted">Remaining Days:</span>
-                        <span className="text-text-primary font-semibold">
-                          {subscription.remaining_days} days
-                        </span>
-                      </div>
+                      <h3 className="text-2xl font-bold text-text-primary">Current Membership</h3>
                     </div>
-                  </div>
-
-                  {/* Daily Progress */}
-                  <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary rounded-2xl p-6 border border-blue-500/20">
-                    <h3 className="text-text-primary font-bold text-xl mb-4 flex items-center gap-2">
-                      <TrendingUp size={20} className="text-blue-400" />
-                      Today's Progress
-                    </h3>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-text-muted">Tasks Completed:</span>
-                        <span className="text-text-primary font-semibold">
-                          {dailyProgress.tasks_completed} / {dailyProgress.daily_limit}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-text-muted">Remaining Tasks:</span>
-                        <span className="text-text-primary font-semibold">
-                          {dailyProgress.remaining_tasks}
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-700 rounded-full h-3">
-                        <div 
-                          className="bg-gradient-to-r from-blue-500 to-cyan-500 h-3 rounded-full transition-all duration-300"
-                          style={{ 
-                            width: `${(dailyProgress.tasks_completed / dailyProgress.daily_limit) * 100}%` 
-                          }}
-                        ></div>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-text-muted">Progress:</span>
-                        <span className="text-text-primary">
-                          {Math.round((dailyProgress.tasks_completed / dailyProgress.daily_limit) * 100)}%
-                        </span>
+                    <div className="p-6 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl border border-green-500/20">
+                      <div className="flex items-start gap-4">
+                        <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                          <CheckCircle size={16} className="text-green-400" />
+                        </div>
+                        <div>
+                          <p className="text-text-primary font-semibold text-lg mb-2">You are currently subscribed to this membership</p>
+                          <p className="text-text-secondary leading-relaxed">
+                            Enjoy all the benefits and features included in this plan. Subscription and progress details will be available soon.
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>

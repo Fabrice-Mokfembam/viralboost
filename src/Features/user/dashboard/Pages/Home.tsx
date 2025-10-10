@@ -100,17 +100,14 @@ const Home = () => {
     </div>
   );
 
-
-
-
   
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-bg-main via-bg-secondary to-bg-main">
-      <div className="max-w-lg mx-auto px-4 py-8">
+      <div className="max-w-lg mx-auto px-3 py-6">
       {/* Header */}
-      <header className="mb-8 space-y-5">
-        <h1 className="text-3xl font-extrabold text-cyan-400 text-center">
+      <header className="mb-6 space-y-4">
+        <h1 className="text-2xl font-extrabold text-cyan-400 text-center">
           Welcome Back! {firstName}
         </h1>
         <p className="text-text-muted text-center">
@@ -118,19 +115,19 @@ const Home = () => {
         </p>
 
         {/* Balance & Top-up */}
-        <div className="relative overflow-hidden rounded-2xl shadow-2xl mb-8">
-          <div className="relative p-6">
+        <div className="relative overflow-hidden rounded-2xl shadow-2xl mb-6">
+          <div className="relative p-4">
             {accountLoading ? (
               <BalanceSkeleton />
             ) : (
-              <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-4 flex justify-between items-center shadow-lg">
+              <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-3 flex justify-between items-center shadow-lg">
                 <div>
                   <p className="text-text-muted text-sm">Current Balance</p>
-                  <p className="text-text-primary font-bold text-xl">${accountData?.data?.balance || '0.00'}</p>
+                  <p className="text-text-primary font-bold text-lg">${accountData?.data?.balance || '0.00'}</p>
                 </div>
                 <button
                   onClick={() => navigate('/v/recharge')}
-                  className="flex items-center bg-cyan-500 hover:bg-cyan-600 text-text-primary rounded-lg py-2 px-4 font-semibold shadow"
+                  className="flex items-center bg-cyan-500 hover:bg-cyan-600 text-text-primary rounded-lg py-2 px-3 font-semibold shadow text-sm"
                 >
                   <PlusCircle size={20} className="mr-2" />
                   Top Up
@@ -141,51 +138,51 @@ const Home = () => {
         </div>
 
         {/* Main Buttons */}
-        <div className="grid grid-cols-3 gap-3 mb-8">
+        <div className="grid grid-cols-3 gap-2 mb-6">
           <button
             onClick={() => navigate('/dashboard/membership')}
-            className="group bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 rounded-xl p-4 shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+            className="group bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 rounded-xl p-3 shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
           >
             <div className="flex flex-col items-center space-y-2">
-              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center group-hover:bg-white/30 transition-colors">
+              <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center group-hover:bg-white/30 transition-colors">
                 <UserCheck size={20} className="text-white" />
               </div>
-              <span className="text-white text-sm font-semibold">Membership</span>
+              <span className="text-white text-xs font-semibold">Membership</span>
             </div>
           </button>
           <button
             onClick={() => navigate('/v/withdraw')}
-            className="group bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 rounded-xl p-4 shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+            className="group bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 rounded-xl p-3 shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
           >
             <div className="flex flex-col items-center space-y-2">
-              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center group-hover:bg-white/30 transition-colors">
+              <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center group-hover:bg-white/30 transition-colors">
                 <CreditCard size={20} className="text-white" />
               </div>
-              <span className="text-white text-sm font-semibold">Withdraw</span>
+              <span className="text-white text-xs font-semibold">Withdraw</span>
             </div>
           </button>
           <button
             onClick={() => navigate('/v/aboutcompany')}
-            className="group bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 rounded-xl p-4 shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+            className="group bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 rounded-xl p-3 shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
           >
             <div className="flex flex-col items-center space-y-2">
-              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center group-hover:bg-white/30 transition-colors">
+              <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center group-hover:bg-white/30 transition-colors">
                 <Info size={20} className="text-white" />
               </div>
-              <span className="text-white text-sm font-semibold">About</span>
+              <span className="text-white text-xs font-semibold">About</span>
             </div>
           </button>
         </div>
       </header>
 
       {/* Tasks Progress */}
-      <div className="relative overflow-hidden rounded-2xl shadow-2xl mb-8">
-        <div className="relative p-6">
-          <h2 className="text-xl font-bold mb-4 text-cyan-400">Today's Progress</h2>
+      <div className="relative overflow-hidden rounded-2xl shadow-2xl mb-6">
+        <div className="relative p-4">
+          <h2 className="text-lg font-bold mb-3 text-cyan-400">Today's Progress</h2>
           {submissionsLoading ? (
             <ProgressSkeleton />
           ) : (
-            <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-4">
+            <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-3">
               <div className="bg-gray-800 rounded-full overflow-hidden h-5 mb-2 shadow-inner">
                 <div
                   className="bg-gradient-to-r from-cyan-500 to-cyan-600 h-full transition-all"
@@ -201,9 +198,9 @@ const Home = () => {
       </div>
 
       {/* Activities */}
-      <div className="relative overflow-hidden rounded-2xl shadow-2xl mb-8">
-        <div className="relative p-6">
-          <h2 className="text-xl font-bold mb-4 text-cyan-400">Your Activities</h2>
+      <div className="relative overflow-hidden rounded-2xl shadow-2xl mb-6">
+        <div className="relative p-4">
+          <h2 className="text-lg font-bold mb-3 text-cyan-400">Your Activities</h2>
           
           {tasksLoading || submissionsLoading ? (
             <div className="space-y-4">
@@ -212,21 +209,21 @@ const Home = () => {
               <ActivitySkeleton />
             </div>
           ) : availableTasks.length > 0 ? (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {availableTasks.slice(0, 3).map((task: { id: number; title: string; description: string; platform: string; benefit: string }) => (
                 <div
                   key={task.id}
                   onClick={() => navigate(`/v/task/${task.id}`)}
-                  className="flex items-center bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl shadow-lg p-4 hover:from-cyan-500/10 hover:to-cyan-600/10 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl cursor-pointer border border-gray-700/50 hover:border-cyan-500/50"
+                  className="flex items-center bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl shadow-lg p-3 hover:from-cyan-500/10 hover:to-cyan-600/10 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl cursor-pointer border border-gray-700/50 hover:border-cyan-500/50"
                 >
-                  <div className="w-12 h-12 bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl flex items-center justify-center group-hover:from-cyan-500/20 group-hover:to-cyan-600/20 transition-all duration-300">
+                  <div className="w-10 h-10 bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl flex items-center justify-center group-hover:from-cyan-500/20 group-hover:to-cyan-600/20 transition-all duration-300 flex-shrink-0">
                     {getPlatformIcon(task.platform)}
                   </div>
-                  <div className="ml-4 flex-1">
-                    <h3 className="text-lg font-semibold text-text-primary">{task.title}</h3>
-                    <p className="text-sm text-text-muted line-clamp-1">{task.description}</p>
+                  <div className="ml-3 flex-1 min-w-0">
+                    <h3 className="text-base font-semibold text-text-primary line-clamp-2 leading-tight">{task.title}</h3>
+                    <p className="text-xs text-text-muted line-clamp-1">{task.description}</p>
                   </div>
-                  <div className="text-cyan-400 font-bold text-lg">${memberShipData?.benefit_amount_per_task}</div>
+                  <div className="text-cyan-400 font-bold text-sm flex-shrink-0">${memberShipData?.benefit_amount_per_task}</div>
                 </div>
               ))}
             </div>
@@ -248,24 +245,24 @@ const Home = () => {
       </div>
 
       {/* Referral Invite */}
-      <div className="relative overflow-hidden rounded-2xl shadow-2xl mb-8">
-        <div className="relative p-6">
-          <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-4 border border-cyan-500/20">
-            <div className="flex items-center space-x-4 mb-3">
-              <div className="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center">
-                <Gift size={24} className="text-cyan-400" />
+      <div className="relative overflow-hidden rounded-2xl shadow-2xl mb-6">
+        <div className="relative p-4">
+          <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-3 border border-cyan-500/20">
+            <div className="flex items-center space-x-3 mb-2">
+              <div className="w-10 h-10 bg-cyan-500/20 rounded-xl flex items-center justify-center">
+                <Gift size={20} className="text-cyan-400" />
               </div>
-              <h3 className="text-cyan-400 font-semibold text-lg">Invite Friends</h3>
+              <h3 className="text-cyan-400 font-semibold text-base">Invite Friends</h3>
             </div>
-            <p className="text-text-muted text-sm mb-4">
+            <p className="text-text-muted text-xs mb-3">
               Earn bonus rewards when your friends join and complete tasks!
             </p>
             <button
               onClick={() => navigate('/v/invitefriends')}
-              className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 rounded-xl p-3 shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl flex items-center justify-center space-x-2"
+              className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 rounded-xl p-2 shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl flex items-center justify-center space-x-2"
             >
-              <Gift size={20} className="text-white" />
-              <span className="text-white font-semibold">Invite Now</span>
+              <Gift size={16} className="text-white" />
+              <span className="text-white font-semibold text-sm">Invite Now</span>
             </button>
           </div>
         </div>
@@ -273,19 +270,19 @@ const Home = () => {
 
       {/* About & Support Links */}
       <div className="relative overflow-hidden rounded-2xl shadow-2xl">
-        <div className="relative p-6">
-          <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-4 border border-cyan-500/20">
-            <h3 className="font-semibold text-cyan-400 mb-4 text-lg">About Company & Support</h3>
-            <p className="text-text-muted text-sm mb-4">
+        <div className="relative p-4">
+          <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-3 border border-cyan-500/20">
+            <h3 className="font-semibold text-cyan-400 mb-3 text-base">About Company & Support</h3>
+            <p className="text-text-muted text-xs mb-3">
               This app helps you earn rewards by completing simple online tasks like
               liking videos and subscribing to channels. Manage your balance,
               withdraw earnings, and track your progress easily.
             </p>
-            <ul className="space-y-2">
+            <ul className="space-y-1">
               <li>
                 <button
                   onClick={() => navigate('/v/helpcenter')}
-                  className="text-cyan-400 hover:text-cyan-300 hover:underline cursor-pointer text-sm transition-colors"
+                  className="text-cyan-400 hover:text-cyan-300 hover:underline cursor-pointer text-xs transition-colors"
                 >
                   Support Center
                 </button>
@@ -293,7 +290,7 @@ const Home = () => {
               <li>
                 <button
                   onClick={() => navigate('/v/helpcenter')}
-                  className="text-cyan-400 hover:text-cyan-300 hover:underline cursor-pointer text-sm transition-colors"
+                  className="text-cyan-400 hover:text-cyan-300 hover:underline cursor-pointer text-xs transition-colors"
                 >
                   FAQs
                 </button>
@@ -301,7 +298,7 @@ const Home = () => {
               <li>
                 <button
                   onClick={() => navigate('/v/privacypolicy')}
-                  className="text-cyan-400 hover:text-cyan-300 hover:underline cursor-pointer text-sm transition-colors"
+                  className="text-cyan-400 hover:text-cyan-300 hover:underline cursor-pointer text-xs transition-colors"
                 >
                   Privacy Policy
                 </button>

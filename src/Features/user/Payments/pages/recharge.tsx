@@ -1,6 +1,7 @@
 import  { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {ustd,bigcoin,Ethereum} from '../../../../assets/images'
+import { ArrowLeft } from 'lucide-react';
 
 const rechargeMethods = [
   { id: 'USDT', name: 'USDT', icon: <img src={ustd} alt="USDT" /> },
@@ -36,8 +37,19 @@ const Recharge = () => {
   };
 
   return (
-    <div className="min-h-screen bg-bg-main p-6 max-w-xl mx-auto text-text-secondary">
-      <h1 className="text-3xl font-bold text-accent-cyan mb-6">Recharge Account</h1>
+    <div className="min-h-screen bg-gradient-to-br from-bg-main via-bg-secondary to-bg-main">
+      <div className="max-w-xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <button
+            onClick={() => navigate('/v/accountdetails')}
+            className="w-10 h-10 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 rounded-xl flex items-center justify-center shadow-lg transition-all duration-300 transform hover:scale-105"
+          >
+            <ArrowLeft size={20} className="text-white" />
+          </button>
+          <h1 className="text-2xl font-bold text-text-primary">Recharge Account</h1>
+          <div className="w-10 h-10"></div> {/* Spacer for center alignment */}
+        </div>
 
       <div className="mb-6">
         <label className="block mb-2 font-semibold text-text-primary">Amount to Recharge</label>
@@ -84,6 +96,7 @@ const Recharge = () => {
       >
         Recharge Now
       </button>
+      </div>
     </div>
   );
 };

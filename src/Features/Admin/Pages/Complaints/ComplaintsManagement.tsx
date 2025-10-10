@@ -1,129 +1,32 @@
-import React, { useState } from 'react';
-import { Search, Filter, CheckCircle, XCircle, Trash2, Eye, Mail, Phone, AlertTriangle } from 'lucide-react';
-import type { Complaint } from '../../Types';
+import React, { useEffect, useState } from 'react';
+import { Search, Filter, CheckCircle, XCircle, Trash2, Eye, Mail, Phone, AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useGetComplaints, useUpdateComplaintStatus, useDeleteComplaint, useGetComplaintStats } from '../../Hooks/useComplaints';
+import { toast } from 'react-toastify';
 
-// Dummy data for complaints
-const dummyComplaints: Complaint[] = [
-  {
-    id: '1',
-    userId: 'user1',
-    user: {
-      id: 'user1',
-      username: 'john_doe',
-      email: 'john.doe@example.com',
-      phone: '+1234567890',
-      membershipTier: { id: 1, membership_name: 'Basic', description: 'Basic membership', tasks_per_day: 5, max_tasks: 10, benefit_amount_per_task: 0, price: 0,  is_active: 1, created_at: '2024-01-01', updated_at: '2024-01-01' },
-      totalPointsEarned: 1250,
-      accountStatus: 'active',
-      registrationDate: '2024-01-01',
-      lastActive: '2024-01-15',
-      isEmailVerified: true,
-      isPhoneVerified: true,
-      tasks_completed_today: 3,
-      last_task_reset_date: '2024-01-15'
-    },
-    userEmail: 'john.doe@example.com',
-    title: 'Task completion not credited',
-    description: 'Completed the video like task but did not receive credit for it. The task was completed successfully but the points were not added to my account.',
-    severity: 'high',
-    status: 'open',
-    contact: 'john.doe@example.com',
-    contactType: 'email',
-    createdAt: '2024-01-15T10:30:00Z',
-    updatedAt: '2024-01-15T10:30:00Z'
-  },
-  {
-    id: '2',
-    userId: 'user2',
-    user: {
-      id: 'user2',
-      username: 'jane_smith',
-      email: 'jane.smith@example.com',
-      phone: '+1234567891',
-      membershipTier: { id: 2, membership_name: 'Premium', description: 'Premium membership', tasks_per_day: 15, max_tasks: 30, benefit_amount_per_task: 9.99, price: 9.99, is_active: 1, created_at: '2024-01-01', updated_at: '2024-01-01' },
-      totalPointsEarned: 2500,
-      accountStatus: 'active',
-      registrationDate: '2024-01-05',
-      lastActive: '2024-01-14',
-      isEmailVerified: true,
-      isPhoneVerified: true,
-      tasks_completed_today: 8,
-      last_task_reset_date: '2024-01-14'
-    },
-    userEmail: 'jane.smith@example.com',
-    title: 'Withdrawal taking too long',
-    description: 'My withdrawal request has been pending for over a week. I submitted the request on January 8th and it\'s still showing as pending.',
-    severity: 'medium',
-    status: 'closed',
-    contact: '+1234567891',
-    contactType: 'phone',
-    createdAt: '2024-01-10T14:20:00Z',
-    updatedAt: '2024-01-12T16:45:00Z',
-    closedAt: '2024-01-12T16:45:00Z'
-  },
-  {
-    id: '3',
-    userId: 'user3',
-    user: {
-      id: 'user3',
-      username: 'mike_wilson',
-      email: 'mike.wilson@example.com',
-      phone: '+1234567892',
-      membershipTier: { id: 1, membership_name: 'Basic', description: 'Basic membership', tasks_per_day: 5, max_tasks: 10, benefit_amount_per_task: 0, price: 0, is_active: 1, created_at: '2024-01-01', updated_at: '2024-01-01' },
-      totalPointsEarned: 800,
-      accountStatus: 'active',
-      registrationDate: '2024-01-08',
-      lastActive: '2024-01-13',
-      isEmailVerified: true,
-      isPhoneVerified: false,
-      tasks_completed_today: 2,
-      last_task_reset_date: '2024-01-13'
-    },
-    userEmail: 'mike.wilson@example.com',
-    title: 'App crashes frequently',
-    description: 'The app keeps crashing when I try to view my profile. This happens every time I navigate to the profile section.',
-    severity: 'low',
-    status: 'open',
-    contact: 'mike.wilson@example.com',
-    contactType: 'email',
-    createdAt: '2024-01-05T09:15:00Z',
-    updatedAt: '2024-01-05T09:15:00Z'
-  },
-  {
-    id: '4',
-    userId: 'user4',
-    user: {
-      id: 'user4',
-      username: 'sarah_jones',
-      email: 'sarah.jones@example.com',
-      phone: '+1234567893',
-      membershipTier: { id: 3, membership_name: 'VIP', description: 'VIP membership', tasks_per_day: 50, max_tasks: 100, benefit_amount_per_task: 29.99, price: 29.99, is_active: 1, created_at: '2024-01-01', updated_at: '2024-01-01' },
-      totalPointsEarned: 5000,
-      accountStatus: 'active',
-      registrationDate: '2024-01-02',
-      lastActive: '2024-01-15',
-      isEmailVerified: true,
-      isPhoneVerified: true,
-      tasks_completed_today: 25,
-      last_task_reset_date: '2024-01-15'
-    },
-    userEmail: 'sarah.jones@example.com',
-    title: 'Premium features not working',
-    description: 'I upgraded to VIP membership but I\'m not seeing the premium features. The task limits are still showing as basic membership limits.',
-    severity: 'high',
-    status: 'open',
-    contact: '+1234567893',
-    contactType: 'phone',
-    createdAt: '2024-01-14T11:30:00Z',
-    updatedAt: '2024-01-14T11:30:00Z'
-  }
-];
 
 const ComplaintsManagement: React.FC = () => {
-  const [complaints, setComplaints] = useState<Complaint[]>(dummyComplaints);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [severityFilter, setSeverityFilter] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(20);
+
+  const { data: complaintsData, isLoading, error } = useGetComplaints(
+    currentPage, 
+    pageSize, 
+    statusFilter === 'all' ? undefined : statusFilter,
+    severityFilter === 'all' ? undefined : severityFilter,
+    searchTerm || undefined
+  );
+  
+  const { data: statsData } = useGetComplaintStats();
+  const updateComplaintStatusMutation = useUpdateComplaintStatus();
+  const deleteComplaintMutation = useDeleteComplaint();
+
+  useEffect(() => {
+    console.log('Complaints Data:', complaintsData);
+    console.log('Stats Data:', statsData);
+  }, [complaintsData, statsData]);
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -138,40 +41,43 @@ const ComplaintsManagement: React.FC = () => {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'open':
-        return 'text-orange-500 bg-orange-500/20 border-orange-500/30';
-      case 'closed':
-        return 'text-green-500 bg-green-500/20 border-green-500/30';
-      default:
-        return 'text-gray-500 bg-gray-500/20 border-gray-500/30';
+  const getStatusColor = (isResolved: boolean) => {
+    return isResolved 
+      ? 'text-green-500 bg-green-500/20 border-green-500/30'
+      : 'text-orange-500 bg-orange-500/20 border-orange-500/30';
+  };
+
+  const handleCloseComplaint = async (id: number) => {
+    try {
+      await updateComplaintStatusMutation.mutateAsync({
+        id: id.toString(),
+        request: {
+          status: 'resolved',
+          admin_response: 'Complaint resolved by admin'
+        }
+      });
+      toast.success('Complaint resolved successfully');
+    } catch (error) {
+      toast.error('Failed to resolve complaint');
+      console.error('Error resolving complaint:', error);
     }
   };
 
-  const handleCloseComplaint = (id: string) => {
-    setComplaints(prev => 
-      prev.map(complaint => 
-        complaint.id === id 
-          ? { ...complaint, status: 'closed' as const, closedAt: new Date().toISOString() }
-          : complaint
-      )
-    );
+  const handleDeleteComplaint = async (id: number) => {
+    if (window.confirm('Are you sure you want to delete this complaint?')) {
+      try {
+        await deleteComplaintMutation.mutateAsync(id.toString());
+        toast.success('Complaint deleted successfully');
+      } catch (error) {
+        toast.error('Failed to delete complaint');
+        console.error('Error deleting complaint:', error);
+      }
+    }
   };
 
-  const handleDeleteComplaint = (id: string) => {
-    setComplaints(prev => prev.filter(complaint => complaint.id !== id));
-  };
-
-  const filteredComplaints = complaints.filter(complaint => {
-    const matchesSearch = complaint.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         complaint.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         complaint.userEmail.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || complaint.status === statusFilter;
-    const matchesSeverity = severityFilter === 'all' || complaint.severity === severityFilter;
-    
-    return matchesSearch && matchesStatus && matchesSeverity;
-  });
+  const complaints = complaintsData?.data?.complaints || [];
+  const pagination = complaintsData?.data?.pagination;
+  const summary = complaintsData?.data?.summary;
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -190,10 +96,60 @@ const ComplaintsManagement: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold text-text-primary">Complaints Management</h1>
           <p className="text-text-secondary mt-1">
-            Manage user complaints and support requests ({filteredComplaints.length} total)
+            Manage user complaints and support requests ({summary?.total_complaints || 0} total)
           </p>
         </div>
       </div>
+
+      {/* Summary Stats */}
+      {summary && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-bg-secondary rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-text-muted text-sm">Total Complaints</p>
+                <p className="text-2xl font-bold text-text-primary">{summary.total_complaints}</p>
+              </div>
+              <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                <AlertTriangle className="w-6 h-6 text-blue-400" />
+              </div>
+            </div>
+          </div>
+          <div className="bg-bg-secondary rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-text-muted text-sm">Pending</p>
+                <p className="text-2xl font-bold text-orange-400">{summary.pending_complaints}</p>
+              </div>
+              <div className="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                <XCircle className="w-6 h-6 text-orange-400" />
+              </div>
+            </div>
+          </div>
+          <div className="bg-bg-secondary rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-text-muted text-sm">Resolved</p>
+                <p className="text-2xl font-bold text-green-400">{summary.resolved_complaints}</p>
+              </div>
+              <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                <CheckCircle className="w-6 h-6 text-green-400" />
+              </div>
+            </div>
+          </div>
+          <div className="bg-bg-secondary rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-text-muted text-sm">Urgent</p>
+                <p className="text-2xl font-bold text-red-400">{summary.urgent_complaints}</p>
+              </div>
+              <div className="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center">
+                <AlertTriangle className="w-6 h-6 text-red-400" />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="bg-bg-secondary rounded-lg p-4">
@@ -217,8 +173,8 @@ const ComplaintsManagement: React.FC = () => {
             className="px-3 py-2 bg-bg-main border border-border rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
           >
             <option value="all">All Status</option>
-            <option value="open">Open</option>
-            <option value="closed">Closed</option>
+            <option value="pending">Pending</option>
+            <option value="resolved">Resolved</option>
           </select>
 
           {/* Severity Filter */}
@@ -257,93 +213,149 @@ const ComplaintsManagement: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {filteredComplaints.map((complaint) => (
-                <tr key={complaint.id} className="hover:bg-bg-main/50 transition-colors">
-                  <td className="px-6 py-4">
-                    <div>
-                      <div className="font-medium text-text-primary">{complaint.user.username}</div>
-                      <div className="text-sm text-text-muted">{complaint.userEmail}</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="max-w-xs">
-                      <div className="font-medium text-text-primary truncate">{complaint.title}</div>
-                      <div className="text-sm text-text-muted truncate">{complaint.description}</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${getSeverityColor(complaint.severity)}`}>
-                      <AlertTriangle size={12} />
-                      {complaint.severity.toUpperCase()}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(complaint.status)}`}>
-                      {complaint.status === 'open' ? (
-                        <XCircle size={12} />
-                      ) : (
-                        <CheckCircle size={12} />
-                      )}
-                      {complaint.status.toUpperCase()}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-text-muted">
-                    {formatDate(complaint.createdAt)}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      {complaint.contactType === 'email' ? (
-                        <Mail size={16} className="text-cyan-400" />
-                      ) : (
-                        <Phone size={16} className="text-green-400" />
-                      )}
-                      <span className="text-sm text-text-muted">{complaint.contact}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center justify-center gap-2">
-                      <button
-                        onClick={() => {/* View complaint details */}}
-                        className="p-2 text-cyan-400 hover:bg-cyan-400/20 rounded-lg transition-colors"
-                        title="View Details"
-                      >
-                        <Eye size={16} />
-                      </button>
-                      {complaint.status === 'open' && (
-                        <button
-                          onClick={() => handleCloseComplaint(complaint.id)}
-                          className="p-2 text-green-400 hover:bg-green-400/20 rounded-lg transition-colors"
-                          title="Close Complaint"
-                        >
-                          <CheckCircle size={16} />
-                        </button>
-                      )}
-                      <button
-                        onClick={() => handleDeleteComplaint(complaint.id)}
-                        className="p-2 text-red-400 hover:bg-red-400/20 rounded-lg transition-colors"
-                        title="Delete Complaint"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+              {isLoading ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-cyan"></div>
+                      <p className="text-text-muted mt-2">Loading complaints...</p>
                     </div>
                   </td>
                 </tr>
-              ))}
+              ) : error ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-4">
+                        <XCircle className="w-8 h-8 text-red-400" />
+                      </div>
+                      <h3 className="text-lg font-medium text-text-primary mb-2">Error loading complaints</h3>
+                      <p className="text-text-muted">Please try again later</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : complaints.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="w-16 h-16 bg-text-muted/10 rounded-full flex items-center justify-center mb-4">
+                        <Search className="w-8 h-8 text-text-muted" />
+                      </div>
+                      <h3 className="text-lg font-medium text-text-primary mb-2">No complaints found</h3>
+                      <p className="text-text-muted">Try adjusting your search or filter criteria</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                complaints.map((complaint:any) => (
+                  <tr key={complaint.id} className="hover:bg-bg-main/50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div>
+                        <div className="font-medium text-text-primary">
+                          {complaint.user?.username || 'Unknown User'}
+                        </div>
+                        <div className="text-sm text-text-muted">{complaint.contact}</div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="max-w-xs">
+                        <div className="text-sm text-text-muted truncate">{complaint.description}</div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${getSeverityColor(complaint.severity_level)}`}>
+                        <AlertTriangle size={12} />
+                        {complaint.severity_level.toUpperCase()}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(complaint.is_resolved)}`}>
+                        {complaint.is_resolved ? (
+                          <CheckCircle size={12} />
+                        ) : (
+                          <XCircle size={12} />
+                        )}
+                        {complaint.is_resolved ? 'RESOLVED' : 'PENDING'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-text-muted">
+                      {formatDate(complaint.created_at)}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        {complaint.contact_type === 'email' ? (
+                          <Mail size={16} className="text-cyan-400" />
+                        ) : (
+                          <Phone size={16} className="text-green-400" />
+                        )}
+                        <span className="text-sm text-text-muted">{complaint.contact}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => {/* View complaint details */}}
+                          className="p-2 text-cyan-400 hover:bg-cyan-400/20 rounded-lg transition-colors"
+                          title="View Details"
+                        >
+                          <Eye size={16} />
+                        </button>
+                        {!complaint.is_resolved && (
+                          <button
+                            onClick={() => handleCloseComplaint(complaint.id)}
+                            className="p-2 text-green-400 hover:bg-green-400/20 rounded-lg transition-colors"
+                            title="Resolve Complaint"
+                            disabled={updateComplaintStatusMutation.isPending}
+                          >
+                            <CheckCircle size={16} />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleDeleteComplaint(complaint.id)}
+                          className="p-2 text-red-400 hover:bg-red-400/20 rounded-lg transition-colors"
+                          title="Delete Complaint"
+                          disabled={deleteComplaintMutation.isPending}
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
 
-        {filteredComplaints.length === 0 && (
-          <div className="text-center py-12">
-            <div className="flex flex-col items-center justify-center">
-              <div className="w-16 h-16 bg-text-muted/10 rounded-full flex items-center justify-center mb-4">
-                <Search className="w-8 h-8 text-text-muted" />
-              </div>
-              <h3 className="text-lg font-medium text-text-primary mb-2">No complaints found</h3>
-              <p className="text-text-muted">Try adjusting your search or filter criteria</p>
-            </div>
+      {/* Pagination */}
+      {pagination && pagination.last_page > 1 && (
+        <div className="flex items-center justify-between bg-bg-secondary rounded-lg p-4">
+          <div className="text-sm text-text-muted">
+            Showing {((pagination.current_page - 1) * pagination.per_page) + 1} to {Math.min(pagination.current_page * pagination.per_page, pagination.total)} of {pagination.total} complaints
           </div>
-        )}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={pagination.current_page === 1}
+              className="flex items-center gap-1 px-3 py-2 bg-bg-main border border-border rounded-lg text-text-primary hover:bg-bg-tertiary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronLeft size={16} />
+              Previous
+            </button>
+            <span className="px-3 py-2 text-text-primary">
+              Page {pagination.current_page} of {pagination.last_page}
+            </span>
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(pagination.last_page, prev + 1))}
+              disabled={pagination.current_page === pagination.last_page}
+              className="flex items-center gap-1 px-3 py-2 bg-bg-main border border-border rounded-lg text-text-primary hover:bg-bg-tertiary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Next
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        </div>
+      )}
       </div>
     </div>
   );

@@ -80,7 +80,9 @@ const Profile = () => {
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-1">
                     <Crown size={14} className="text-yellow-500" />
-                    <span className="text-xs font-medium text-yellow-500">Basic</span>
+                    <span className="text-xs font-medium text-yellow-500">
+                      {user?.membership?.membership_name || 'Basic'}
+                    </span>
                   </div>
                   
                 </div>

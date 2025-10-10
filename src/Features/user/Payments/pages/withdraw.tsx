@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { useAccount } from '../../accounts';
 import { useCreateWithdrawal } from '../../withdrawals';
 import { ustd, bigcoin, Ethereum } from '../../../../assets/images';
-import { AlertTriangle, X, CheckCircle } from 'lucide-react';
+import { AlertTriangle, X, CheckCircle, ArrowLeft } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const cryptoMethods = [
   { 
@@ -27,6 +28,7 @@ const cryptoMethods = [
 ];
 
 const Withdraw = () => {
+  const navigate = useNavigate();
   const { data: accountResponse } = useAccount();
   const createWithdrawalMutation = useCreateWithdrawal();
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
@@ -95,8 +97,19 @@ const Withdraw = () => {
   };
 
   return (
-    <div className="min-h-screen bg-bg-main p-6 max-w-xl mx-auto text-text-secondary">
-      <h1 className="text-3xl font-bold text-accent-cyan mb-6">Withdraw Funds</h1>
+    <div className="min-h-screen bg-gradient-to-br from-bg-main via-bg-secondary to-bg-main">
+      <div className="max-w-xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <button
+            onClick={() => navigate('/v/accountdetails')}
+            className="w-10 h-10 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 rounded-xl flex items-center justify-center shadow-lg transition-all duration-300 transform hover:scale-105"
+          >
+            <ArrowLeft size={20} className="text-white" />
+          </button>
+          <h1 className="text-2xl font-bold text-text-primary">Withdraw Funds</h1>
+          <div className="w-10 h-10"></div> {/* Spacer for center alignment */}
+        </div>
 
       {/* Current Balance Display */}
       <div className="mb-6 p-4 bg-bg-secondary rounded-lg border border-border">
@@ -256,6 +269,7 @@ const Withdraw = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

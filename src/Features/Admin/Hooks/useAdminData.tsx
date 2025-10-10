@@ -2,9 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import { 
   getUsers, 
   getTasks, 
-  getComplaints, 
   getTransactions 
 } from '../API';
+import { getComplaints } from '../API/complaints';
 import type { 
   UserFilters,
   TaskFilters,
@@ -56,7 +56,7 @@ export const useTasks = (filters: TaskFilters = {}, page = 1, limit = 20) => {
 export const useComplaints = (filters: ComplaintFilters = {}, page = 1, limit = 20) => {
   return useQuery({
     queryKey: ['admin-complaints', filters, page, limit],
-    queryFn: () => getComplaints(page, limit, filters.status),
+    queryFn: () => getComplaints(page, limit, filters.status, filters.priority, filters.search),
   });
 };
 

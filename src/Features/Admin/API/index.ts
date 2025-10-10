@@ -3,9 +3,7 @@ import type {
   AdminLoginCredentials, 
   User, 
   MembershipTier, 
-  Complaint, 
   Transaction, 
-  Notification,
   TaskFilters,
   TaskCreationForm
 } from '../Types';
@@ -127,31 +125,6 @@ const startTaskScheduler = async () => {
   return data;
 };
 
-// Complaints Management
-const getComplaints = async (page = 1, limit = 20, status?: string) => {
-  const params = new URLSearchParams({
-    page: page.toString(),
-    limit: limit.toString(),
-    ...(status && { status }),
-  });
-  const { data } = await apiClient.get(`/admin/complaints?${params}`);
-  return data;
-};
-
-const getComplaintById = async (complaintId: string) => {
-  const { data } = await apiClient.get(`/admin/complaints/${complaintId}`);
-  return data;
-};
-
-const updateComplaint = async (complaintId: string, complaint: Partial<Complaint>) => {
-  const { data } = await apiClient.patch(`/admin/complaints/${complaintId}`, complaint);
-  return data;
-};
-
-const deleteComplaint = async (complaintId: string) => {
-  const { data } = await apiClient.delete(`/admin/complaints/${complaintId}`);
-  return data;
-};
 
 // Transactions Management
 const getTransactions = async (page = 1, limit = 20, status?: string) => {
@@ -174,30 +147,6 @@ const updateTransaction = async (transactionId: string, transaction: Partial<Tra
   return data;
 };
 
-// Notifications Management
-const getNotifications = async (page = 1, limit = 20) => {
-  const params = new URLSearchParams({
-    page: page.toString(),
-    limit: limit.toString(),
-  });
-  const { data } = await apiClient.get(`/admin/notifications?${params}`);
-  return data;
-};
-
-const createNotification = async (notification: Omit<Notification, 'id' | 'created_at' | 'updated_at'>) => {
-  const { data } = await apiClient.post("/admin/notifications", notification);
-  return data;
-};
-
-const updateNotification = async (notificationId: string, notification: Partial<Notification>) => {
-  const { data } = await apiClient.patch(`/admin/notifications/${notificationId}`, notification);
-  return data;
-};
-
-const deleteNotification = async (notificationId: string) => {
-  const { data } = await apiClient.delete(`/admin/notifications/${notificationId}`);
-  return data;
-};
 
 // Reports
 const getReports = async (type: string, startDate?: string, endDate?: string) => {
@@ -242,17 +191,9 @@ export {
   assignDailyTasks,
   resetDailyTasks,
   startTaskScheduler,
-  getComplaints,
-  getComplaintById,
-  updateComplaint,
-  deleteComplaint,
   getTransactions,
   getTransactionById,
   updateTransaction,
-  getNotifications,
-  createNotification,
-  updateNotification,
-  deleteNotification,
   getReports,
   getSettings,
   updateSettings,

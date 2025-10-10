@@ -128,17 +128,15 @@ const Transactions = () => {
     <div className="min-h-screen bg-gradient-to-br from-bg-main via-bg-secondary to-bg-main">
       <div className="max-w-lg mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex items-center space-x-4 mb-8">
+        <div className="flex items-center justify-between mb-8">
           <button
             onClick={() => navigate('/dashboard/profile')}
-            className="w-10 h-10 bg-bg-secondary rounded-full flex items-center justify-center hover:bg-bg-tertiary transition-colors"
+            className="w-10 h-10 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 rounded-xl flex items-center justify-center shadow-lg transition-all duration-300 transform hover:scale-105"
           >
-            <ArrowLeft size={20} className="text-text-primary" />
+            <ArrowLeft size={20} className="text-white" />
           </button>
-          <div>
-            <h1 className="text-2xl font-bold text-text-primary">Transactions</h1>
-            <p className="text-text-muted">View your transaction history</p>
-          </div>
+          <h1 className="text-2xl font-bold text-text-primary">Transactions</h1>
+          <div className="w-10 h-10"></div> {/* Spacer for center alignment */}
         </div>
 
         {/* Tab Navigation */}

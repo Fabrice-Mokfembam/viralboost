@@ -33,7 +33,7 @@ const UsersManagement: React.FC = () => {
   const { mutate: activateUser, isPending: isActivating } = useActivateUser();
   const { mutate: deleteUser, isPending: isDeleting } = useDeleteUser();
 
-  const { data: usersResponse, isLoading, error } = useGetUsers(currentPage, 15, searchTerm);
+  const { data: usersResponse, isLoading, error } = useGetUsers(currentPage, 15, filters.search || '');
   
   // Add random membership to each user
   const usersWithMemberships = useMemo((): UserWithMembership[] => {
@@ -54,6 +54,7 @@ const UsersManagement: React.FC = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    setFilters({ ...filters, search: searchTerm });
     setCurrentPage(1);
   };
 

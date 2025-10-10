@@ -28,6 +28,7 @@ const getPlatformIcon = (platform: string) => {
 const Tasks = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('undone');
+  const [timeLeft, setTimeLeft] = useState('');
   
   const { data: Tasks, isLoading: tasksLoading, error: tasksError } = useRunTaskDistribution();
   const { data: Submissions, isLoading: submissionsLoading } = useGetUserSubmissions();
@@ -46,6 +47,32 @@ const Tasks = () => {
       console.log('Tasks data:', Tasks.data);
     }
   }, [Submissions, Tasks]);
+
+  // Countdown timer for daily task reset
+  useEffect(() => {
+    const updateCountdown = () => {
+      const now = new Date();
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0); // Reset to midnight
+      
+      const timeDiff = tomorrow.getTime() - now.getTime();
+      
+      const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+      const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+      
+      setTimeLeft(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+    };
+
+    // Update immediately
+    updateCountdown();
+    
+    // Update every second
+    const interval = setInterval(updateCountdown, 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   // Show loading state
   if (tasksLoading || submissionsLoading) {
@@ -108,12 +135,6 @@ const Tasks = () => {
         console.log('Undone tasks:', undoneTasks.length);
         return undoneTasks;
       }
-      case 'in-progress': {
-        // Show tasks that are pending (this might be empty based on your logic)
-        const inProgressTasks = tasksArray.filter((task: { id: number; task_status: string }) => task.task_status === 'pending' && !isTaskSubmitted(task.id));
-        console.log('In progress tasks:', inProgressTasks.length);
-        return inProgressTasks;
-      }
       case 'completed': {
         // Show tasks that have been submitted
         const completedTasks = tasksArray.filter((task: { id: number }) => isTaskSubmitted(task.id));
@@ -129,26 +150,26 @@ const Tasks = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-bg-main via-bg-secondary to-bg-main">
-      <div className="max-w-lg mx-auto px-4 py-8">
+      <div className="max-w-lg mx-auto px-3 py-6">
       {/* Header Section */}
-      <div className="relative overflow-hidden rounded-2xl shadow-2xl mb-8">
-        <div className="relative p-6">
-          <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-4 border border-cyan-500/20">
+      <div className="relative overflow-hidden rounded-2xl shadow-2xl mb-6">
+        <div className="relative p-4">
+          <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-3 border border-cyan-500/20">
             <div className="flex justify-between text-text-primary text-sm mb-2">
               <span>Today's Tasks</span>
               <span>Duration</span>
             </div>
             <div className="flex justify-between items-center font-bold text-xl text-text-primary">
-              <span>0/15</span>
-              <span>22:54:22</span>
+              <span>{Submissions?.data?.submissions?.length || 0}/{memberShipData?.tasks_per_day || 5}</span>
+              <span>{timeLeft}</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="relative overflow-hidden rounded-2xl shadow-2xl mb-8">
-        <div className="relative p-6">
+      <div className="relative overflow-hidden rounded-2xl shadow-2xl mb-6">
+        <div className="relative p-4">
           <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-1 border border-cyan-500/20">
             <div className="flex">
               <button 
@@ -160,16 +181,6 @@ const Tasks = () => {
                 }`}
               >
                 Undone
-              </button>
-              <button 
-                onClick={() => setActiveTab('in-progress')}
-                className={`flex-1 py-3 text-center text-sm font-semibold rounded-lg transition-colors cursor-pointer ${
-                  activeTab === 'in-progress' 
-                    ? 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-white' 
-                    : 'text-text-muted hover:text-text-primary'
-                }`}
-              >
-                In Progress
               </button>
               <button 
                 onClick={() => setActiveTab('completed')}
@@ -197,40 +208,40 @@ const Tasks = () => {
                 key={task.id}
                 className="relative overflow-hidden rounded-2xl shadow-2xl"
               >
-                <div className="relative p-6">
-                  <div className={`bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-4 border transition-all duration-300 ${
+                <div className="relative p-4">
+                  <div className={`bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-3 border transition-all duration-300 ${
                     isCompleted 
                       ? 'border-green-500/50 hover:border-green-500/70' 
                       : 'border-gray-700/50 hover:border-cyan-500/50 transform hover:scale-[1.02] hover:shadow-xl'
                   }`}>
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className={`w-12 h-12 bg-gradient-to-br rounded-xl flex items-center justify-center transition-all duration-300 ${
+                      <div className="flex items-center space-x-3">
+                        <div className={`w-10 h-10 bg-gradient-to-br rounded-xl flex items-center justify-center transition-all duration-300 flex-shrink-0 ${
                           isCompleted 
                             ? 'from-green-500/20 to-green-600/20' 
                             : 'from-gray-700 to-gray-800 group-hover:from-cyan-500/20 group-hover:to-cyan-600/20'
                         }`}>
                           {isCompleted ? (
-                            <Check size={28} className="text-green-500" />
+                            <Check size={20} className="text-green-500" />
                           ) : (
                             getPlatformIcon(task.platform)
                           )}
                         </div>
-                        <div>
-                          <div className="text-text-primary font-semibold text-lg">{task.title}</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-text-primary font-semibold text-base line-clamp-2 leading-tight">{task.title}</div>
                           <div className="text-cyan-400 text-sm font-bold">Earn ${memberShipData?.benefit_amount_per_task}</div>
                           <div className="text-xs text-text-muted mt-1">{task.category}</div>
                         </div>
                       </div>
                       {isCompleted ? (
-                        <div className="ml-4 flex items-center space-x-2">
-                          <Check size={24} className="text-green-500" />
-                          <span className="text-green-500 font-semibold">Completed</span>
+                        <div className="ml-3 flex items-center space-x-2 flex-shrink-0">
+                          <Check size={20} className="text-green-500" />
+                          <span className="text-green-500 font-semibold text-sm">Completed</span>
                         </div>
                       ) : (
                         <button 
                           onClick={() => navigate(`/v/task/${task.id}`)} 
-                          className="ml-4 bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl cursor-pointer"
+                          className="ml-3 bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white font-semibold py-2 px-4 rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl cursor-pointer text-sm flex-shrink-0"
                         >
                           Do Task
                         </button>
@@ -243,16 +254,14 @@ const Tasks = () => {
           })
         ) : (
           <div className="relative overflow-hidden rounded-2xl shadow-2xl">
-            <div className="relative p-6">
-              <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-8 text-center border border-gray-700/50">
+            <div className="relative p-4">
+              <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-6 text-center border border-gray-700/50">
                 <div className="text-text-muted text-lg mb-2">
                   {activeTab === 'undone' && 'No undone tasks available'}
-                  {activeTab === 'in-progress' && 'No tasks in progress'}
                   {activeTab === 'completed' && 'No completed tasks'}
                 </div>
                 <div className="text-text-muted text-sm">
                   {activeTab === 'undone' && 'Check back later for new tasks!'}
-                  {activeTab === 'in-progress' && 'Start working on some tasks to see them here.'}
                   {activeTab === 'completed' && 'Complete some tasks to see them here.'}
                 </div>
               </div>

@@ -1,9 +1,11 @@
 import  { useState } from 'react';
-import { Clipboard } from 'lucide-react';
+import { Clipboard, ArrowLeft } from 'lucide-react';
 import { generateReferralLink } from '../../auth/Utils/referralUtils';
 import { getUserData } from '../../auth/Utils/authUtils';
+import { useNavigate } from 'react-router-dom';
 
 const InviteFriends = () => {
+  const navigate = useNavigate();
   const user = getUserData();
   const referralCode = user?.referral_code || 'ABCD1234'; // Fallback for demo
   const referralLink = generateReferralLink(referralCode);
@@ -18,7 +20,17 @@ const InviteFriends = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-bg-main via-bg-secondary to-bg-main">
       <div className="max-w-lg mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-cyan-400 mb-8 text-center">Invite Friends</h1>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <button
+            onClick={() => navigate('/dashboard/profile')}
+            className="w-10 h-10 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 rounded-xl flex items-center justify-center shadow-lg transition-all duration-300 transform hover:scale-105"
+          >
+            <ArrowLeft size={20} className="text-white" />
+          </button>
+          <h1 className="text-2xl font-bold text-text-primary">Invite Friends</h1>
+          <div className="w-10 h-10"></div> {/* Spacer for center alignment */}
+        </div>
 
         <div className="relative overflow-hidden rounded-2xl shadow-2xl mb-8">
           <div className="relative p-6">

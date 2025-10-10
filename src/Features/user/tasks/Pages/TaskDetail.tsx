@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { X } from 'lucide-react';
+import { X, ArrowLeft, CheckCircle, AlertTriangle, Upload, Target, DollarSign, Globe, Tag } from 'lucide-react';
 import { useGetUserTaskDetails } from '../Hooks/useTasks';
 import type { CloudinaryUploadResponse } from '../../../../types/cloudinary';
 import { useCloudinaryUpload } from '../../../../Hooks/useCloudinaryUpload';
@@ -104,10 +104,10 @@ const TaskDetail: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-bg-main text-text-primary max-w-3xl mx-auto md:px-6 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-bg-main via-bg-secondary to-bg-main flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-cyan mx-auto mb-4"></div>
-          <p className="text-text-muted">Loading task details...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
+          <p className="text-text-muted text-lg">Loading task details...</p>
         </div>
       </div>
     );
@@ -115,12 +115,15 @@ const TaskDetail: React.FC = () => {
 
   if (error || !task) {
     return (
-      <div className="min-h-screen bg-bg-main text-text-primary max-w-3xl mx-auto md:px-6 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-bg-main via-bg-secondary to-bg-main flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-500 mb-4">Failed to load task details</p>
+          <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertTriangle size={32} className="text-red-400" />
+          </div>
+          <p className="text-red-400 text-lg font-medium mb-4">Failed to load task details</p>
           <button 
             onClick={() => window.location.reload()} 
-            className="bg-accent-cyan text-white px-4 py-2 rounded-lg hover:bg-accent-cyan-hover"
+            className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105"
           >
             Retry
           </button>
@@ -130,180 +133,269 @@ const TaskDetail: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-bg-main text-text-primary max-w-3xl mx-auto md:px-6">
-      <header className="mb-6">
-        <h1 className="text-3xl font-extrabold text-accent-cyan mb-1">Task Detail</h1>
-        <p className="text-text-muted text-sm">Task ID: {id}</p>
-      </header>
+    <div className="min-h-screen bg-gradient-to-br from-bg-main via-bg-secondary to-bg-main relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-cyan-500/5 rounded-full blur-xl"></div>
+        <div className="absolute top-40 right-10 w-24 h-24 bg-blue-500/5 rounded-full blur-xl"></div>
+        <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-purple-500/5 rounded-full blur-xl"></div>
+        <div className="absolute bottom-40 right-1/4 w-28 h-28 bg-green-500/5 rounded-full blur-xl"></div>
+      </div>
 
-      {/* Task Info Box */}
-      <section className="bg-bg-secondary rounded-2xl p-6 shadow-xl border border-cyan-600 mb-8">
-        <h2 className="text-2xl font-bold text-text-primary mb-2">{task.title}</h2>
-        <p className="text-cyan-400 font-semibold mb-2">Reward: ${memberShipData?.benefit_amount_per_task}</p>
-        <p className="text-text-secondary mb-4">{task.description}</p>
-
-        {/* Task Details */}
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div>
-            <p className="text-text-muted text-sm">Platform</p>
-            <p className="text-text-primary font-semibold">{task.platform}</p>
-          </div>
-          <div>
-            <p className="text-text-muted text-sm">Category</p>
-            <p className="text-text-primary font-semibold">{task.category}</p>
-          </div>
-          <div>
-            <p className="text-text-muted text-sm">Priority</p>
-            <p className="text-text-primary font-semibold capitalize">{task.priority}</p>
-          </div>
-          <div>
-            <p className="text-text-muted text-sm">Status</p>
-            <p className="text-text-primary font-semibold capitalize">{task.task_status}</p>
-          </div>
-        </div>
-
-        {/* Target URL */}
-        {task.target_url && (
-          <div className="mb-4">
-            <p className="text-text-muted text-sm mb-2">Target URL:</p>
-            <a 
-              href={task.target_url} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-accent-cyan hover:text-accent-cyan-hover underline break-all"
+      <div className="relative z-10 pt-8 pb-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
+            <button
+              onClick={() => navigate('/dashboard/tasks')}
+              className="w-10 h-10 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 rounded-xl flex items-center justify-center shadow-lg transition-all duration-300 transform hover:scale-105"
             >
-              {task.target_url}
-            </a>
+              <ArrowLeft size={20} className="text-white" />
+            </button>
+            <h1 className="text-2xl font-bold text-text-primary">Task Detail</h1>
+            <div className="w-10 h-10"></div> {/* Spacer for center alignment */}
           </div>
-        )}
 
-        {/* Additional info */}
-        <div className="bg-bg-tertiary p-4 rounded-lg mb-4 border-l-4 border-cyan-500">
-          <h3 className="font-semibold text-cyan-300 mb-2">Important Notes:</h3>
-          <ul className="list-disc list-inside text-text-muted text-sm space-y-1">
-            <li>Please ensure screenshots are clear and unedited.</li>
-            <li>Submitting incomplete proof may lead to rejection.</li>
-            <li>Tasks must be completed within 24 hours to be valid.</li>
-          </ul>
-        </div>
-      </section>
-
-      {/* Instructions */}
-      <section className="mb-8">
-        <h3 className="text-xl font-semibold text-cyan-400 mb-4">How to Complete the Task</h3>
-        <ol className="list-decimal list-inside space-y-3 text-text-muted text-lg">
-          {formatInstructions(task.instructions).map((step, index) => (
-            <li key={index} className="pl-2 border-l-4 border-cyan-500">
-              {step}
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      {/* Image Upload Section */}
-      <section className="mb-8">
-        <h3 className="text-xl font-semibold text-cyan-400 mb-3">Upload Proof Image</h3>
-        
-        {/* Upload Progress */}
-        {isUploading && (
-          <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
-              <span className="text-blue-700 font-medium">Uploading image...</span>
+          {/* Task Header Card */}
+          <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary rounded-3xl p-8 shadow-2xl border border-cyan-500/20 mb-8">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-full border border-cyan-500/30 mb-4">
+                <Target size={20} className="text-cyan-400" />
+                <span className="text-cyan-300 font-semibold text-sm">Task Details</span>
+              </div>
+              
+              <h2 className="text-3xl font-bold text-text-primary mb-4 bg-gradient-to-r from-text-primary to-cyan-400 bg-clip-text text-transparent">
+                {task.title}
+              </h2>
+              
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-full border border-green-500/30 mb-6">
+                <DollarSign size={16} className="text-green-400" />
+                <span className="text-green-400 font-semibold text-sm">Reward: ${memberShipData?.benefit_amount_per_task}</span>
+              </div>
             </div>
-            {uploadProgress && (
-              <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${uploadProgress.percentage}%` }}
-                ></div>
+
+            <p className="text-text-secondary text-center text-lg leading-relaxed mb-8">
+              {task.description}
+            </p>
+
+            {/* Task Details Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div className="text-center">
+                <div className="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <Globe size={20} className="text-cyan-400" />
+                </div>
+                <p className="text-text-muted text-sm font-medium mb-1">Platform</p>
+                <p className="text-text-primary font-semibold">{task.platform}</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <Tag size={20} className="text-purple-400" />
+                </div>
+                <p className="text-text-muted text-sm font-medium mb-1">Category</p>
+                <p className="text-text-primary font-semibold">{task.category}</p>
+              </div>
+            </div>
+
+            {/* Target URL */}
+            {task.target_url && (
+              <div className="bg-gradient-to-r from-bg-tertiary to-bg-secondary p-6 rounded-2xl border border-cyan-500/20 mb-6">
+                <div className="flex items-center gap-3 mb-3">
+                  <Globe size={20} className="text-cyan-400" />
+                  <h3 className="text-text-primary font-semibold">Target URL</h3>
+                </div>
+                <a 
+                  href={task.target_url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-cyan-400 hover:text-cyan-300 underline break-all transition-colors"
+                >
+                  {task.target_url}
+                </a>
+              </div>
+            )}
+
+            {/* Important Notes */}
+            <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 p-6 rounded-2xl border border-orange-500/20">
+              <div className="flex items-center gap-3 mb-4">
+                <AlertTriangle size={20} className="text-orange-400" />
+                <h3 className="text-orange-400 font-semibold text-lg">Important Notes</h3>
+              </div>
+              <ul className="space-y-3 text-text-muted">
+                <li className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <span>Please ensure screenshots are clear and unedited.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <span>Submitting incomplete proof may lead to rejection.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <span>Tasks must be completed within 24 hours to be valid.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Instructions */}
+          <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary rounded-3xl p-8 shadow-2xl border border-cyan-500/20 mb-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                <Target size={24} className="text-blue-400" />
+              </div>
+              <h3 className="text-2xl font-bold text-text-primary">How to Complete the Task</h3>
+            </div>
+            
+            <div className="space-y-4">
+              {formatInstructions(task.instructions).map((step, index) => (
+                <div key={index} className="flex items-start gap-4 p-4 bg-gradient-to-r from-bg-tertiary to-bg-secondary rounded-2xl border border-cyan-500/20">
+                  <div className="w-8 h-8 bg-cyan-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                    <span className="text-cyan-400 font-bold text-sm">{index + 1}</span>
+                  </div>
+                  <p className="text-text-secondary leading-relaxed">{step}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Image Upload Section */}
+          <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary rounded-3xl p-8 shadow-2xl border border-cyan-500/20 mb-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
+                <Upload size={24} className="text-purple-400" />
+              </div>
+              <h3 className="text-2xl font-bold text-text-primary">Upload Proof Image</h3>
+            </div>
+            
+            {/* Upload Progress */}
+            {isUploading && (
+              <div className="mb-6 p-6 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-2xl border border-blue-500/20">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                  <span className="text-blue-400 font-semibold">Uploading image...</span>
+                </div>
+                {uploadProgress && (
+                  <div className="w-full bg-gray-700 rounded-full h-3">
+                    <div 
+                      className="bg-gradient-to-r from-blue-500 to-cyan-500 h-3 rounded-full transition-all duration-300"
+                      style={{ width: `${uploadProgress.percentage}%` }}
+                    ></div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Upload Error */}
+            {uploadError && (
+              <div className="mb-6 p-6 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-2xl border border-red-500/20">
+                <div className="flex items-center gap-3">
+                  <AlertTriangle size={20} className="text-red-400" />
+                  <p className="text-red-400 font-semibold">Upload Error: {uploadError}</p>
+                </div>
+              </div>
+            )}
+
+            <input
+              type="file"
+              id="uploadImages"
+              className="hidden"
+              accept="image/*"
+              onChange={onImageChange}
+              disabled={isUploading}
+            />
+            <label
+              htmlFor="uploadImages"
+              className={`inline-flex items-center gap-3 cursor-pointer font-semibold px-8 py-4 rounded-2xl shadow-xl transition-all duration-300 transform hover:scale-105 ${
+                isUploading 
+                  ? 'bg-gray-600 cursor-not-allowed text-gray-400' 
+                  : 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white'
+              }`}
+            >
+              <Upload size={20} />
+              {isUploading ? 'Uploading...' : 'Select Image'}
+            </label>
+
+            {/* Selected Images Section */}
+            {selectedImages.length > 0 && (
+              <div className="mt-8">
+                <h4 className="text-text-primary font-semibold mb-4">Selected Images</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {selectedImages.map((image, index) => {
+                    const url = URL.createObjectURL(image);
+                    return (
+                      <div key={index} className="relative rounded-2xl overflow-hidden shadow-xl group">
+                        <img
+                          src={url}
+                          alt={`upload-${index}`}
+                          className="w-full h-48 object-cover brightness-90 group-hover:brightness-75 transition-all duration-300"
+                          onLoad={() => URL.revokeObjectURL(url)}
+                        />
+                        <button
+                          type="button"
+                          aria-label="Remove Image"
+                          onClick={() => removeImage(index)}
+                          className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 shadow-lg opacity-90 hover:opacity-100 transition-all duration-300 transform hover:scale-110"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>
-        )}
 
-        {/* Upload Error */}
-        {uploadError && (
-          <div className="mb-4 p-4 bg-red-50 rounded-lg border border-red-200">
-            <p className="text-red-700 font-medium">Upload Error: {uploadError}</p>
-          </div>
-        )}
+          {/* Submit Error */}
+          {submitError && (
+            <div className="mb-6 p-6 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-2xl border border-red-500/20">
+              <div className="flex items-center gap-3">
+                <AlertTriangle size={20} className="text-red-400" />
+                <p className="text-red-400 font-semibold">Submission Error: {submitError.message}</p>
+              </div>
+            </div>
+          )}
 
-        <input
-          type="file"
-          id="uploadImages"
-          className="hidden"
-          accept="image/*"
-          onChange={onImageChange}
-          disabled={isUploading}
-        />
-        <label
-          htmlFor="uploadImages"
-          className={`inline-block cursor-pointer font-semibold px-6 py-3 shadow transition ${
-            isUploading 
-              ? 'bg-gray-400 cursor-not-allowed text-gray-600' 
-              : 'bg-cyan-600 hover:bg-cyan-700 text-text-primary'
-          }`}
-        >
-          {isUploading ? 'Uploading...' : 'Select Image'}
-        </label>
+          {/* Submit Success */}
+          {submitSuccess && (
+            <div className="mb-6 p-6 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl border border-green-500/20">
+              <div className="flex items-center gap-3">
+                <CheckCircle size={20} className="text-green-400" />
+                <p className="text-green-400 font-semibold">Task proof submitted successfully!</p>
+              </div>
+            </div>
+          )}
 
-        {/* Selected Images Section */}
-        {selectedImages.length > 0 && (
-          <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {selectedImages.map((image, index) => {
-              const url = URL.createObjectURL(image);
-              return (
-                <div key={index} className="relative rounded-lg overflow-hidden shadow-lg group">
-                  <img
-                    src={url}
-                    alt={`upload-${index}`}
-                    className="w-full h-32 object-cover brightness-90 group-hover:brightness-75 transition"
-                    onLoad={() => URL.revokeObjectURL(url)}
-                  />
-                  <button
-                    type="button"
-                    aria-label="Remove Image"
-                    onClick={() => removeImage(index)}
-                    className="absolute -top-2 -right-2 bg-red-600 text-text-primary rounded-full p-1 shadow-lg opacity-90 hover:opacity-100 transition"
-                  >
-                    <X size={20} />
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </section>
-
-      {/* Submit Error */}
-      {submitError && (
-        <div className="mb-4 p-4 bg-red-50 rounded-lg border border-red-200">
-          <p className="text-red-700 font-medium">Submission Error: {submitError.message}</p>
+          {/* Submit Button */}
+          <button
+            onClick={handleSubmit}
+            disabled={uploadedImages.length === 0 || isUploading || isSubmitting}
+            className={`w-full py-6 font-bold text-xl rounded-2xl shadow-2xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-3 ${
+              uploadedImages.length === 0 || isUploading || isSubmitting
+                ? 'bg-gray-600 cursor-not-allowed text-gray-400'
+                : 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
+            }`}
+          >
+            {isUploading ? (
+              <>
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                Uploading...
+              </>
+            ) : isSubmitting ? (
+              <>
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                Submitting...
+              </>
+            ) : (
+              <>
+                <CheckCircle size={24} />
+                Submit Proof ({uploadedImages.length} image{uploadedImages.length !== 1 ? 's' : ''})
+              </>
+            )}
+          </button>
         </div>
-      )}
-
-      {/* Submit Success */}
-      {submitSuccess && (
-        <div className="mb-4 p-4 bg-green-50 rounded-lg border border-green-200">
-          <p className="text-green-700 font-medium">Task proof submitted successfully!</p>
-        </div>
-      )}
-
-      {/* Submit Button */}
-      <button
-        onClick={handleSubmit}
-        disabled={uploadedImages.length === 0 || isUploading || isSubmitting}
-        className={`w-full py-4 font-bold text-lg transition ${
-          uploadedImages.length === 0 || isUploading || isSubmitting
-            ? 'bg-bg-tertiary cursor-not-allowed text-text-muted'
-            : 'bg-cyan-500 hover:bg-cyan-600 text-text-primary shadow-xl'
-        }`}
-      >
-        {isUploading ? 'Uploading...' : 
-         isSubmitting ? 'Submitting...' : 
-         `Submit Proof (${uploadedImages.length} image${uploadedImages.length !== 1 ? 's' : ''})`}
-      </button>
+      </div>
     </div>
   );
 };

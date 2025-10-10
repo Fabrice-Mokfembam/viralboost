@@ -62,19 +62,22 @@ export interface MembershipTier {
 }
 
 export interface Complaint {
-  id: string;
-  userId: string;
-  user: User;
-  userEmail: string;
-  title: string;
-  description: string;
-  severity: 'low' | 'medium' | 'high';
-  status: 'open' | 'closed';
+  id: number;
+  uuid: string;
+  user_uuid: string | null;
+  user: User | null;
+  contact_type: 'email' | 'phone';
   contact: string;
-  contactType: 'email' | 'phone';
-  createdAt: string;
-  updatedAt: string;
-  closedAt?: string;
+  description: string;
+  severity_level: 'low' | 'medium' | 'high';
+  is_resolved: boolean;
+  is_active: boolean;
+  admin_response: string | null;
+  assigned_admin: string | null;
+  assigned_to: string | null;
+  resolved_at: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Transaction {
@@ -171,6 +174,26 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
+export interface ComplaintsApiResponse {
+  success: boolean;
+  data: {
+    complaints: Complaint[];
+    pagination: {
+      current_page: number;
+      last_page: number;
+      per_page: number;
+      total: number;
+      has_more: boolean;
+    };
+    summary: {
+      total_complaints: number;
+      pending_complaints: number;
+      resolved_complaints: number;
+      urgent_complaints: number;
+    };
+  };
+}
+
 export interface PaginatedResponse<T> {
   data: T[];
   pagination: {
@@ -207,6 +230,19 @@ export interface ComplaintFilters {
   assignedTo?: string;
   dateFrom?: string;
   dateTo?: string;
+}
+
+// Complaint API Request Types
+export interface UpdateComplaintStatusRequest {
+  status: string;
+  admin_response?: string;
+  priority?: string;
+}
+
+export interface BulkUpdateComplaintsRequest {
+  complaint_ids: number[];
+  status: string;
+  admin_response?: string;
 }
 
 // Task Creation Form Type
@@ -264,34 +300,6 @@ export interface MembershipCreationForm {
   is_active: boolean;
 }
 
-// Notification Types
-export interface Notification {
-  id: string;
-  type: 'task_completed' | 'user_registered' | 'complaint_created' | 'withdrawal_requested' | 'system_alert';
-  title: string;
-  message: string;
-  userId?: string;
-  userName?: string;
-  taskId?: string;
-  taskTitle?: string;
-  amount?: number;
-  status: 'unread' | 'read';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  createdAt: string;
-  readAt?: string;
-  metadata?: Record<string, unknown>;
-}
-
-export interface TaskCompletionNotification extends Notification {
-  type: 'task_completed';
-  taskId: string;
-  taskTitle: string;
-  completedBy: string;
-  completedAt: string;
-  rewardAmount: number;
-  platform: string;
-  taskType: string;
-}
 
 // Membership Creation Form Errors Type
 export interface MembershipCreationFormErrors {

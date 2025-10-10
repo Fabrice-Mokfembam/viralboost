@@ -1,13 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { Home, CheckSquare, Users, User, Globe2, Menu, SunMoon, Flag, LogOut } from 'lucide-react';
-import { useTheme } from '../../../../Hooks/useTheme';
+import { Home, CheckSquare, Users, User,  Menu, Flag, LogOut } from 'lucide-react';
+import { useLogout } from '../../auth/Hooks/useAuth';
+// import { useTheme } from '../../../../Hooks/useTheme';
 
 const DashboardLayout = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
-  const {toggleTheme}= useTheme()
+  const { mutate: logoutMutation, isPending } = useLogout();
+  // const {toggleTheme}= useTheme()
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -31,9 +33,19 @@ const DashboardLayout = () => {
     setMenuOpen(false);
   };
 
-  const logout = () => {
-    alert('Logging out! (Implement logout)');
-    setMenuOpen(false);
+  const handleLogout = () => {
+    logoutMutation(undefined, {
+      onSuccess: () => {
+        navigate('/');
+        setMenuOpen(false);
+      },
+      onError: () => {
+        // Even if logout fails on server, navigate to login
+        localStorage.clear();
+        navigate('/');
+        setMenuOpen(false);
+      }
+    });
   };
 
   return (
@@ -44,7 +56,7 @@ const DashboardLayout = () => {
           <div className="text-cyan-500 font-bold text-xl">Viral Boost</div>
 
           <div className="flex items-center gap-2 text-text-muted relative">
-            <Globe2 size={24} className="cursor-pointer hover:text-cyan-500" />
+            {/* <Globe2 size={24} className="cursor-pointer hover:text-cyan-500" /> */}
 
             {/* Hamburger menu button */}
             <button
@@ -63,12 +75,12 @@ const DashboardLayout = () => {
                 ${menuOpen ? 'scale-100 opacity-100 visible' : 'scale-95 opacity-0 invisible'}
               `}
             >
-              <button
+              {/* <button
                 onClick={toggleTheme}
                 className="flex items-center w-full px-2 py-3 text-text-secondary hover:bg-cyan-600 hover:text-text-primary rounded-t-lg"
               >
                 <SunMoon size={20} className="mr-3" /> Toggle Theme
-              </button>
+              </button> */}
               <button
                 onClick={reportProblem}
                 className="flex items-center w-full px-2 py-3 text-text-secondary hover:bg-cyan-600 hover:text-text-primary"
@@ -77,10 +89,12 @@ const DashboardLayout = () => {
               </button>
             
               <button
-                onClick={logout}
-                className="flex items-center w-full px-2 py-3 text-red-500 hover:bg-red-600 hover:text-text-primary rounded-b-lg"
+                onClick={handleLogout}
+                disabled={isPending}
+                className="flex items-center w-full px-2 py-3 text-red-500 hover:bg-red-600 hover:text-text-primary rounded-b-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <LogOut size={20} className="mr-3" /> Logout
+                <LogOut size={20} className="mr-3" /> 
+                {isPending ? 'Logging out...' : 'Logout'}
               </button>
             </div>
           </div>

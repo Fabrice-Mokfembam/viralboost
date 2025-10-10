@@ -1,18 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Crown, Star, Zap, CheckCircle, ArrowRight, Gift, Shield, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useMemberships, useMyMembership } from '../../memberships';
+import { useMemberships } from '../../memberships';
+import { useGetProfile } from '../../auth/Hooks/useAuth';
+import { getUserData } from '../../auth/Utils/authUtils';
 
 const Membership: React.FC = () => {
   const navigate = useNavigate();
   const { data: membershipsResponse, isLoading, error } = useMemberships();
-  const { data: myMembershipResponse } = useMyMembership();
+  const { data: userProfile } = useGetProfile();
+  const storedUser = getUserData();
 
   const memberships = membershipsResponse?.data?.memberships || [];
-  const currentMembershipId = myMembershipResponse?.data?.membership?.id;
+  // Get user data from profile or stored data
+  const user = userProfile?.data?.user || storedUser;
+  const currentMembershipId = user?.membership?.id;
+
+  useEffect(() => {
+    console.log('User membership:', user?.membership);
+  }, [user?.membership]);
 
   // Helper function to get membership styling based on membership ID (random colors)
-  const getMembershipStyling = (membership: any) => {
+  const getMembershipStyling = (membership: { id: number }) => {
     const membershipId = membership.id;
     
     // Define color schemes for different membership IDs
@@ -117,7 +126,7 @@ const Membership: React.FC = () => {
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 lg:gap-8">
               {memberships.map((membership) => {
                 const isCurrent = membership.id === currentMembershipId;
                 const styling = getMembershipStyling(membership);

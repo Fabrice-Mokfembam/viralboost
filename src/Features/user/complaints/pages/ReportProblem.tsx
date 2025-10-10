@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Calendar, CheckCircle } from 'lucide-react';
+import { Plus, Calendar, CheckCircle, ArrowLeft } from 'lucide-react';
 import { useComplaints, useUpdateComplaint } from '../hooks/useComplaints';
 
 const ReportProblem = () => {
@@ -78,8 +78,19 @@ const ReportProblem = () => {
   // Note: Delete functionality removed as there's no delete endpoint in the API
 
   return (
-    <div className="min-h-screen bg-bg-main max-w-4xl mx-auto text-text-secondary">
-      <h1 className="text-3xl font-bold text-accent-cyan mb-8 text-center">Report a Problem</h1>
+    <div className="min-h-screen bg-gradient-to-br from-bg-main via-bg-secondary to-bg-main">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <button
+            onClick={() => navigate('/dashboard/profile')}
+            className="w-10 h-10 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 rounded-xl flex items-center justify-center shadow-lg transition-all duration-300 transform hover:scale-105"
+          >
+            <ArrowLeft size={20} className="text-white" />
+          </button>
+          <h1 className="text-2xl font-bold text-text-primary">Report a Problem</h1>
+          <div className="w-10 h-10"></div> {/* Spacer for center alignment */}
+        </div>
       
       {/* Previous Complaints Section */}
       <section className="mb-8">
@@ -261,6 +272,7 @@ const ReportProblem = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

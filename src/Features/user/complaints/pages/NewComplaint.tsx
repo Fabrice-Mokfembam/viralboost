@@ -101,17 +101,19 @@ const NewComplaint = () => {
   };
 
   return (
-    <div className="min-h-screen bg-bg-main max-w-4xl mx-auto text-text-secondary">
-      {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
-        <button
-          onClick={() => navigate('/v/report-problem')}
-          className="p-2 text-cyan-500 hover:bg-cyan-500/20 rounded-lg transition-colors"
-        >
-          <ArrowLeft size={24} />
-        </button>
-        <h1 className="text-3xl font-bold text-accent-cyan">Write New Complaint</h1>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-bg-main via-bg-secondary to-bg-main">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <button
+            onClick={() => navigate('/v/report-problem')}
+            className="w-10 h-10 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 rounded-xl flex items-center justify-center shadow-lg transition-all duration-300 transform hover:scale-105"
+          >
+            <ArrowLeft size={20} className="text-white" />
+          </button>
+          <h1 className="text-2xl font-bold text-text-primary">Write New Complaint</h1>
+          <div className="w-10 h-10"></div> {/* Spacer for center alignment */}
+        </div>
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -284,6 +286,7 @@ const NewComplaint = () => {
           </button>
         </div>
       </form>
+      </div>
     </div>
   );
 };

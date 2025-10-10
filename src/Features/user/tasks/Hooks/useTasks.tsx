@@ -12,7 +12,7 @@ export const useRunTaskDistribution = () => {
 
 export const useGetUserTaskDetails = (taskId: string) => {
   return useQuery({
-    queryKey: ["task"],
+    queryKey: ["task", taskId],
     queryFn: () => getUserTaskDetails(taskId),
     enabled: !!taskId,
   });
@@ -24,9 +24,9 @@ export const useUpdateUserTask = () => {
   return useMutation({
     mutationFn: ({ taskId, updateData }: { taskId: string; updateData: any }) =>
       updateUserTask(taskId, updateData),
-    onSuccess: (data) => {
-      // Update the specific task in cache
-      queryClient.setQueryData(["task"], data);
+    onSuccess: (data, variables) => {
+      // Update the specific task in cache using the taskId
+      queryClient.setQueryData(["task", variables.taskId], data);
       // Invalidate tasks list to refetch
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },

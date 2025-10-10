@@ -31,22 +31,8 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuClick, admin }) => {
             </div>
           </div>
 
-          {/* Right side - Notifications and user menu */}
+          {/* Right side - User menu */}
           <div className="flex items-center ">
-            {/* Notifications */}
-            <button
-              type="button"
-              className="p-2 rounded-md text-text-secondary hover:text-text-primary hover:bg-bg-tertiary focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent-cyan relative"
-            >
-              <span className="sr-only">View notifications</span>
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM4.828 7l2.586 2.586a2 2 0 002.828 0L12 7H4.828z" />
-              </svg>
-              {/* Notification badge */}
-              <span className="absolute -top-1 -right-1 h-4 w-4 bg-accent-cyan rounded-full flex items-center justify-center">
-                <span className="text-xs text-white font-medium">3</span>
-              </span>
-            </button>
 
             {/* User menu */}
             <div className="flex items-center space-x-3">
