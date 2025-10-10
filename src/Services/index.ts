@@ -13,8 +13,8 @@ const apiClient: AxiosInstance = axios.create({
 // Request interceptor to add auth token (user or admin)
 apiClient.interceptors.request.use(
   (config) => {
-    // Check if this is an admin endpoint
-    const isAdminEndpoint = config.url?.includes('/admin/');
+    // Check if this is an admin endpoint (both /admin/ and /new-admin/)
+    const isAdminEndpoint = config.url?.includes('/admin/') || config.url?.includes('/new-admin/');
     
     if (isAdminEndpoint) {
       // Use admin token for admin endpoints
@@ -42,7 +42,7 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error?.response?.status === 401) {
-      const isAdminEndpoint = typeof error?.config?.url === 'string' && error.config.url.includes('/admin/');
+      const isAdminEndpoint = typeof error?.config?.url === 'string' && (error.config.url.includes('/admin/') || error.config.url.includes('/new-admin/'));
       const isAuthEndpoint = typeof error?.config?.url === 'string' && error.config.url.includes('/auth/');
       
       if (isAdminEndpoint) {

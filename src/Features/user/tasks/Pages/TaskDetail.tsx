@@ -185,35 +185,35 @@ const TaskDetail: React.FC = () => {
                   <Globe size={20} className="text-cyan-400" />
                 </div>
                 <p className="text-text-muted text-sm font-medium mb-1">Platform</p>
-                <p className="text-text-primary font-semibold">{task.platform}</p>
-              </div>
+            <p className="text-text-primary font-semibold">{task.platform}</p>
+          </div>
               
               <div className="text-center">
                 <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center mx-auto mb-3">
                   <Tag size={20} className="text-purple-400" />
                 </div>
                 <p className="text-text-muted text-sm font-medium mb-1">Category</p>
-                <p className="text-text-primary font-semibold">{task.category}</p>
-              </div>
-            </div>
+            <p className="text-text-primary font-semibold">{task.category}</p>
+          </div>
+        </div>
 
-            {/* Target URL */}
-            {task.target_url && (
+        {/* Target URL */}
+        {task.target_url && (
               <div className="bg-gradient-to-r from-bg-tertiary to-bg-secondary p-6 rounded-2xl border border-cyan-500/20 mb-6">
                 <div className="flex items-center gap-3 mb-3">
                   <Globe size={20} className="text-cyan-400" />
                   <h3 className="text-text-primary font-semibold">Target URL</h3>
                 </div>
-                <a 
-                  href={task.target_url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
+            <a 
+              href={task.target_url} 
+              target="_blank" 
+              rel="noopener noreferrer"
                   className="text-cyan-400 hover:text-cyan-300 underline break-all transition-colors"
-                >
-                  {task.target_url}
-                </a>
-              </div>
-            )}
+            >
+              {task.target_url}
+            </a>
+          </div>
+        )}
 
             {/* Important Notes */}
             <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 p-6 rounded-2xl border border-orange-500/20">
@@ -234,11 +234,11 @@ const TaskDetail: React.FC = () => {
                   <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
                   <span>Tasks must be completed within 24 hours to be valid.</span>
                 </li>
-              </ul>
-            </div>
+          </ul>
+        </div>
           </div>
 
-          {/* Instructions */}
+      {/* Instructions */}
           <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary rounded-3xl p-8 shadow-2xl border border-cyan-500/20 mb-8">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
@@ -248,7 +248,7 @@ const TaskDetail: React.FC = () => {
             </div>
             
             <div className="space-y-4">
-              {formatInstructions(task.instructions).map((step, index) => (
+          {formatInstructions(task.instructions).map((step, index) => (
                 <div key={index} className="flex items-start gap-4 p-4 bg-gradient-to-r from-bg-tertiary to-bg-secondary rounded-2xl border border-cyan-500/20">
                   <div className="w-8 h-8 bg-cyan-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                     <span className="text-cyan-400 font-bold text-sm">{index + 1}</span>
@@ -259,7 +259,7 @@ const TaskDetail: React.FC = () => {
             </div>
           </div>
 
-          {/* Image Upload Section */}
+      {/* Image Upload Section */}
           <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary rounded-3xl p-8 shadow-2xl border border-cyan-500/20 mb-8">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
@@ -267,112 +267,112 @@ const TaskDetail: React.FC = () => {
               </div>
               <h3 className="text-2xl font-bold text-text-primary">Upload Proof Image</h3>
             </div>
-            
-            {/* Upload Progress */}
-            {isUploading && (
+        
+        {/* Upload Progress */}
+        {isUploading && (
               <div className="mb-6 p-6 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-2xl border border-blue-500/20">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
                   <span className="text-blue-400 font-semibold">Uploading image...</span>
-                </div>
-                {uploadProgress && (
+            </div>
+            {uploadProgress && (
                   <div className="w-full bg-gray-700 rounded-full h-3">
-                    <div 
+                <div 
                       className="bg-gradient-to-r from-blue-500 to-cyan-500 h-3 rounded-full transition-all duration-300"
-                      style={{ width: `${uploadProgress.percentage}%` }}
-                    ></div>
-                  </div>
-                )}
+                  style={{ width: `${uploadProgress.percentage}%` }}
+                ></div>
               </div>
             )}
+          </div>
+        )}
 
-            {/* Upload Error */}
-            {uploadError && (
+        {/* Upload Error */}
+        {uploadError && (
               <div className="mb-6 p-6 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-2xl border border-red-500/20">
                 <div className="flex items-center gap-3">
                   <AlertTriangle size={20} className="text-red-400" />
                   <p className="text-red-400 font-semibold">Upload Error: {uploadError}</p>
                 </div>
-              </div>
-            )}
+          </div>
+        )}
 
-            <input
-              type="file"
-              id="uploadImages"
-              className="hidden"
-              accept="image/*"
-              onChange={onImageChange}
-              disabled={isUploading}
-            />
-            <label
-              htmlFor="uploadImages"
+        <input
+          type="file"
+          id="uploadImages"
+          className="hidden"
+          accept="image/*"
+          onChange={onImageChange}
+          disabled={isUploading}
+        />
+        <label
+          htmlFor="uploadImages"
               className={`inline-flex items-center gap-3 cursor-pointer font-semibold px-8 py-4 rounded-2xl shadow-xl transition-all duration-300 transform hover:scale-105 ${
-                isUploading 
+            isUploading 
                   ? 'bg-gray-600 cursor-not-allowed text-gray-400' 
                   : 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white'
-              }`}
-            >
+          }`}
+        >
               <Upload size={20} />
-              {isUploading ? 'Uploading...' : 'Select Image'}
-            </label>
+          {isUploading ? 'Uploading...' : 'Select Image'}
+        </label>
 
-            {/* Selected Images Section */}
-            {selectedImages.length > 0 && (
+        {/* Selected Images Section */}
+        {selectedImages.length > 0 && (
               <div className="mt-8">
                 <h4 className="text-text-primary font-semibold mb-4">Selected Images</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {selectedImages.map((image, index) => {
-                    const url = URL.createObjectURL(image);
-                    return (
+            {selectedImages.map((image, index) => {
+              const url = URL.createObjectURL(image);
+              return (
                       <div key={index} className="relative rounded-2xl overflow-hidden shadow-xl group">
-                        <img
-                          src={url}
-                          alt={`upload-${index}`}
+                  <img
+                    src={url}
+                    alt={`upload-${index}`}
                           className="w-full h-48 object-cover brightness-90 group-hover:brightness-75 transition-all duration-300"
-                          onLoad={() => URL.revokeObjectURL(url)}
-                        />
-                        <button
-                          type="button"
-                          aria-label="Remove Image"
-                          onClick={() => removeImage(index)}
+                    onLoad={() => URL.revokeObjectURL(url)}
+                  />
+                  <button
+                    type="button"
+                    aria-label="Remove Image"
+                    onClick={() => removeImage(index)}
                           className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 shadow-lg opacity-90 hover:opacity-100 transition-all duration-300 transform hover:scale-110"
-                        >
+                  >
                           <X size={16} />
-                        </button>
-                      </div>
-                    );
-                  })}
+                  </button>
                 </div>
-              </div>
-            )}
+              );
+            })}
+                </div>
+          </div>
+        )}
           </div>
 
-          {/* Submit Error */}
-          {submitError && (
+      {/* Submit Error */}
+      {submitError && (
             <div className="mb-6 p-6 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-2xl border border-red-500/20">
               <div className="flex items-center gap-3">
                 <AlertTriangle size={20} className="text-red-400" />
                 <p className="text-red-400 font-semibold">Submission Error: {submitError.message}</p>
               </div>
-            </div>
-          )}
+        </div>
+      )}
 
-          {/* Submit Success */}
-          {submitSuccess && (
+      {/* Submit Success */}
+      {submitSuccess && (
             <div className="mb-6 p-6 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl border border-green-500/20">
               <div className="flex items-center gap-3">
                 <CheckCircle size={20} className="text-green-400" />
                 <p className="text-green-400 font-semibold">Task proof submitted successfully!</p>
               </div>
-            </div>
-          )}
+        </div>
+      )}
 
-          {/* Submit Button */}
-          <button
-            onClick={handleSubmit}
-            disabled={uploadedImages.length === 0 || isUploading || isSubmitting}
+      {/* Submit Button */}
+      <button
+        onClick={handleSubmit}
+        disabled={uploadedImages.length === 0 || isUploading || isSubmitting}
             className={`w-full py-6 font-bold text-xl rounded-2xl shadow-2xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-3 ${
-              uploadedImages.length === 0 || isUploading || isSubmitting
+          uploadedImages.length === 0 || isUploading || isSubmitting
                 ? 'bg-gray-600 cursor-not-allowed text-gray-400'
                 : 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
             }`}
@@ -393,7 +393,7 @@ const TaskDetail: React.FC = () => {
                 Submit Proof ({uploadedImages.length} image{uploadedImages.length !== 1 ? 's' : ''})
               </>
             )}
-          </button>
+      </button>
         </div>
       </div>
     </div>

@@ -5,9 +5,10 @@ import type { UpdateAccountPayload } from "../Types";
 // Hook to get user account details
 export const useAccount = () => {
   return useQuery({
-    queryKey: ["user-account"],
+    queryKey: ["account"],
     queryFn: getAccount,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!localStorage.getItem('authToken'),
+    staleTime: 2 * 60 * 1000, // 2 minutes
     retry: 2,
   });
 };
@@ -20,7 +21,7 @@ export const useUpdateAccount = () => {
     mutationFn: (accountData: UpdateAccountPayload) => updateAccount(accountData),
     onSuccess: () => {
       // Invalidate and refetch account data
-      queryClient.invalidateQueries({ queryKey: ["user-account"] });
+      queryClient.invalidateQueries({ queryKey: ["account"] });
     },
     onError: (error) => {
       console.error("Failed to update account:", error);

@@ -29,6 +29,15 @@ export const useLogin = () => {
         // Store authentication data using utility function
         storeAuthData(data);
         queryClient.setQueryData(['user'], data.user);
+        
+        // Invalidate and refetch all user-related data after successful login
+        queryClient.invalidateQueries({ queryKey: ['tasks'] });
+        queryClient.invalidateQueries({ queryKey: ['user-submissions'] });
+        queryClient.invalidateQueries({ queryKey: ['submission-stats'] });
+        queryClient.invalidateQueries({ queryKey: ['account'] });
+        queryClient.invalidateQueries({ queryKey: ['memberships'] });
+        queryClient.invalidateQueries({ queryKey: ['payments'] });
+        queryClient.invalidateQueries({ queryKey: ['withdrawals'] });
       }
     },
     onError: (error) => {

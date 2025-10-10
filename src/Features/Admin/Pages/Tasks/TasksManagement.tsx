@@ -348,9 +348,6 @@ const TasksManagement: React.FC = () => {
                   Category
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                  Benefit
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
@@ -368,26 +365,11 @@ const TasksManagement: React.FC = () => {
               {tasks?.data.map((task: TaskData) => (
                 <tr key={task.id} className="hover:bg-bg-tertiary">
                   <td className="px-6 py-4">
-                    <div className="flex items-start">
-                      <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 rounded-lg bg-bg-tertiary flex items-center justify-center">
-                          <span className="text-lg">{getPlatformIcon(task.platform)}</span>
-                        </div>
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-text-primary">
-                          {task.title}
-                        </div>
-                        <div className="text-sm text-text-secondary mt-1">
-                          {task.description.length > 100 
-                            ? `${task.description.substring(0, 100)}...` 
-                            : task.description
-                          }
-                        </div>
-                        <div className="text-xs text-text-muted mt-1">
-                          ID: {task.id}
-                        </div>
-                      </div>
+                    <div className="text-sm font-medium text-text-primary">
+                      {task.title}
+                    </div>
+                    <div className="text-xs text-text-muted mt-1">
+                      ID: {task.id}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -401,11 +383,6 @@ const TasksManagement: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-text-primary">
                       {getTaskProperty(task, 'category', 'category')}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-text-primary">
-                      ${getTaskProperty(task, 'benefit', 'benefit')}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">

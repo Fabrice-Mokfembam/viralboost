@@ -7,6 +7,8 @@ export const useRunTaskDistribution = () => {
   return useQuery({
     queryKey: ["tasks"],
     queryFn: () => runTaskDistribution(),
+    enabled: !!localStorage.getItem('authToken'),
+    staleTime: 2 * 60 * 1000, // 2 minutes
   });
 };
 

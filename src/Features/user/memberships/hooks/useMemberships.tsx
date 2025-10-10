@@ -7,6 +7,7 @@ export const useMemberships = () => {
   return useQuery({
     queryKey: ["memberships"],
     queryFn: getMemberships,
+    enabled: !!localStorage.getItem('authToken'),
     staleTime: 10 * 60 * 1000, // 10 minutes (memberships don't change often)
     retry: 2,
   });

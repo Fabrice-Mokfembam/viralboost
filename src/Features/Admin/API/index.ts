@@ -170,6 +170,9 @@ const updateSettings = async (settings: Record<string, unknown>) => {
   return data;
 };
 
+// Export admin management functions
+export * from './admins';
+
 export {
   loginAdmin,
   logoutAdmin,

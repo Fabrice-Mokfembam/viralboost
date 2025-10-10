@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { UserFilters } from '../../Types';
-import { useGetUsers, useDeactivateUser, useActivateUser, useDeleteUser } from '../../Hooks/useUsers';
+import { useGetUsers, useDeleteUser } from '../../Hooks/useUsers';
 import { toast } from 'react-toastify';
 
 interface UserWithMembership {
@@ -29,8 +29,6 @@ const UsersManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; user: UserWithMembership | null }>({ show: false, user: null });
   
-  const { mutate: deactivateUser, isPending: isDeactivating } = useDeactivateUser();
-  const { mutate: activateUser, isPending: isActivating } = useActivateUser();
   const { mutate: deleteUser, isPending: isDeleting } = useDeleteUser();
 
   const { data: usersResponse, isLoading, error } = useGetUsers(currentPage, 15, filters.search || '');
@@ -83,28 +81,6 @@ const UsersManagement: React.FC = () => {
         onError: (error) => {
           console.error('Delete error:', error);
           toast.error('Failed to delete user');
-        }
-      });
-    }
-  };
-
-  const handleSuspendUser = (user: UserWithMembership) => {
-    if (user.accountStatus === 'active') {
-      deactivateUser(user.uuid, {
-        onSuccess: () => {
-          toast.success('User suspended successfully');
-        },
-        onError: () => {
-          toast.error('Failed to suspend user');
-        }
-      });
-    } else {
-      activateUser(user.uuid, {
-        onSuccess: () => {
-          toast.success('User activated successfully');
-        },
-        onError: () => {
-          toast.error('Failed to activate user');
         }
       });
     }
@@ -215,9 +191,6 @@ const UsersManagement: React.FC = () => {
                   Membership
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                  Points
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
@@ -231,7 +204,7 @@ const UsersManagement: React.FC = () => {
             <tbody className="bg-bg-secondary divide-y divide-border">
               {isLoading ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-text-secondary">
+                  <td colSpan={6} className="px-6 py-8 text-center text-text-secondary">
                     <div className="flex items-center justify-center">
                       <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-accent-cyan"></div>
                       <span className="ml-2">Loading users...</span>
@@ -240,13 +213,13 @@ const UsersManagement: React.FC = () => {
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-red-500">
+                  <td colSpan={6} className="px-6 py-8 text-center text-red-500">
                     Error loading users. Please try again.
                   </td>
                 </tr>
               ) : usersWithMemberships.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-text-secondary">
+                  <td colSpan={6} className="px-6 py-8 text-center text-text-secondary">
                     No users found.
                   </td>
                 </tr>
@@ -298,11 +271,6 @@ const UsersManagement: React.FC = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-text-primary">
-                      {user.totalPointsEarned.toLocaleString()}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
                     {getStatusBadge(user.accountStatus)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">
@@ -313,29 +281,16 @@ const UsersManagement: React.FC = () => {
                       <button 
                         onClick={() => handleViewUser(user.uuid)}
                         className="text-accent-cyan hover:text-accent-cyan-hover disabled:opacity-50"
-                        disabled={isDeleting || isActivating}
+                        disabled={isDeleting}
                       >
                         View
                       </button>
                       <button 
                         onClick={() => handleDeleteUser(user)}
                         className="text-red-600 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={isDeleting || isActivating}
+                        disabled={isDeleting}
                       >
                         {isDeleting ? 'Deleting...' : 'Delete'}
-                      </button>
-                      <button 
-                        onClick={() => handleSuspendUser(user)}
-                        className={`disabled:opacity-50 disabled:cursor-not-allowed ${
-                          user.accountStatus === 'active' 
-                            ? "text-yellow-600 hover:text-yellow-700" 
-                            : "text-green-600 hover:text-green-700"
-                        }`}
-                        disabled={isDeleting || isActivating}
-                      >
-                        {isDeactivating ? 'Processing...' : 
-                         isActivating ? 'Activating...' :
-                         user.accountStatus === 'active' ? 'Suspend' : 'Activate'}
                       </button>
                     </div>
                   </td>

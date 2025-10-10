@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Save, RefreshCw, DollarSign, Globe, Bitcoin, CreditCard, Coins } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useAdminPaymentDetails, useUpdatePaymentDetails } from './Hooks';
+import { useAdmins } from '../../Hooks/useAdmins';
 
 interface SettingsData {
   // General Settings
@@ -31,6 +32,12 @@ const SettingsManagement: React.FC = () => {
     maximumPayoutAmount: 1000.00,
     withdrawalProcessingFee: 2.50
   });
+
+  const {data} = useAdmins()
+
+  useEffect(()=>{
+      console.log('admins',data)
+  },[data])
 
   // Payment Details hooks
   const { data: paymentDetailsResponse, isLoading: paymentDetailsLoading, error: paymentDetailsError } = useAdminPaymentDetails();

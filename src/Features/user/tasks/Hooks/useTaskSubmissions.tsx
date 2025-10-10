@@ -53,7 +53,8 @@ export const useGetUserSubmissions = (params: GetSubmissionsParams = {}) => {
   return useQuery<UserSubmissionsResponse>({
     queryKey: ['user-submissions'],
     queryFn: () => getUserSubmissions(params),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!localStorage.getItem('authToken'),
+    staleTime: 2 * 60 * 1000, // 2 minutes
   });
 };
 
