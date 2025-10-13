@@ -9,7 +9,7 @@ import type { Withdrawal } from '../../withdrawals/Types';
 
 const Transactions = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'withdrawals' | 'topups'>('withdrawals');
+  const [activeTab, setActiveTab] = useState<'withdrawals' | 'topups'>('topups');
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [selectedWithdrawal, setSelectedWithdrawal] = useState<Withdrawal | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -143,19 +143,6 @@ const Transactions = () => {
         <div className="bg-bg-secondary rounded-xl p-1 mb-6 border border-gray-700/50">
           <div className="grid grid-cols-2 gap-1">
             <button
-              onClick={() => setActiveTab('withdrawals')}
-              className={`py-3 px-4 rounded-lg font-semibold transition-all duration-300 ${
-                activeTab === 'withdrawals'
-                  ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg'
-                  : 'text-text-muted hover:text-text-primary hover:bg-bg-tertiary'
-              }`}
-            >
-              <div className="flex items-center justify-center space-x-2">
-                <TrendingDown size={18} />
-                <span>Withdrawals</span>
-              </div>
-            </button>
-            <button
               onClick={() => setActiveTab('topups')}
               className={`py-3 px-4 rounded-lg font-semibold transition-all duration-300 ${
                 activeTab === 'topups'
@@ -168,62 +155,25 @@ const Transactions = () => {
                 <span>Top-ups</span>
               </div>
             </button>
+            <button
+              onClick={() => setActiveTab('withdrawals')}
+              className={`py-3 px-4 rounded-lg font-semibold transition-all duration-300 ${
+                activeTab === 'withdrawals'
+                  ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg'
+                  : 'text-text-muted hover:text-text-primary hover:bg-bg-tertiary'
+              }`}
+            >
+              <div className="flex items-center justify-center space-x-2">
+                <TrendingDown size={18} />
+                <span>Withdrawals</span>
+              </div>
+            </button>
           </div>
         </div>
 
         {/* Transaction List */}
         <div className="space-y-4">
-          {activeTab === 'withdrawals' ? (
-            // Withdrawals Tab - Show actual withdrawal data
-            withdrawals.map((withdrawal) => (
-              <div
-                key={withdrawal.uuid}
-                className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-4 border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-red-500/20">
-                      <CreditCard size={20} className="text-red-400" />
-                    </div>
-                    <div>
-                      <p className="text-text-primary font-semibold">
-                        ${parseFloat(withdrawal.withdrawal_amount).toFixed(2)}
-                      </p>
-                      <p className="text-text-muted text-sm">{withdrawal.platform || 'Withdrawal'}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(false, withdrawal.is_completed)}`}>
-                      {getStatusText(false, withdrawal.is_completed)}
-                    </span>
-                    <p className="text-text-muted text-xs mt-1">{formatDate(withdrawal.created_at)}</p>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between text-xs text-text-muted">
-                  <span>ID: {withdrawal.uuid.slice(0, 8)}...</span>
-                  <div className="flex items-center space-x-2">
-                    <button 
-                      onClick={() => handleViewWithdrawalDetails(withdrawal)}
-                      className="text-cyan-400 hover:text-cyan-300 transition-colors flex items-center space-x-1"
-                    >
-                      <Eye size={14} />
-                      <span>View Details</span>
-                    </button>
-                    {!withdrawal.is_completed && (
-                      <button 
-                        onClick={() => handleCancelWithdrawal(withdrawal.uuid)}
-                        disabled={deleteWithdrawalMutation.isPending}
-                        className="text-red-400 hover:text-red-300 transition-colors flex items-center space-x-1 disabled:opacity-50"
-                      >
-                        <Trash2 size={14} />
-                        <span>Cancel</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : (
+          {activeTab === 'topups' ? (
             // Top-ups Tab - Show payment data
             payments.map((payment) => (
               <div
@@ -273,17 +223,67 @@ const Transactions = () => {
                 </div>
               </div>
             ))
+          ) : (
+            // Withdrawals Tab - Show actual withdrawal data
+            withdrawals.map((withdrawal) => (
+              <div
+                key={withdrawal.uuid}
+                className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-xl p-4 border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-red-500/20">
+                      <CreditCard size={20} className="text-red-400" />
+                    </div>
+                    <div>
+                      <p className="text-text-primary font-semibold">
+                        ${parseFloat(withdrawal.withdrawal_amount).toFixed(2)}
+                      </p>
+                      <p className="text-text-muted text-sm">{withdrawal.platform || 'Withdrawal'}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(false, withdrawal.is_completed)}`}>
+                      {getStatusText(false, withdrawal.is_completed)}
+                    </span>
+                    <p className="text-text-muted text-xs mt-1">{formatDate(withdrawal.created_at)}</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between text-xs text-text-muted">
+                  <span>ID: {withdrawal.uuid.slice(0, 8)}...</span>
+                  <div className="flex items-center space-x-2">
+                    <button 
+                      onClick={() => handleViewWithdrawalDetails(withdrawal)}
+                      className="text-cyan-400 hover:text-cyan-300 transition-colors flex items-center space-x-1"
+                    >
+                      <Eye size={14} />
+                      <span>View Details</span>
+                    </button>
+                    {!withdrawal.is_completed && (
+                      <button 
+                        onClick={() => handleCancelWithdrawal(withdrawal.uuid)}
+                        disabled={deleteWithdrawalMutation.isPending}
+                        className="text-red-400 hover:text-red-300 transition-colors flex items-center space-x-1 disabled:opacity-50"
+                      >
+                        <Trash2 size={14} />
+                        <span>Cancel</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))
           )}
         </div>
 
         {/* Empty State */}
-        {((activeTab === 'withdrawals' ? withdrawals : payments).length === 0) && (
+        {((activeTab === 'topups' ? payments : withdrawals).length === 0) && (
           <div className="text-center py-12">
             <div className="w-16 h-16 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
-              {activeTab === 'withdrawals' ? (
-                <CreditCard size={32} className="text-gray-500" />
-              ) : (
+              {activeTab === 'topups' ? (
                 <Repeat size={32} className="text-gray-500" />
+              ) : (
+                <CreditCard size={32} className="text-gray-500" />
               )}
             </div>
             <h3 className="text-text-primary font-semibold mb-2">No {activeTab} found</h3>
@@ -295,19 +295,19 @@ const Transactions = () => {
 
         {/* Action Buttons */}
         <div className="mt-8 space-y-3">
-          {activeTab === 'withdrawals' ? (
-            <button
-              onClick={() => navigate('/v/withdraw')}
-              className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-3 rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
-            >
-              Request Withdrawal
-            </button>
-          ) : (
+          {activeTab === 'topups' ? (
             <button
               onClick={() => navigate('/v/recharge')}
               className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
             >
               Add Funds
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate('/v/withdraw')}
+              className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-3 rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
+            >
+              Request Withdrawal
             </button>
           )}
         </div>

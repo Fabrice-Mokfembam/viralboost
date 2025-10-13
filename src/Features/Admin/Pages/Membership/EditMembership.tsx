@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import type { MembershipCreationForm, MembershipCreationFormErrors } from '../../Types';
 import { useGetMembershipById, useUpdateMembership } from '../../Hooks/useMemberships';
+import { useCloudinaryUpload } from '../../../../Hooks/useCloudinaryUpload';
+import { ImageUpload } from '../../../../Components/ImageUpload';
 
 interface ApiError {
   response?: {
@@ -23,13 +25,26 @@ const EditMembership: React.FC = () => {
     max_tasks: 50,
     benefit_amount_per_task : 0,
     price: 0,
+    membership_icons: '',
     is_active: true,
   });
 
   const [errors, setErrors] = useState<MembershipCreationFormErrors>({});
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
 
   const { data: membershipData, isLoading, error } = useGetMembershipById(id || '');
   const { mutate: updateMembership, isPending: isUpdatingMembership, isError: isUpdatingMembershipError, error: updateMembershipError } = useUpdateMembership();
+  const { error: uploadError } = useCloudinaryUpload();
+
+  const handleImageUpload = async (response: { secure_url: string }) => {
+    setUploadedImage(response.secure_url);
+    setFormData(prev => ({ ...prev, membership_icons: response.secure_url }));
+    setErrors(prev => ({ ...prev, membership_icons: undefined }));
+  };
+
+  const handleUploadError = (error: string) => {
+    setErrors(prev => ({ ...prev, membership_icons: error }));
+  };
 
   // Populate form when membership data is loaded
   useEffect(() => {
@@ -42,8 +57,14 @@ const EditMembership: React.FC = () => {
         max_tasks: membership.max_tasks || 50,
         benefit_amount_per_task: membership.benefit_amount_per_task || 0,
         price: membership.price || 0,
+        membership_icons: membership.membership_icons || '',
         is_active: membership.is_active === 1,
       });
+      
+      // Set uploaded image if membership has an icon
+      if (membership.membership_icons) {
+        setUploadedImage(membership.membership_icons);
+      }
     }
   }, [membershipData]);
 
@@ -364,6 +385,63 @@ const EditMembership: React.FC = () => {
                 </label>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Membership Icon Upload */}
+        <div className="bg-bg-secondary rounded-lg p-6">
+          <h2 className="text-lg font-semibold text-text-primary mb-6">Membership Icon</h2>
+          
+          <div className="space-y-4">
+            <p className="text-text-muted text-sm">
+              Upload an icon for this membership tier. This will be displayed to users.
+            </p>
+            
+            {/* Image Preview */}
+            {uploadedImage && (
+              <div className="mb-4">
+                <p className="text-text-primary font-medium mb-2 text-sm">Icon Preview:</p>
+                <div className="relative bg-bg-tertiary rounded-lg p-4 border border-gray-600 max-w-xs">
+                  <img
+                    src={uploadedImage}
+                    alt="Membership icon preview"
+                    className="w-20 h-20 object-cover rounded-lg mx-auto"
+                  />
+                </div>
+              </div>
+            )}
+
+            <ImageUpload
+              onUploadSuccess={handleImageUpload}
+              onUploadError={handleUploadError}
+              accept="image/*"
+              maxSize={5}
+              className="w-full"
+            >
+              <div className="border-2 border-dashed border-cyan-500/50 rounded-lg p-8 text-center hover:border-cyan-500 transition-colors">
+                <div className="text-cyan-500 mb-4">
+                  <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <p className="text-text-primary font-medium mb-2">
+                  {uploadedImage ? 'Upload another icon' : 'Click to upload membership icon'}
+                </p>
+                <p className="text-text-muted text-sm">
+                  {uploadedImage ? 'Click to replace current icon' : 'Upload an image file (max 5MB)'}
+                </p>
+              </div>
+            </ImageUpload>
+            
+            {errors.membership_icons && (
+              <p className="mt-1 text-sm text-red-500">{errors.membership_icons}</p>
+            )}
+            
+            {uploadError && (
+              <div className="text-red-400 text-sm bg-red-500/10 border border-red-500/30 rounded-lg p-3">
+                {uploadError}
+              </div>
+            )}
           </div>
         </div>
 

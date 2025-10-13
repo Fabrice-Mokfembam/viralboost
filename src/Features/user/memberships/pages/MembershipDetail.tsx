@@ -16,6 +16,8 @@ const MembershipDetail: React.FC = () => {
 
   const memberships = membershipsResponse?.data?.memberships || [];
   const membership = memberships.find(m => m.id === parseInt(id || '0'));
+
+  console.log(membership);
   
   // Get user data and balance
   const storedUser = getUserData();

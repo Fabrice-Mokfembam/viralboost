@@ -10,6 +10,8 @@ const MembershipDetail: React.FC = () => {
 
   const membership = membershipData;
 
+  console.log(membership);
+
   const getStatusBadge = (isActive: number) => {
     return (
       <span className={`px-3 py-1 text-sm font-medium rounded-full ${

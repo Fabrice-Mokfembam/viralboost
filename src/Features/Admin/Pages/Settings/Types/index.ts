@@ -2,9 +2,13 @@
 export interface PaymentDetails {
   id: number;
   bitcoin_address: string;
+  bitcoin_instructions: string[];
   ethereum_address: string;
+  ethereum_instructions: string[];
   usdt_address_TRC20: string;
+  usdt_trc20_instructions: string[];
   usdt_address_ERC20: string;
+  usdt_erc20_instructions: string[];
   created_at: string;
   updated_at: string;
 }
@@ -12,16 +16,24 @@ export interface PaymentDetails {
 // Request payload types
 export interface CreatePaymentDetailsPayload {
   bitcoin_address: string;
+  bitcoin_instructions: string[];
   ethereum_address: string;
+  ethereum_instructions: string[];
   usdt_address_TRC20: string;
+  usdt_trc20_instructions: string[];
   usdt_address_ERC20: string;
+  usdt_erc20_instructions: string[];
 }
 
 export interface UpdatePaymentDetailsPayload {
   bitcoin_address?: string;
+  bitcoin_instructions?: string[];
   ethereum_address?: string;
+  ethereum_instructions?: string[];
   usdt_address_TRC20?: string;
+  usdt_trc20_instructions?: string[];
   usdt_address_ERC20?: string;
+  usdt_erc20_instructions?: string[];
 }
 
 // API Response types

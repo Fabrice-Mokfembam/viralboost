@@ -14,9 +14,13 @@ const PaymentDetailsManagement: React.FC = () => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     bitcoin_address: '',
+    bitcoin_instructions: [] as string[],
     ethereum_address: '',
+    ethereum_instructions: [] as string[],
     usdt_address_TRC20: '',
-    usdt_address_ERC20: ''
+    usdt_trc20_instructions: [] as string[],
+    usdt_address_ERC20: '',
+    usdt_erc20_instructions: [] as string[]
   });
 
 
@@ -28,6 +32,8 @@ const PaymentDetailsManagement: React.FC = () => {
   const deleteMutation = useDeletePaymentDetails();
 
   const paymentDetails = paymentDetailsResponse?.data || [];
+
+
 
   const handleInputChange = (field: keyof typeof formData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -43,7 +49,16 @@ const PaymentDetailsManagement: React.FC = () => {
       await createMutation.mutateAsync(formData);
       toast.success('Payment details created successfully!');
       setIsCreating(false);
-      setFormData({ bitcoin_address: '', ethereum_address: '', usdt_address_TRC20: '', usdt_address_ERC20: '' });
+      setFormData({ 
+        bitcoin_address: '', 
+        bitcoin_instructions: [],
+        ethereum_address: '', 
+        ethereum_instructions: [],
+        usdt_address_TRC20: '', 
+        usdt_trc20_instructions: [],
+        usdt_address_ERC20: '',
+        usdt_erc20_instructions: []
+      });
     } catch {
       toast.error('Failed to create payment details');
     }
@@ -59,7 +74,16 @@ const PaymentDetailsManagement: React.FC = () => {
       await updateMutation.mutateAsync({ id, payload: formData });
       toast.success('Payment details updated successfully!');
       setEditingId(null);
-      setFormData({ bitcoin_address: '', ethereum_address: '', usdt_address_TRC20: '', usdt_address_ERC20: '' });
+      setFormData({ 
+        bitcoin_address: '', 
+        bitcoin_instructions: [],
+        ethereum_address: '', 
+        ethereum_instructions: [],
+        usdt_address_TRC20: '', 
+        usdt_trc20_instructions: [],
+        usdt_address_ERC20: '',
+        usdt_erc20_instructions: []
+      });
     } catch {
       toast.error('Failed to update payment details');
     }
@@ -80,16 +104,29 @@ const PaymentDetailsManagement: React.FC = () => {
     setEditingId(details.id);
     setFormData({
       bitcoin_address: details.bitcoin_address,
+      bitcoin_instructions: details.bitcoin_instructions || [],
       ethereum_address: details.ethereum_address,
+      ethereum_instructions: details.ethereum_instructions || [],
       usdt_address_TRC20: details.usdt_address_TRC20,
-      usdt_address_ERC20: details.usdt_address_ERC20
+      usdt_trc20_instructions: details.usdt_trc20_instructions || [],
+      usdt_address_ERC20: details.usdt_address_ERC20,
+      usdt_erc20_instructions: details.usdt_erc20_instructions || []
     });
   };
 
   const handleCancel = () => {
     setIsCreating(false);
     setEditingId(null);
-    setFormData({ bitcoin_address: '', ethereum_address: '', usdt_address_TRC20: '', usdt_address_ERC20: '' });
+    setFormData({ 
+      bitcoin_address: '', 
+      bitcoin_instructions: [],
+      ethereum_address: '', 
+      ethereum_instructions: [],
+      usdt_address_TRC20: '', 
+      usdt_trc20_instructions: [],
+      usdt_address_ERC20: '',
+      usdt_erc20_instructions: []
+    });
   };
 
   if (isLoading) {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Save, RefreshCw, DollarSign, Globe, Bitcoin, CreditCard, Coins } from 'lucide-react';
+import { Save, RefreshCw, DollarSign, Globe, Bitcoin, CreditCard, Coins, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useAdminPaymentDetails, useUpdatePaymentDetails } from './Hooks';
 import { useAdmins } from '../../Hooks/useAdmins';
@@ -45,14 +45,24 @@ const SettingsManagement: React.FC = () => {
 
   // Get the first payment details record (assuming there's only one active set)
   const paymentDetails = paymentDetailsResponse?.data?.[0];
+
+  console.log(paymentDetails);
   
   // Payment details form state
   const [paymentFormData, setPaymentFormData] = useState({
     bitcoin_address: '',
+    bitcoin_instructions: [] as string[],
     ethereum_address: '',
+    ethereum_instructions: [] as string[],
     usdt_address_TRC20: '',
-    usdt_address_ERC20: ''
+    usdt_trc20_instructions: [] as string[],
+    usdt_address_ERC20: '',
+    usdt_erc20_instructions: [] as string[]
   });
+
+  // Instruction management state
+  const [activeInstructionTab, setActiveInstructionTab] = useState<'bitcoin' | 'ethereum' | 'usdt_trc20' | 'usdt_erc20'>('bitcoin');
+  const [newInstruction, setNewInstruction] = useState('');
 
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('general');
@@ -62,9 +72,13 @@ const SettingsManagement: React.FC = () => {
     if (paymentDetails) {
       setPaymentFormData({
         bitcoin_address: paymentDetails.bitcoin_address || '',
+        bitcoin_instructions: paymentDetails.bitcoin_instructions || [],
         ethereum_address: paymentDetails.ethereum_address || '',
+        ethereum_instructions: paymentDetails.ethereum_instructions || [],
         usdt_address_TRC20: paymentDetails.usdt_address_TRC20 || '',
-        usdt_address_ERC20: paymentDetails.usdt_address_ERC20 || ''
+        usdt_trc20_instructions: paymentDetails.usdt_trc20_instructions || [],
+        usdt_address_ERC20: paymentDetails.usdt_address_ERC20 || '',
+        usdt_erc20_instructions: paymentDetails.usdt_erc20_instructions || []
       });
     }
   }, [paymentDetails]);
@@ -75,6 +89,36 @@ const SettingsManagement: React.FC = () => {
 
   const handlePaymentInputChange = (field: keyof typeof paymentFormData, value: string) => {
     setPaymentFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Instruction management functions
+  const addInstruction = () => {
+    if (!newInstruction.trim()) {
+      toast.error('Please enter an instruction');
+      return;
+    }
+
+    const instructionField = `${activeInstructionTab}_instructions` as keyof typeof paymentFormData;
+    setPaymentFormData(prev => ({
+      ...prev,
+      [instructionField]: [...(prev[instructionField] as string[]), newInstruction.trim()]
+    }));
+    setNewInstruction('');
+    toast.success('Instruction added successfully');
+  };
+
+  const removeInstruction = (index: number) => {
+    const instructionField = `${activeInstructionTab}_instructions` as keyof typeof paymentFormData;
+    setPaymentFormData(prev => ({
+      ...prev,
+      [instructionField]: (prev[instructionField] as string[]).filter((_, i) => i !== index)
+    }));
+    toast.success('Instruction removed successfully');
+  };
+
+  const getCurrentInstructions = () => {
+    const instructionField = `${activeInstructionTab}_instructions` as keyof typeof paymentFormData;
+    return paymentFormData[instructionField] as string[];
   };
 
   const handleSave = async () => {
@@ -289,6 +333,125 @@ const SettingsManagement: React.FC = () => {
                 />
                 <p className="text-xs text-text-muted mt-1">Ethereum network USDT address</p>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Payment Instructions Management */}
+        <div className="bg-bg-tertiary rounded-lg p-4 border border-gray-600/50 mt-6">
+          <h3 className="text-lg font-semibold text-text-primary mb-4">Payment Instructions</h3>
+          <p className="text-text-muted text-sm mb-6">
+            Add step-by-step instructions for each payment method to help users complete their transactions.
+          </p>
+          
+          {/* Instruction Tabs */}
+          <div className="bg-bg-secondary rounded-xl p-1 mb-6 border border-gray-700/50">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-1">
+              <button
+                onClick={() => setActiveInstructionTab('bitcoin')}
+                className={`py-3 px-4 rounded-lg font-semibold transition-all duration-300 ${
+                  activeInstructionTab === 'bitcoin'
+                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg'
+                    : 'text-text-muted hover:text-text-primary hover:bg-bg-tertiary'
+                }`}
+              >
+                <div className="flex items-center justify-center space-x-2">
+                  <Bitcoin size={18} />
+                  <span>Bitcoin</span>
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveInstructionTab('ethereum')}
+                className={`py-3 px-4 rounded-lg font-semibold transition-all duration-300 ${
+                  activeInstructionTab === 'ethereum'
+                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg'
+                    : 'text-text-muted hover:text-text-primary hover:bg-bg-tertiary'
+                }`}
+              >
+                <div className="flex items-center justify-center space-x-2">
+                  <CreditCard size={18} />
+                  <span>Ethereum</span>
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveInstructionTab('usdt_trc20')}
+                className={`py-3 px-4 rounded-lg font-semibold transition-all duration-300 ${
+                  activeInstructionTab === 'usdt_trc20'
+                    ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg'
+                    : 'text-text-muted hover:text-text-primary hover:bg-bg-tertiary'
+                }`}
+              >
+                <div className="flex items-center justify-center space-x-2">
+                  <Coins size={18} />
+                  <span>USDT TRC20</span>
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveInstructionTab('usdt_erc20')}
+                className={`py-3 px-4 rounded-lg font-semibold transition-all duration-300 ${
+                  activeInstructionTab === 'usdt_erc20'
+                    ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg'
+                    : 'text-text-muted hover:text-text-primary hover:bg-bg-tertiary'
+                }`}
+              >
+                <div className="flex items-center justify-center space-x-2">
+                  <Coins size={18} />
+                  <span>USDT ERC20</span>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* Current Instructions Display */}
+          <div className="mb-6">
+            <h4 className="text-md font-semibold text-text-primary mb-3">
+              Current Instructions ({getCurrentInstructions().length})
+            </h4>
+            {getCurrentInstructions().length === 0 ? (
+              <div className="bg-bg-secondary rounded-lg p-6 text-center border border-gray-600/50">
+                <p className="text-text-muted">No instructions added yet. Add your first instruction below.</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {getCurrentInstructions().map((instruction, index) => (
+                  <div key={index} className="bg-bg-secondary rounded-lg p-4 border border-gray-600/50 flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-6 h-6 bg-cyan-500/20 rounded-full flex items-center justify-center text-cyan-400 text-sm font-semibold">
+                        {index + 1}
+                      </div>
+                      <p className="text-text-primary">{instruction}</p>
+                    </div>
+                    <button
+                      onClick={() => removeInstruction(index)}
+                      className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Add New Instruction */}
+          <div className="bg-bg-secondary rounded-lg p-4 border border-gray-600/50">
+            <h4 className="text-md font-semibold text-text-primary mb-3">Add New Instruction</h4>
+            <div className="flex gap-3">
+              <input
+                type="text"
+                value={newInstruction}
+                onChange={(e) => setNewInstruction(e.target.value)}
+                placeholder={`Enter instruction for ${activeInstructionTab.replace('_', ' ').toUpperCase()}`}
+                className="flex-1 px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
+                onKeyPress={(e) => e.key === 'Enter' && addInstruction()}
+              />
+              <button
+                onClick={addInstruction}
+                className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-cyan-600 text-white rounded-lg hover:from-cyan-600 hover:to-cyan-700 transition-all duration-300 flex items-center space-x-2"
+              >
+                <Plus size={16} />
+                <span>Add</span>
+              </button>
             </div>
           </div>
         </div>
