@@ -25,7 +25,7 @@ const EditMembership: React.FC = () => {
     max_tasks: 50,
     benefit_amount_per_task : 0,
     price: 0,
-    membership_icons: '',
+    membership_icon: '',
     is_active: true,
   });
 
@@ -38,12 +38,12 @@ const EditMembership: React.FC = () => {
 
   const handleImageUpload = async (response: { secure_url: string }) => {
     setUploadedImage(response.secure_url);
-    setFormData(prev => ({ ...prev, membership_icons: response.secure_url }));
-    setErrors(prev => ({ ...prev, membership_icons: undefined }));
+    setFormData(prev => ({ ...prev, membership_icon: response.secure_url }));
+    setErrors(prev => ({ ...prev, membership_icon: undefined }));
   };
 
   const handleUploadError = (error: string) => {
-    setErrors(prev => ({ ...prev, membership_icons: error }));
+    setErrors(prev => ({ ...prev, membership_icon: error }));
   };
 
   // Populate form when membership data is loaded
@@ -57,13 +57,13 @@ const EditMembership: React.FC = () => {
         max_tasks: membership.max_tasks || 50,
         benefit_amount_per_task: membership.benefit_amount_per_task || 0,
         price: membership.price || 0,
-        membership_icons: membership.membership_icons || '',
+        membership_icon: membership.membership_icon || '',
         is_active: membership.is_active === 1,
       });
       
       // Set uploaded image if membership has an icon
-      if (membership.membership_icons) {
-        setUploadedImage(membership.membership_icons);
+      if (membership.membership_icon) {
+        setUploadedImage(membership.membership_icon);
       }
     }
   }, [membershipData]);
@@ -433,8 +433,8 @@ const EditMembership: React.FC = () => {
               </div>
             </ImageUpload>
             
-            {errors.membership_icons && (
-              <p className="mt-1 text-sm text-red-500">{errors.membership_icons}</p>
+            {errors.membership_icon && (
+              <p className="mt-1 text-sm text-red-500">{errors.membership_icon}</p>
             )}
             
             {uploadError && (

@@ -5,6 +5,8 @@ export interface Withdrawal {
   user_uuid: string;
   withdrawal_amount: string;
   platform?: string;
+  wallet_address?: string;
+  address_type?: string;
   picture_path?: string;
   is_completed: boolean;
   created_at: string;
@@ -60,12 +62,16 @@ export interface PaginationInfo {
 export interface CreateWithdrawalPayload {
   withdrawal_amount: number;
   platform?: string;
+  wallet_address?: string;
+  address_type?: string;
   picture_path?: string;
 }
 
 export interface UpdateWithdrawalPayload {
   withdrawal_amount?: number;
   platform?: string;
+  wallet_address?: string;
+  address_type?: string;
   picture_path?: string;
 }
 

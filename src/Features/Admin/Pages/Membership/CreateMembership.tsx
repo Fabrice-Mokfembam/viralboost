@@ -24,7 +24,7 @@ const CreateMembership: React.FC = () => {
     max_tasks: 50,
     price: 0,
     benefit_amount_per_task: 0,
-    membership_icons: '',
+    membership_icon: '',
     is_active: true,
   });
 
@@ -44,12 +44,12 @@ const CreateMembership: React.FC = () => {
 
   const handleImageUpload = async (response: { secure_url: string }) => {
     setUploadedImage(response.secure_url);
-    setFormData(prev => ({ ...prev, membership_icons: response.secure_url }));
-    setErrors(prev => ({ ...prev, membership_icons: undefined }));
+    setFormData(prev => ({ ...prev, membership_icon: response.secure_url }));
+    setErrors(prev => ({ ...prev, membership_icon: undefined }));
   };
 
   const handleUploadError = (error: string) => {
-    setErrors(prev => ({ ...prev, membership_icons: error }));
+    setErrors(prev => ({ ...prev, membership_icon: error }));
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -119,7 +119,7 @@ const CreateMembership: React.FC = () => {
     }
 
     setIsSubmitting(true);
-    console.log(formData);
+    console.log('formData createMembership', formData);
 
     createMembership(formData, {
       onSuccess: () => {
@@ -365,9 +365,9 @@ const CreateMembership: React.FC = () => {
               </div>
             </ImageUpload>
             
-            {errors.membership_icons && (
-              <p className="mt-1 text-sm text-red-500">{errors.membership_icons}</p>
-            )}
+        {errors.membership_icon && (
+          <p className="mt-1 text-sm text-red-500">{errors.membership_icon}</p>
+        )}
             
             {uploadError && (
               <div className="text-red-400 text-sm bg-red-500/10 border border-red-500/30 rounded-lg p-3">

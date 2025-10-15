@@ -239,7 +239,18 @@ const Transactions = () => {
                       <p className="text-text-primary font-semibold">
                         ${parseFloat(withdrawal.withdrawal_amount).toFixed(2)}
                       </p>
-                      <p className="text-text-muted text-sm">{withdrawal.platform || 'Withdrawal'}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-text-muted text-sm">{withdrawal.platform || 'Withdrawal'}</p>
+                        {withdrawal.platform === 'USDT' && withdrawal.address_type && (
+                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                            withdrawal.address_type === 'TRC20' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-blue-100 text-blue-800'
+                          }`}>
+                            {withdrawal.address_type}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <div className="text-right">
@@ -358,12 +369,31 @@ const Transactions = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-text-muted">Platform:</span>
-                  <span className="text-text-primary">
-                    {modalType === 'payment' 
-                      ? selectedPayment?.platform 
-                      : selectedWithdrawal?.platform || 'Withdrawal'}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-text-primary">
+                      {modalType === 'payment' 
+                        ? selectedPayment?.platform 
+                        : selectedWithdrawal?.platform || 'Withdrawal'}
+                    </span>
+                    {modalType === 'withdrawal' && selectedWithdrawal?.platform === 'USDT' && selectedWithdrawal?.address_type && (
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        selectedWithdrawal.address_type === 'TRC20' 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-blue-100 text-blue-800'
+                      }`}>
+                        {selectedWithdrawal.address_type}
+                      </span>
+                    )}
+                  </div>
                 </div>
+                {modalType === 'withdrawal' && selectedWithdrawal?.wallet_address && (
+                  <div className="flex justify-between">
+                    <span className="text-text-muted">Wallet Address:</span>
+                    <span className="text-text-primary font-mono text-xs break-all max-w-48 text-right">
+                      {selectedWithdrawal.wallet_address}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-text-muted">Status:</span>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${

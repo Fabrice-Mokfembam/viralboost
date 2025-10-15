@@ -35,6 +35,7 @@ const Withdraw = () => {
   const [amount, setAmount] = useState('');
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [walletAddress, setWalletAddress] = useState('');
+  const [addressType, setAddressType] = useState<'TRC20' | 'ERC20'>('TRC20');
   const [isProcessing, setIsProcessing] = useState(false);
 
   const account = accountResponse?.data;
@@ -67,11 +68,24 @@ const Withdraw = () => {
     }
 
     setIsProcessing(true);
+
+    console.log('Withdrawal data to be submitted:', {
+      withdrawal_amount: withdrawalAmount,
+      platform: selectedMethod || undefined,
+      wallet_address: walletAddress,
+      address_type: selectedMethod === 'USDT' ? addressType : undefined,
+      picture_path: undefined // No image required for withdrawal
+    });
     
     try {
+
+     
+
       await createWithdrawalMutation.mutateAsync({
         withdrawal_amount: withdrawalAmount,
         platform: selectedMethod || undefined,
+        wallet_address: walletAddress,
+        address_type: selectedMethod === 'USDT' ? addressType : undefined,
         picture_path: undefined // No image required for withdrawal
       });
 
@@ -80,10 +94,16 @@ const Withdraw = () => {
       setWalletAddress('');
       setAmount('');
       setSelectedMethod(null);
-    } catch (error: any) {
+      setAddressType('TRC20'); // Reset to default
+    } catch (error: unknown) {
       console.error('Withdrawal submission error:', error);
-      if (error?.response?.data?.message) {
-        toast.error(error.response.data.message);
+      if (error && typeof error === 'object' && 'response' in error) {
+        const apiError = error as { response?: { data?: { message?: string } } };
+        if (apiError.response?.data?.message) {
+          toast.error(apiError.response.data.message);
+        } else {
+          toast.error('Failed to submit withdrawal request. Please try again.');
+        }
       } else {
         toast.error('Failed to submit withdrawal request. Please try again.');
       }
@@ -178,7 +198,10 @@ const Withdraw = () => {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-text-primary">Enter Wallet Address</h3>
               <button
-                onClick={() => setShowAddressModal(false)}
+                onClick={() => {
+                  setShowAddressModal(false);
+                  setAddressType('TRC20'); // Reset to default
+                }}
                 className="text-text-muted hover:text-text-primary"
                 disabled={isProcessing}
               >
@@ -202,6 +225,55 @@ const Withdraw = () => {
                 disabled={isProcessing}
               />
             </div>
+
+            {/* USDT Address Type Selection */}
+            {selectedMethod === 'USDT' && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-text-primary mb-2">
+                  Select USDT Network Type
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setAddressType('TRC20')}
+                    disabled={isProcessing}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      addressType === 'TRC20'
+                        ? 'border-green-500 bg-green-500/20 text-green-400'
+                        : 'border-gray-600 bg-bg-main text-text-muted hover:border-green-500 hover:text-green-400'
+                    }`}
+                  >
+                    <div className="text-center">
+                      <div className="font-semibold text-sm">TRC20</div>
+                      <div className="text-xs opacity-75">Tron Network</div>
+                      <div className="text-xs text-green-400 mt-1">Lower Fees</div>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAddressType('ERC20')}
+                    disabled={isProcessing}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      addressType === 'ERC20'
+                        ? 'border-blue-500 bg-blue-500/20 text-blue-400'
+                        : 'border-gray-600 bg-bg-main text-text-muted hover:border-blue-500 hover:text-blue-400'
+                    }`}
+                  >
+                    <div className="text-center">
+                      <div className="font-semibold text-sm">ERC20</div>
+                      <div className="text-xs opacity-75">Ethereum Network</div>
+                      <div className="text-xs text-orange-400 mt-1">Higher Fees</div>
+                    </div>
+                  </button>
+                </div>
+                <p className="text-xs text-text-muted mt-2">
+                  {addressType === 'TRC20' 
+                    ? 'Recommended: Lower transaction fees on Tron network'
+                    : 'Alternative: Higher fees but works with Ethereum wallets'
+                  }
+                </p>
+              </div>
+            )}
 
             {/* Disclaimer */}
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
@@ -231,6 +303,16 @@ const Withdraw = () => {
                   <span className="text-text-muted">Method:</span>
                   <span className="text-text-primary font-medium">{getSelectedMethodInfo()?.name}</span>
                 </div>
+                {selectedMethod === 'USDT' && (
+                  <div className="flex justify-between">
+                    <span className="text-text-muted">Network:</span>
+                    <span className={`font-medium ${
+                      addressType === 'TRC20' ? 'text-green-400' : 'text-blue-400'
+                    }`}>
+                      {addressType}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-text-muted">Address:</span>
                   <span className="text-text-primary font-mono text-xs truncate max-w-32">
@@ -242,7 +324,10 @@ const Withdraw = () => {
 
             <div className="flex space-x-3">
               <button
-                onClick={() => setShowAddressModal(false)}
+                onClick={() => {
+                  setShowAddressModal(false);
+                  setAddressType('TRC20'); // Reset to default
+                }}
                 className="flex-1 px-4 py-2 text-text-secondary hover:text-text-primary border border-border rounded-lg hover:bg-bg-tertiary transition-colors disabled:opacity-50"
                 disabled={isProcessing}
               >

@@ -15,6 +15,7 @@ export const createWithdrawal = async (payload: CreateWithdrawalPayload): Promis
 };
 
 // GET /api/v1/withdrawals - Get User's Withdrawals
+
 export const getWithdrawals = async (params?: GetWithdrawalsQueryParams): Promise<GetWithdrawalsResponse> => {
   const queryParams = new URLSearchParams();
 

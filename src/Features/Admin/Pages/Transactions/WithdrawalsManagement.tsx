@@ -188,6 +188,9 @@ const WithdrawalsManagement: React.FC = () => {
                   Platform
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
+                  Wallet Address
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
@@ -201,7 +204,7 @@ const WithdrawalsManagement: React.FC = () => {
             <tbody className="bg-bg-secondary divide-y divide-border">
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-text-secondary">
+                  <td colSpan={7} className="px-6 py-8 text-center text-text-secondary">
                     <div className="flex items-center justify-center">
                       <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-accent-cyan"></div>
                       <span className="ml-2">Loading withdrawals...</span>
@@ -210,13 +213,13 @@ const WithdrawalsManagement: React.FC = () => {
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-red-500">
+                  <td colSpan={7} className="px-6 py-8 text-center text-red-500">
                     Error loading withdrawals. Please try again.
                   </td>
                 </tr>
               ) : withdrawals.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-text-secondary">
+                  <td colSpan={7} className="px-6 py-8 text-center text-text-secondary">
                     No withdrawals found.
                   </td>
                 </tr>
@@ -249,9 +252,27 @@ const WithdrawalsManagement: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-text-primary">
-                        {withdrawal.platform || 'N/A'}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-text-primary">
+                          {withdrawal.platform || 'N/A'}
+                        </span>
+                        {withdrawal.platform === 'USDT' && withdrawal.address_type && (
+                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                            withdrawal.address_type === 'TRC20' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-blue-100 text-blue-800'
+                          }`}>
+                            {withdrawal.address_type}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="max-w-xs">
+                        <p className="text-sm text-text-primary font-mono truncate" title={withdrawal.wallet_address || 'N/A'}>
+                          {withdrawal.wallet_address || 'N/A'}
+                        </p>
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {getStatusBadge(withdrawal.is_completed)}

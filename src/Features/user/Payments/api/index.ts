@@ -50,6 +50,6 @@ export const deletePayment = async (uuid: string): Promise<DeletePaymentResponse
 
 // POST /api/v1/payments/{uuid}/approve - Approve Payment
 export const approvePayment = async (uuid: string): Promise<ApprovePaymentResponse> => {
-  const { data } = await apiClient.post(`/payments/${uuid}/approve`);
+  const { data } = await apiClient.post(`/admin/payments/${uuid}/approve`);
   return data;
 };

@@ -41,6 +41,7 @@ const Home = () => {
     console.log('userProfile',userProfile);
   }, [Tasks, userProfile]);
 
+
   // Helper function to check if a task has been submitted
   const isTaskSubmitted = (taskId: number) => {
     if (!Submissions?.data?.submissions) return false;
@@ -66,6 +67,7 @@ const Home = () => {
   const memberShipData = user?.membership;
 
   console.log('account',accountData);
+
 
   // Skeleton component for balance
   const BalanceSkeleton = () => (
@@ -102,8 +104,10 @@ const Home = () => {
 
   
 
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-bg-main via-bg-secondary to-bg-main">
+      
       <div className="max-w-lg mx-auto px-3 py-6">
       {/* Header */}
       <header className="mb-6 space-y-4">

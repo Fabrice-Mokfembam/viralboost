@@ -191,6 +191,7 @@ const Profile = () => {
           ))}
         </div>
 
+
         {/* Stats Section */}
         <div className="mt-6 grid grid-cols-2 gap-3">
           <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary rounded-xl p-3 border border-cyan-500/20">

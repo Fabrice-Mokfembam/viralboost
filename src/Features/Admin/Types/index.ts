@@ -56,7 +56,7 @@ export interface MembershipTier {
   max_tasks: number;
   price: string | number;
   benefit_amount_per_task: string | number;
-  membership_icons: string;
+  membership_icon: string;
   is_active: number;
   created_at: string;
   updated_at: string;
@@ -298,7 +298,7 @@ export interface MembershipCreationForm {
   max_tasks: number;
   price: number;
   benefit_amount_per_task: number;
-  membership_icons: string;
+  membership_icon: string;
   is_active: boolean;
 }
 
@@ -311,6 +311,6 @@ export interface MembershipCreationFormErrors {
   max_tasks?: string;
   price?: string;
   benefit_amount_per_task?: string;
-  membership_icons?: string;
+  membership_icon?: string;
   is_active?: string;
 }

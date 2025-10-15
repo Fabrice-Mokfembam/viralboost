@@ -168,6 +168,58 @@ const WithdrawalDetail: React.FC = () => {
                       <p className="text-text-primary font-medium">{withdrawal.platform || 'N/A'}</p>
                     )}
                   </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-text-secondary">Wallet Address</label>
+                    {editMode ? (
+                      <input
+                        type="text"
+                        value={editForm.wallet_address || withdrawal.wallet_address || ''}
+                        onChange={(e) => setEditForm({ ...editForm, wallet_address: e.target.value })}
+                        className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
+                        placeholder="Wallet Address"
+                      />
+                    ) : (
+                      <p className="text-text-primary font-mono text-sm break-all bg-bg-main p-2 rounded border">
+                        {withdrawal.wallet_address || 'N/A'}
+                      </p>
+                    )}
+                  </div>
+
+                  {withdrawal.platform === 'USDT' && (
+                    <div>
+                      <label className="text-sm font-medium text-text-secondary">Address Type</label>
+                      {editMode ? (
+                        <select
+                          value={editForm.address_type || withdrawal.address_type || ''}
+                          onChange={(e) => setEditForm({ ...editForm, address_type: e.target.value })}
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-bg-main text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan"
+                        >
+                          <option value="">Select Address Type</option>
+                          <option value="TRC20">TRC20 (Tron Network)</option>
+                          <option value="ERC20">ERC20 (Ethereum Network)</option>
+                        </select>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                            withdrawal.address_type === 'TRC20' 
+                              ? 'bg-green-100 text-green-800' 
+                              : withdrawal.address_type === 'ERC20'
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {withdrawal.address_type || 'N/A'}
+                          </span>
+                          {withdrawal.address_type === 'TRC20' && (
+                            <span className="text-xs text-green-600">Lower Fees</span>
+                          )}
+                          {withdrawal.address_type === 'ERC20' && (
+                            <span className="text-xs text-orange-600">Higher Fees</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-4">
