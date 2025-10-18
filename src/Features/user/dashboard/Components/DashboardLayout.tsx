@@ -53,7 +53,7 @@ const DashboardLayout = () => {
       {/* Main content */}
       <main className="flex-grow relative w-full max-w-3xl md:mx-auto bg-bg-main pt-6 pb-20 px-4">
         <header className="w-full h-[70px] bg-bg-main sticky top-0 z-50 flex items-center justify-between  py-3">
-          <div className="text-cyan-500 font-bold text-xl">Viral Boost</div>
+          <div className="text-cyan-500 font-bold text-xl">PIS</div>
 
           <div className="flex items-center gap-2 text-text-muted relative">
             {/* <Globe2 size={24} className="cursor-pointer hover:text-cyan-500" /> */}

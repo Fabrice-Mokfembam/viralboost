@@ -45,7 +45,7 @@ const Home = () => {
   // Helper function to check if a task has been submitted
   const isTaskSubmitted = (taskId: number) => {
     if (!Submissions?.data?.submissions) return false;
-    return Submissions.data.submissions.some((submission: { task_id: number }) => submission.task_id === taskId);
+    return Submissions.data.submissions.some((submission:{ task_id: number }) => submission.task_id === taskId);
   };
 
   // Filter out completed tasks

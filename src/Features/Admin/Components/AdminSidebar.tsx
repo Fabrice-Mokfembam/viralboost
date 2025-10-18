@@ -137,9 +137,9 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose, currentPat
           <div className="flex items-center justify-center h-16 px-4 bg-bg-main border-b border-border">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-accent-cyan rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">V</span>
+                <span className="text-white font-bold text-sm">PIS</span>
               </div>
-              <span className="text-xl font-bold text-text-primary">ViralBoost</span>
+              <span className="text-xl font-bold text-text-primary">PIS</span>
             </div>
           </div>
 
