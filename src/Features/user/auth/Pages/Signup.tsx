@@ -402,7 +402,7 @@ const Signup: React.FC = () => {
                   placeholder="Referral Code (Optional)"
                 />
               </div>
-            </div>
+            </div>     
 
             {registrationError && (
               <div className="rounded-md bg-red-50 p-4">
@@ -415,7 +415,7 @@ const Signup: React.FC = () => {
                       Registration failed
                     </h3>
                     <div className="mt-2 text-sm text-red-700">
-                      {registrationError}
+                      {registrationError}  
                     </div>
                   </div>
                 </div>
@@ -432,7 +432,7 @@ const Signup: React.FC = () => {
                   <>
                     <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
                     Registering...
-                  </>
+                  </> 
                 ) : (
                   'Sign Up'
                 )}

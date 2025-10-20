@@ -19,7 +19,6 @@ const AdminLogin: React.FC = () => {
       [e.target.name]: e.target.value,
     });
   };
-
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -27,7 +26,7 @@ const AdminLogin: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Basic validation - just check if fields are not empty
+    
     if (formData.email.trim() && formData.password.trim()) {
       try {
         console.log('Attempting admin login...');
@@ -35,7 +34,7 @@ const AdminLogin: React.FC = () => {
           onSuccess: () => {
             console.log('Admin login successful');
             toast.success('Login successful!');
-            // Small delay to ensure state updates before navigation
+          
             setTimeout(() => {
               navigate('/admin/dashboard');
             }, 100);
@@ -48,7 +47,7 @@ const AdminLogin: React.FC = () => {
               ? (error.response.data as { message: string }).message
               : 'Login failed. Please try again.';
             toast.error(errorMessage);
-          }
+          }  
         });
       } catch (error) {
         console.error('Admin login error:', error);
@@ -76,6 +75,8 @@ const AdminLogin: React.FC = () => {
             Sign in to access the ViralBoost admin panel
           </p>
         </div>
+
+
 
 
         {/* Login Form */}
@@ -138,11 +139,12 @@ const AdminLogin: React.FC = () => {
               </label>
             </div>
 
-            <div className="text-sm">
+            {/* <div className="text-sm">
               <a href="#" className="font-medium text-accent-cyan hover:text-accent-cyan-hover">
                 Forgot your password?
               </a>
-            </div>
+            </div> */}
+
           </div>
 
           <div>

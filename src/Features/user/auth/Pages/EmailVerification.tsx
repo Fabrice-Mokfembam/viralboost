@@ -9,7 +9,7 @@ import { getAuthErrorMessage } from '../Utils/errorUtils';
 
 const EmailVerification: React.FC = () => {
   const [code, setCode] = useState<string[]>(new Array(6).fill(''));
-  const [timeLeft, setTimeLeft] = useState(120); // 2 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(120); 
   const [canResend, setCanResend] = useState(false);
   const inputRefs = useRef<HTMLInputElement[]>([]);
   const navigate = useNavigate();
