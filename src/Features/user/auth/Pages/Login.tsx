@@ -12,7 +12,7 @@ const Login: React.FC = () => {
     password: ''
   });
   const navigate = useNavigate();
-  const [isPhoneLogin, setIsPhoneLogin] = useState(true);
+
   const [loginError, setLoginError] = useState<string>('');
   
   // Auth hook
@@ -40,15 +40,10 @@ const Login: React.FC = () => {
     }
 
     // Prepare login data based on login type
-    const loginPayload: { password: string; phone?: string; email?: string } = {
-      password: loginData.password
+    const loginPayload: { password: string; email: string } = {
+      password: loginData.password,
+      email: loginData.LoginValue
     };
-
-    if (isPhoneLogin) {
-      loginPayload.phone = loginData.LoginValue;
-    } else {
-      loginPayload.email = loginData.LoginValue;
-    }
 
     login(loginPayload, {
       onSuccess: (data) => {
@@ -83,23 +78,28 @@ const Login: React.FC = () => {
           </h3>
         </div>
         <div className="bg-bg-main p-8 rounded-lg shadow-lg">
-          <div className="flex justify-center mb-6">
-            <button className={`w-1/2 cursor-pointer py-2 rounded-l-lg  text-text-primary font-semibold ${isPhoneLogin ? 'bg-cyan-500' : 'bg-bg-tertiary'}`} onClick={()=>setIsPhoneLogin(true)}>Phone</button>
-            <button className={`w-1/2 cursor-pointer py-2 rounded-r ${isPhoneLogin ? 'bg-bg-tertiary' : 'bg-cyan-500'} text-text-primary font-semibold`} onClick={()=>setIsPhoneLogin(false)}>Email</button>
+         <div className="flex justify-center mb-6">
+           
+            <button 
+              className={`w-full cursor-pointer py-3 rounded text-text-primary font-semibold ${'bg-cyan-500'}`} 
+            >
+              Email
+            </button>
           </div>
+
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="rounded-md shadow-sm -space-y-px">
               <div>
                 <input
                   id="login-value"
                   name="LoginValue"
-                  type={isPhoneLogin ? "number" : "email"}
-                  autoComplete="tel"
+                  type="email"
+                  autoComplete="email"
                   required
                   value={loginData.LoginValue}
                   onChange={handleInputChange}
                   className="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-700 placeholder-gray-500 text-text-primary rounded-t-md focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm bg-bg-tertiary"
-                  placeholder={isPhoneLogin ? "Phone Number" : "Email"}
+                  placeholder="Email"
                 />
               </div>
               <div className="relative mt-4">
@@ -126,13 +126,13 @@ const Login: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-end">
+            {/* <div className="flex items-center justify-end">
               <div className="text-sm">
                 <a href="/forgot-password" className="font-medium text-cyan-500 hover:text-accent-cyan">
                   Forgot Password?
                 </a>
               </div>
-            </div>
+            </div> */}
 
             {loginError && (
               <div className="rounded-md bg-red-50 p-4">
@@ -180,4 +180,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login; 
+export default Login;

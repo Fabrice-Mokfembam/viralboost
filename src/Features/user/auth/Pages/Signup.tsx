@@ -15,13 +15,13 @@ const Signup: React.FC = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isPhoneLogin, setIsPhoneLogin] = useState(true);
+
   const [registrationError, setRegistrationError] = useState<string>('');
   const { mutate: register, isPending} = useRegister();
 
   const [formData, setFormData] = useState({
     name: '',
-    phonenumber: '',
+
     email: '',
     password: '',
     confirmPassword: '',
@@ -32,7 +32,7 @@ const Signup: React.FC = () => {
     name: '',
     password: '',
     confirmPassword: '',
-    phonenumber: '',
+
     email: ''
   });
 
@@ -42,7 +42,7 @@ const Signup: React.FC = () => {
     name: false,
     password: false,
     confirmPassword: false,
-    phonenumber: false,
+
     email: false
   });
 
@@ -89,9 +89,7 @@ const Signup: React.FC = () => {
     if (touched.name && name === 'name') {
       validateName(value);
     }
-    if (touched.phonenumber && name === 'phonenumber') {
-      validatePhoneNumber(value);
-    }
+
     if (touched.email && name === 'email') {
       validateEmail(value);
     }
@@ -106,8 +104,7 @@ const Signup: React.FC = () => {
       validatePassword(formData.password);
     } else if (field === 'confirmPassword') {
       validateConfirmPassword(formData.confirmPassword);
-    } else if (field === 'phonenumber') {
-      validatePhoneNumber(formData.phonenumber);
+
     } else if (field === 'email') {
       validateEmail(formData.email);
     }
@@ -128,21 +125,7 @@ const Signup: React.FC = () => {
     return newErrors.name === '';
   };
 
-  const validatePhoneNumber = (phone: string) => {
-    const newErrors = { ...errors };
-    const phoneRegex = /^\+?[1-9]\d{1,14}$/; // Basic international phone format validation
-    
-    if (!phone.trim()) {
-      newErrors.phonenumber = 'Phone number is required';
-    } else if (!phoneRegex.test(phone)) {
-      newErrors.phonenumber = 'Please enter a valid phone number';
-    } else {
-      newErrors.phonenumber = '';
-    }
-    
-    setErrors(newErrors);
-    return newErrors.phonenumber === '';
-  };
+
 
   const validateEmail = (email: string) => {
     const newErrors = { ...errors };
@@ -202,36 +185,27 @@ const Signup: React.FC = () => {
       name: true,
       password: true,
       confirmPassword: true,
-      phonenumber: isPhoneLogin,
-      email: !isPhoneLogin
+      email: true
     };
     setTouched(allTouched);
-    
+
     const isNameValid = validateName(formData.name);
     const isPasswordValid = validatePassword(formData.password);
     const isConfirmPasswordValid = validateConfirmPassword(formData.confirmPassword);
-    const isPhoneValid = isPhoneLogin ? validatePhoneNumber(formData.phonenumber) : true;
-    const isEmailValid = !isPhoneLogin ? validateEmail(formData.email) : true;
-    
-    if (isNameValid && isPasswordValid && isConfirmPasswordValid && isPhoneValid && isEmailValid) {
+    const isEmailValid = validateEmail(formData.email);
+
+    if (isNameValid && isPasswordValid && isConfirmPasswordValid && isEmailValid) {
       // Prepare registration data
       const registrationData: {
         name: string;
         password: string;
-        phone?: string;
-        email?: string;
+        email: string;
         referralCode?: string;
       } = {
         name: formData.name,
         password: formData.password,
+        email: formData.email
       };
-
-      // Add phone or email based on selection
-      if (isPhoneLogin) {
-        registrationData.phone = formData.phonenumber;
-      } else {
-        registrationData.email = formData.email;
-      }
 
       // Add referral code if provided
       if (formData.referralCode.trim()) {
@@ -243,12 +217,7 @@ const Signup: React.FC = () => {
         onSuccess: (data) => {
           toast.success(data.message || 'Registration successful! Please check your email to verify your account.');
           // Navigate to verification page with the email
-          navigate('/code-verification', { 
-            state: { 
-              email: isPhoneLogin ? formData.email : formData.email,
-              isPhone: isPhoneLogin
-            } 
-          });
+          navigate('/code-verification', { state: { email: formData.email } });
         },
         onError: (error: unknown) => {
           const parsedError = parseAuthError(error);
@@ -291,10 +260,7 @@ const Signup: React.FC = () => {
     return errors.confirmPassword ? 'border-red-500' : 'border-green-500';
   };
 
-  const getPhoneInputClass = () => {
-    if (!touched.phonenumber) return 'border-gray-700';
-    return errors.phonenumber ? 'border-red-500' : 'border-green-500';
-  };
+
 
   const getEmailInputClass = () => {
     if (!touched.email) return 'border-gray-700';
@@ -313,21 +279,14 @@ const Signup: React.FC = () => {
           </h3>
         </div>
         <div className="bg-bg-main p-8 rounded-lg shadow-lg">
-          <div className="flex justify-center mb-6">
-            <button 
-              className={`w-1/2 cursor-pointer py-2 rounded-l-lg text-text-primary font-semibold ${isPhoneLogin ? 'bg-cyan-500' : 'bg-bg-tertiary'}`} 
-              onClick={() => setIsPhoneLogin(true)}
-            >
-              Phone
-            </button>
-            <button 
-              className={`w-1/2 cursor-pointer py-2 rounded-r text-text-primary font-semibold ${isPhoneLogin ? 'bg-bg-tertiary' : 'bg-cyan-500'}`} 
-              onClick={() => setIsPhoneLogin(false)}
-            >
-              Email
-            </button>
-          </div>
-          
+        <div className="flex justify-center mb-6">
+           
+           <button 
+             className={`w-full cursor-pointer py-3 rounded text-text-primary font-semibold ${'bg-cyan-500'}`} 
+           >
+             Email
+           </button>
+         </div>
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="rounded-md shadow-sm -space-y-px">
               <div>
@@ -350,30 +309,7 @@ const Signup: React.FC = () => {
                     </div>
                   ) : null}
               </div>
-              
-              {isPhoneLogin ? (
-                <div className="mt-4">
-                  <input
-                    id="phonenumber"
-                    name="phonenumber"
-                    type="tel"
-                    autoComplete="tel"
-                    required
-                    value={formData.phonenumber}
-                    onChange={handleInputChange}
-                    onBlur={() => handleBlur('phonenumber')}
-                    className={`appearance-none rounded-none relative block w-full px-3 py-3 border placeholder-gray-500 text-text-primary focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm bg-bg-tertiary ${getPhoneInputClass()}`}
-                    placeholder="Phone Number (e.g., +1234567890)"
-                  />
-                  {(touched.phonenumber && errors.phonenumber) || serverErrors.phone ? (
-                    <div className="mt-1 flex items-center text-red-500 text-xs">
-                      <AlertCircle size={14} className="mr-1" />
-                      {serverErrors.phone || errors.phonenumber}
-                    </div>
-                  ) : null}
-                </div>
-              ) : (
-                <div className="mt-4">
+                 <div className="mt-4">
                   <input
                     id="email-address"
                     name="email"
@@ -393,7 +329,6 @@ const Signup: React.FC = () => {
                     </div>
                   ) : null}
                 </div>
-              )}
               
               <div className="relative mt-4">
                 <div className={`rounded-none bg-bg-tertiary ${getPasswordInputClass()} ${errors.password ? 'border-2' : 'border'}`}>
@@ -491,7 +426,7 @@ const Signup: React.FC = () => {
               <button
                 type="submit"
                 className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-text-primary bg-cyan-500 hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={isPending || !!errors.name || !!errors.password || !!errors.confirmPassword || (isPhoneLogin && !!errors.phonenumber) || (!isPhoneLogin && !!errors.email)}
+                disabled={isPending || !!errors.name || !!errors.password || !!errors.confirmPassword }
               >
                 {isPending ? (
                   <>
@@ -501,7 +436,6 @@ const Signup: React.FC = () => {
                 ) : (
                   'Sign Up'
                 )}
-            
               </button>
             </div>
           </form>
