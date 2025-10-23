@@ -1,5 +1,6 @@
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import LandingPage from './Features/user/dashboard/Pages/LandingPage.tsx';
 import Login from './Features/user/auth/Pages/Login.tsx';
 import Signup from './Features/user/auth/Pages/Signup.tsx';
 import EmailVerification from './Features/user/auth/Pages/EmailVerification.tsx';
@@ -60,6 +61,10 @@ import EditMembership from './Features/Admin/Pages/Membership/EditMembership.tsx
 const router = createBrowserRouter([
   {
     path: "/",
+    element: <LandingPage />,
+  },
+  {
+    path: "/login",
     element: (
       <AuthRoute>
         <Login />
