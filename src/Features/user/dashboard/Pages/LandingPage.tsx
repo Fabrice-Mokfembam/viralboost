@@ -8,6 +8,7 @@ import TestimonialsSection from '../Components/LandingPage/TestimonialsSection';
 import PricingSection from '../Components/LandingPage/PricingSection';
 import CTASection from '../Components/LandingPage/CTASection';
 import FooterSection from '../Components/LandingPage/FooterSection';
+import Popups from '../Components/Popups';
 
 const LandingPage: React.FC = () => {
   return (
@@ -42,6 +43,9 @@ const LandingPage: React.FC = () => {
         <CTASection />
         <FooterSection />
       </div>
+      
+      {/* Notification Popups */}
+      <Popups />
     </div>
   );
 };

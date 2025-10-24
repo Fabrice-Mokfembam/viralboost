@@ -7,6 +7,7 @@ import { useRunTaskDistribution } from '../../tasks/Hooks/useTasks';
 import { useGetUserSubmissions } from '../../tasks/Hooks/useTaskSubmissions';
 import { useEffect } from 'react';
 import { useAccount } from '../../accounts';
+import Popups from '../Components/Popups';
 
 
 // Function to get platform icon
@@ -312,6 +313,9 @@ const Home = () => {
         </div>
       </div>
       </div>
+      
+      {/* Notification Popups */}
+      <Popups />
     </div>
   );
 };
