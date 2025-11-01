@@ -90,18 +90,18 @@ const FooterSection: React.FC = () => {
             <motion.div variants={itemVariants} className="lg:col-span-2">
               <div className="mb-6">
                 <h3 className="text-2xl font-bold text-text-primary mb-4 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                  Passive Income (PIS)
+                  ViralBoast
                 </h3>
                 <p className="text-text-muted leading-relaxed mb-6">
-                  The leading platform for generating passive income through social media engagement. 
-                  Join thousands of users who are already building their passive income streams.
+                  The leading platform for earning through social media engagement. 
+                  Join thousands of users who are already building their income streams with ViralBoast.
                 </p>
                 
                 {/* Contact Info */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <Mail size={16} className="text-cyan-400" />
-                    <span className="text-text-muted text-sm">support@passiveincome.com</span>
+                    <span className="text-text-muted text-sm">support@viralboast.com</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Phone size={16} className="text-cyan-400" />
@@ -235,7 +235,7 @@ const FooterSection: React.FC = () => {
           >
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <div className="text-text-muted text-sm">
-                © 2024 Passive Income (PIS). All rights reserved. Made with ❤️ for passive income earners worldwide.
+                © 2024 ViralBoast. All rights reserved. Made with ❤️ for ViralBoast earners worldwide.
               </div>
               
               <div className="flex items-center gap-6">

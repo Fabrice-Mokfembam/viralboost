@@ -96,7 +96,7 @@ const HowItWorksSection: React.FC = () => {
           </h2>
           
           <p className="text-xl text-text-muted max-w-3xl mx-auto">
-            Start generating passive income in just 4 simple steps. No experience needed - 
+            Start earning with ViralBoast in just 4 simple steps. No experience needed - 
             just follow the instructions and build your income stream!
           </p>
         </motion.div>
@@ -232,7 +232,7 @@ const HowItWorksSection: React.FC = () => {
               See It In Action
             </h3>
             <p className="text-xl text-text-muted max-w-2xl mx-auto">
-              Watch how easy it is to start generating passive income with our platform
+              Watch how easy it is to start earning with ViralBoast
             </p>
           </div>
           
@@ -278,10 +278,10 @@ const HowItWorksSection: React.FC = () => {
         >
           <div className="bg-gradient-to-r from-bg-secondary to-bg-tertiary rounded-3xl p-8 border border-cyan-500/20 backdrop-blur-sm">
             <h3 className="text-2xl font-bold text-text-primary mb-4">
-              Ready to Start Passive Income?
+              Ready to Start Earning with ViralBoast?
             </h3>
             <p className="text-text-muted mb-6">
-              Join thousands of users who are already building their passive income streams.
+              Join thousands of users who are already earning with ViralBoast.
             </p>
             <button
               onClick={() => navigate('/signup')}

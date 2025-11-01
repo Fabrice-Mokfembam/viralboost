@@ -91,19 +91,19 @@ const FeaturesSection: React.FC = () => {
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-full border border-cyan-500/30 mb-6">
             <CheckCircle size={20} className="text-cyan-400" />
-            <span className="text-cyan-300 font-semibold text-sm">Why Choose Passive Income</span>
+            <span className="text-cyan-300 font-semibold text-sm">Why Choose ViralBoast</span>
           </div>
           
           <h2 className="text-4xl md:text-5xl font-bold text-text-primary mb-6 bg-gradient-to-r from-text-primary to-cyan-400 bg-clip-text text-transparent">
             Everything You Need to
             <br />
             <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-              Generate Passive Income
+              Earn with ViralBoast
             </span>
           </h2>
           
           <p className="text-xl text-text-muted max-w-3xl mx-auto">
-            Our platform makes it incredibly easy to generate passive income from social media engagement. 
+            Our platform makes it incredibly easy to earn from social media engagement. 
             No special skills required - just follow simple instructions and build your income stream!
           </p>
         </motion.div>

@@ -65,10 +65,10 @@ const LandingPageNav: React.FC = () => {
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           >
             <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">P</span>
+              <span className="text-white font-bold text-sm">V</span>
             </div>
             <span className="text-xl font-bold text-text-primary bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-              Passive Income
+              ViralBoast
             </span>
           </motion.div>
 

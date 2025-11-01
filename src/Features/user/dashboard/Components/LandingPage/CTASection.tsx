@@ -18,7 +18,7 @@ const CTASection: React.FC = () => {
   const benefits = [
     {
       icon: <Zap size={24} className="text-green-400" />,
-      text: "Start passive income in minutes"
+      text: "Start earning in minutes"
     },
     {
       icon: <DollarSign size={24} className="text-yellow-400" />,
@@ -118,7 +118,7 @@ const CTASection: React.FC = () => {
               Ready to Start
               <br />
               <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                Passive Income Today?
+                ViralBoast Today?
               </span>
             </motion.h2>
 
@@ -127,7 +127,7 @@ const CTASection: React.FC = () => {
               variants={itemVariants}
               className="text-xl md:text-2xl text-text-muted mb-8 max-w-3xl mx-auto leading-relaxed"
             >
-              Join thousands of users who are already building passive income streams from simple social media tasks. 
+              Join thousands of users who are already earning from simple social media tasks. 
               No experience needed - just follow instructions and start earning!
             </motion.p>
 
@@ -160,7 +160,7 @@ const CTASection: React.FC = () => {
                 className="group bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-10 py-5 rounded-2xl font-bold text-xl shadow-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-3xl flex items-center gap-3"
               >
               <Smartphone size={28} />
-              Start Passive Income
+              Start ViralBoast
               <ArrowRight size={28} className="group-hover:translate-x-1 transition-transform" />
               </button>
               

@@ -55,10 +55,10 @@ const HeroSection: React.FC = () => {
             variants={itemVariants}
             className="text-5xl md:text-7xl font-bold text-text-primary mb-6 bg-gradient-to-r from-text-primary via-cyan-400 to-purple-400 bg-clip-text text-transparent leading-tight"
           >
-            Generate
+            Start Earning
             <br />
             <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-              Passive Income
+              with ViralBoast
             </span>
           </motion.h1>
 
@@ -68,7 +68,7 @@ const HeroSection: React.FC = () => {
             className="text-xl md:text-2xl text-text-muted mb-8 max-w-3xl mx-auto leading-relaxed"
           >
             Complete simple tasks like liking videos, subscribing to channels, and following accounts. 
-            Build your passive income stream with minimal effort!
+            Build your income stream with minimal effort!
           </motion.p>
 
           {/* CTA Buttons */}
@@ -80,7 +80,7 @@ const HeroSection: React.FC = () => {
               onClick={() => navigate('/signup')}
               className="group bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-3xl flex items-center gap-3"
             >
-              Start Passive Income
+              Start ViralBoast
               <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
             </button>
             

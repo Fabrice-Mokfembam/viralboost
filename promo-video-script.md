@@ -5,7 +5,7 @@
 ---
 
 ### **Opening Hook (0-10 seconds)**
-*"Tired of complex side hustles that require hours of work for minimal returns? What if I told you there's a way to generate passive income by simply using social media the way you already do?"*
+*"Tired of complex side hustles that require hours of work for minimal returns? What if I told you there's a way to earn money by simply using social media the way you already do?"*
 
 ---
 
@@ -25,12 +25,12 @@
 ---
 
 ### **Social Proof (50-65 seconds)**
-*"Join over 50,000 active users who are already building their passive income streams. We've paid out over 2 million dollars to our community, with more than 1 million tasks completed successfully. Real people, real earnings, real results."*
+*"Join over 50,000 active users who are already earning with ViralBoast. We've paid out over 2 million dollars to our community, with more than 1 million tasks completed successfully. Real people, real earnings, real results."*
 
 ---
 
 ### **Call to Action (65-90 seconds)**
-*"Don't let another day pass watching others make money while you just scroll. Start your passive income journey today. Sign up for ViralBoost and turn your social media time into profit. The only question is - are you ready to get paid for what you're already doing? Visit ViralBoost now and start earning today."*
+*"Don't let another day pass watching others make money while you just scroll. Start your earning journey today with ViralBoast. Sign up for ViralBoost and turn your social media time into profit. The only question is - are you ready to get paid for what you're already doing? Visit ViralBoost now and start earning today."*
 
 ---
 
@@ -40,10 +40,10 @@
 *"What if every like, follow, and subscribe could put money in your pocket? With ViralBoost, it can."*
 
 ### **Solution (8-25 seconds)**
-*"ViralBoost transforms your social media activity into passive income. Complete simple tasks like liking videos and following accounts, submit proof with a screenshot, and get paid instantly. No skills required, no complex setup - just earn money doing what you already do."*
+*"ViralBoost transforms your social media activity into earnings. Complete simple tasks like liking videos and following accounts, submit proof with a screenshot, and get paid instantly. No skills required, no complex setup - just earn money doing what you already do."*
 
 ### **Proof & CTA (25-45 seconds)**
-*"Over 50,000 users are already earning with ViralBoost. We've paid out 2 million dollars and counting. Ready to turn your scrolling into earning? Sign up now and start your passive income journey today."*
+*"Over 50,000 users are already earning with ViralBoost. We've paid out 2 million dollars and counting. Ready to turn your scrolling into earning? Sign up now and start earning with ViralBoast today."*
 
 ---
 
@@ -53,7 +53,7 @@
 - ✅ **Speed**: Quick signup and instant payments
 - ✅ **Proof**: Real numbers and social proof
 - ✅ **Accessibility**: Works for anyone with a smartphone
-- ✅ **Passive**: Earn while doing what you already do
+- ✅ **Earn Effortlessly**: Earn while doing what you already do
 
 ## **Tone Guidelines:**
 - **Professional yet approachable**

@@ -98,7 +98,7 @@ const TestimonialsSection: React.FC = () => {
           
           <p className="text-xl text-text-muted max-w-3xl mx-auto">
             Don't just take our word for it. Here's what real users are saying about their 
-            experience generating passive income with our platform.
+            experience earning with ViralBoast.
           </p>
         </motion.div>
 

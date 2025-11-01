@@ -110,7 +110,7 @@ const StatsSection: React.FC = () => {
           
           <p className="text-xl text-text-muted max-w-3xl mx-auto">
             Our platform has processed millions of tasks and paid out millions in rewards. 
-            Join the growing community of successful passive income earners.
+            Join the growing community of successful ViralBoast earners.
           </p>
         </motion.div>
 
