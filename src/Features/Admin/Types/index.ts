@@ -167,6 +167,19 @@ export interface AdminAuthResponse {
   };
 }
 
+export interface AdminLoginAsUserResponse {
+  success: boolean;
+  message: string;
+  token: string;
+  token_type: string;
+  admin_login: boolean;
+  data: {
+    user: any; // The full user object with all fields
+    memberships: any[]; // Array of memberships
+    account: any; // Account details
+  };
+}
+
 // API Response Types
 export interface ApiResponse<T> {
   success: boolean;

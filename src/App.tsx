@@ -34,10 +34,12 @@ import { useTheme } from './Hooks/useTheme.tsx';
 
 // Admin imports
 import AdminLogin from './Features/Admin/Pages/Auth/AdminLogin.tsx';
+import AdminLoginAs from './Features/Admin/Pages/Auth/AdminLoginAs.tsx';
 import AdminLayout from './Features/Admin/Components/AdminLayout.tsx';
 import AdminDashboard from './Features/Admin/Pages/AdminDashboard.tsx';
 import UsersManagement from './Features/Admin/Pages/Users/UsersManagement.tsx';
 import UserDetail from './Features/Admin/Pages/Users/UserDetail.tsx';
+import CreateUser from './Features/Admin/Pages/Users/CreateUser.tsx';
 import TasksManagement from './Features/Admin/Pages/Tasks/TasksManagement.tsx';
 import TaskCreation from './Features/Admin/Pages/Tasks/TaskCreation.tsx';
 import AdminProtectedRoute from './Features/Admin/Components/AdminProtectedRoute.tsx';
@@ -217,6 +219,14 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: "/admin/auth/login-as",
+    element: (
+      <AdminProtectedRoute>
+        <AdminLoginAs />
+      </AdminProtectedRoute>
+    ),
+  },
+  {
     path: "/admin/dashboard",
     element: (
       <AdminProtectedRoute>
@@ -235,6 +245,10 @@ const router = createBrowserRouter([
       {
         path: "users/:uuid",
         element: <UserDetail />,
+      },
+      {
+        path: "user/create",
+        element: <CreateUser />,
       },
       {
         path: "tasks",

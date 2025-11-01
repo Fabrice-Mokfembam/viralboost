@@ -47,3 +47,23 @@ export const deleteUser = async (uuid: string) => {
   });
   return data;
 };
+
+// Create user (Admin only)
+export const createUser = async (userData: {
+  name: string;
+  email: string;
+  password: string;
+}) => {
+  const payload = {
+    ...userData,
+    password_confirmation: userData.password
+  };
+  const { data } = await apiClient.post('/admin/users', payload);
+  return data;
+};
+
+// Login as user (Admin only)
+export const loginAsUser = async (email: string) => {
+  const { data } = await apiClient.post('/admin/users/login-as', { email });
+  return data;
+};

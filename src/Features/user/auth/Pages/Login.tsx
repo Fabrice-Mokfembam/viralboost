@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
 import { useLogin } from '../Hooks/useAuth';
 import { toast } from 'react-toastify';
 import { getAuthErrorMessage, parseAuthError, formatLoginError } from '../Utils/errorUtils';
 
 const Login: React.FC = () => {
+  const [searchParams] = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [loginData, setLoginData] = useState({
     LoginValue: '',
@@ -17,6 +18,26 @@ const Login: React.FC = () => {
   
   // Auth hook
   const { mutate: login, isPending } = useLogin();
+
+  // Read query parameters and auto-fill form fields
+  useEffect(() => {
+    const email = searchParams.get('email');
+    const password = searchParams.get('password');
+    
+    if (email) {
+      setLoginData(prev => ({
+        ...prev,
+        LoginValue: email
+      }));
+    }
+    
+    if (password) {
+      setLoginData(prev => ({
+        ...prev,
+        password: password
+      }));
+    }
+  }, [searchParams]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

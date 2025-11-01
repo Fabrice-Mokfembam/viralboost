@@ -148,14 +148,14 @@ const Profile = () => {
               </button>
               
               <button
-                onClick={() => navigate('/admin')}
+                onClick={() => navigate('/v/accountdetails')}
                 className="group bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 rounded-xl p-4 shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
               >
                 <div className="flex flex-col items-center space-y-2">
                   <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                    <User size={20} className="text-white" />
+                    <Settings size={20} className="text-white" />
                   </div>
-                  <span className="text-white text-xs font-semibold">Admin</span>
+                  <span className="text-white text-xs font-semibold">Account</span>
                 </div>
               </button>
             </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Filter, CheckCircle, XCircle, Trash2, Eye, Mail, Phone, AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Filter, CheckCircle, XCircle, Trash2, Mail, Phone, AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useGetComplaints, useUpdateComplaintStatus, useDeleteComplaint, useGetComplaintStats } from '../../Hooks/useComplaints';
 import { toast } from 'react-toastify';
 
@@ -204,7 +204,7 @@ const ComplaintsManagement: React.FC = () => {
             <thead className="bg-bg-tertiary">
               <tr>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">User</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Title</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Issue</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Severity</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Status</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Created</th>
@@ -252,14 +252,14 @@ const ComplaintsManagement: React.FC = () => {
                     <td className="px-6 py-4">
                       <div>
                         <div className="font-medium text-text-primary">
-                          {complaint.user?.username || 'Unknown User'}
+                          {complaint.user?.name || 'Unknown User'}
                         </div>
                         <div className="text-sm text-text-muted">{complaint.contact}</div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="max-w-xs">
-                        <div className="text-sm text-text-muted truncate">{complaint.description}</div>
+                        <div className="font-medium text-text-primary truncate">{complaint.title || complaint.description}</div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -293,13 +293,6 @@ const ComplaintsManagement: React.FC = () => {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-center gap-2">
-                        <button
-                          onClick={() => {/* View complaint details */}}
-                          className="p-2 text-cyan-400 hover:bg-cyan-400/20 rounded-lg transition-colors"
-                          title="View Details"
-                        >
-                          <Eye size={16} />
-                        </button>
                         {!complaint.is_resolved && (
                           <button
                             onClick={() => handleCloseComplaint(complaint.id)}

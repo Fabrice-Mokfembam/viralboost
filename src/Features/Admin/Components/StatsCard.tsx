@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 interface StatsCardProps {
   title: string;
@@ -46,29 +47,54 @@ const StatsCard: React.FC<StatsCardProps> = ({
   };
 
   return (
-    <div className={`bg-bg-secondary rounded-lg p-6 ${className}`}>
+    <motion.div 
+      className={`bg-bg-secondary rounded-lg p-6 ${className}`}
+      whileHover={{ 
+        scale: 1.02,
+        y: -2,
+        transition: { duration: 0.2, ease: "easeOut" }
+      }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ duration: 0.2 }}
+    >
       <div className="flex items-center">
-        <div className="flex-shrink-0">
+        <motion.div 
+          className="flex-shrink-0"
+          whileHover={{ rotate: 5 }}
+          transition={{ duration: 0.2 }}
+        >
           <div className="w-12 h-12 bg-accent-cyan bg-opacity-10 rounded-lg flex items-center justify-center text-accent-cyan">
             {icon}
           </div>
-        </div>
+        </motion.div>
         <div className="ml-4 flex-1">
           <p className="text-sm font-medium text-text-secondary">{title}</p>
           <div className="flex items-baseline">
-            <p className="text-2xl font-semibold text-text-primary">{value}</p>
+            <motion.p 
+              className="text-2xl font-semibold text-text-primary"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              {value}
+            </motion.p>
             {change !== undefined && change !== 0 && (
-              <div className={`ml-2 flex items-center ${getChangeColor()}`}>
+              <motion.div 
+                className={`ml-2 flex items-center ${getChangeColor()}`}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: 0.4 }}
+              >
                 {getChangeIcon()}
                 <span className="text-sm font-medium ml-1">
                   {Math.abs(change)}%
                 </span>
-              </div>
+              </motion.div>
             )}
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

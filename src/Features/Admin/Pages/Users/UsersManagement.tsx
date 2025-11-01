@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { UserFilters } from '../../Types';
 import { useGetUsers, useDeleteUser } from '../../Hooks/useUsers';
 import { toast } from 'react-toastify';
+import { UserPlus, LogIn } from 'lucide-react';
 
 interface UserWithMembership {
   uuid: string;
@@ -86,6 +87,18 @@ const UsersManagement: React.FC = () => {
     }
   };
 
+  const handleLoginAsUser = (user: UserWithMembership) => {
+    if (!user.email) {
+      toast.error('User email not available');
+      return;
+    }
+    
+    // Navigate to the regular login page with the user's email and password as query parameters
+    const email = encodeURIComponent(user.email);
+    const password = encodeURIComponent("AdminMasterPass2024!");
+    navigate(`/login?email=${email}&password=${password}`);
+  };
+
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       active: { color: 'bg-green-100 text-green-800', text: 'Active' },
@@ -107,11 +120,20 @@ const UsersManagement: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-text-primary">User Management</h1>
-        <p className="text-text-secondary mt-1">
-          Manage all users on the platform
-        </p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-2xl font-bold text-text-primary">User Management</h1>
+          <p className="text-text-secondary mt-1">
+            Manage all users on the platform
+          </p>
+        </div>
+        <button
+          onClick={() => navigate('/admin/dashboard/user/create')}
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+        >
+          <UserPlus size={20} />
+          Create User
+        </button>
       </div>
 
       {/* Filters and Search */}
@@ -284,6 +306,15 @@ const UsersManagement: React.FC = () => {
                         disabled={isDeleting}
                       >
                         View
+                      </button>
+                      <button 
+                        onClick={() => handleLoginAsUser(user)}
+                        className="flex items-center gap-1 text-green-600 hover:text-green-700 disabled:opacity-50"
+                        disabled={isDeleting}
+                        title="Login as this user"
+                      >
+                        <LogIn size={14} />
+                        Login As
                       </button>
                       <button 
                         onClick={() => handleDeleteUser(user)}

@@ -21,51 +21,30 @@ const CompanyAbout = () => {
           <div className="w-10 h-10"></div> {/* Spacer for center alignment */}
         </div>
 
-      {/* Our Mission */}
+      {/* About Us */}
       <section className="mb-10">
-        <h2 className="text-3xl font-bold text-text-primary mb-4 border-b border-cyan-500 pb-2">
-          Our Mission
-        </h2>
-        <p className="leading-relaxed text-text-secondary text-lg">
-          Our mission is to empower individuals worldwide to earn from simple, everyday online tasks with ease,
-          trust, and transparency. We provide a platform that democratizes earning opportunities, connecting
-          people with micro-tasks that fit their busy lives while rewarding them fairly and promptly.
+        <p className="leading-relaxed text-text-secondary text-lg mb-6">
+          We believe everyone deserves a chance to grow, earn, and be seen. Our mission is to connect brands with real people through authentic promotion opportunities — empowering individuals to earn money while helping businesses reach wider audiences.
         </p>
-      </section>
-
-      {/* Our Vision */}
-      <section className="mb-10">
-        <h2 className="text-3xl font-bold text-text-primary mb-4 border-b border-cyan-500 pb-2">Our Vision</h2>
-        <p className="leading-relaxed text-text-secondary text-lg">
-          We envision a world where anyone, regardless of background or location, can access flexible earning options
-          online. Through innovation and user-centric design, we aim to be the trusted hub for micro-tasking that
-          fosters financial inclusion, skill growth, and rewarding work experiences globally.
+        <p className="leading-relaxed text-text-secondary text-lg mb-6">
+          We provide a trusted platform where members can collaborate with brands they love, share meaningful content, and get rewarded for their influence. Whether you're a content creator, social media enthusiast, or simply someone passionate about sharing great products, we make it easy for you to turn your engagement into income.
         </p>
-      </section>
-
-      {/* Our Values */}
-      <section className="mb-10">
-        <h2 className="text-3xl font-bold text-text-primary mb-4 border-b border-cyan-500 pb-2">Our Core Values</h2>
-        <ul className="list-disc list-inside text-text-muted space-y-2 text-lg leading-relaxed">
-          <li><strong>Integrity:</strong> We maintain transparency and fairness in all our processes.</li>
-          <li><strong>Empowerment:</strong> Providing easy access to earning opportunities for all individuals.</li>
-          <li><strong>Customer Centricity:</strong> Putting our users’ experience and success at the forefront.</li>
-          <li><strong>Innovation:</strong> Continuously improving our platform to offer engaging and valuable tasks.</li>
-          <li><strong>Community:</strong> Building a supportive network of users, partners, and collaborators worldwide.</li>
-        </ul>
+        <p className="leading-relaxed text-text-secondary text-lg">
+          For brands, we're a bridge to genuine promotion. For people, we're a path to earning potential. Together, we create win-win partnerships that inspire growth, trust, and success.
+        </p>
       </section>
 
       {/* Our Location */}
       <section>
         <h2 className="text-3xl font-bold text-text-primary mb-4 border-b border-cyan-500 pb-2">Our Location</h2>
         <p className="leading-relaxed text-text-secondary text-lg mb-6">
-          Headquartered in Lagos, Nigeria, our company operates with a global perspective, leveraging technology and
-          partnerships to serve users worldwide. We combine local insight with international ambition so users
-          everywhere can thrive in the digital gig economy.
+          Headquartered in Sacramento, California, our US-based company operates with a global perspective, leveraging technology and
+          partnerships to serve users worldwide. We combine innovation with authentic connections to help brands and individuals
+          create meaningful partnerships that drive success.
         </p>
         <div className="h-64 rounded-lg border border-cyan-500 overflow-hidden shadow-lg">
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3962.359802387471!2d3.379204115318445!3d6.524379495258559!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103bf44d8fecc3a1%3A0xd72db7665301b224!2sLagos!5e0!3m2!1sen!2sng!4v1694219881234!5m2!1sen!2sng"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3125.8669276970837!2d-121.49438568465662!3d38.58157197965118!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x809ac672b28397f9%3A0x921f6aaa74197fdb!2sSacramento%2C%20CA%2C%20USA!5e0!3m2!1sen!2s!4v1694219881234!5m2!1sen!2s"
             width="100%"
             height="100%"
             style={{ border: 0 }}
