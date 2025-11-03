@@ -5,7 +5,7 @@ import { getAdminToken, clearAdminData } from '../Features/Admin/Utils/adminUtil
 const apiClient: AxiosInstance = axios.create({
   // baseURL: 'http://127.0.0.1:8000/api/v1',
 //baseURL: 'https://viral.logisticcargoexpres.com/api/v1',
- baseURL: 'http://passive.inc.cryptoexpertss.net/api/v1',
+ baseURL: 'https://passive.inc.cryptoexpertss.net/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },
