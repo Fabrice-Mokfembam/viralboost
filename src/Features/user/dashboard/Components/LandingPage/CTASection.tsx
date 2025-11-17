@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   ArrowRight, 
@@ -8,12 +8,28 @@ import {
   Users, 
   Clock,
   Smartphone,
-  Gift
+  Gift,
+  LayoutDashboard
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { isAuthenticated, isTokenExpired } from '../../../auth/Utils/authUtils';
 
 const CTASection: React.FC = () => {
   const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Check authentication status
+    const checkAuth = () => {
+      const authenticated = isAuthenticated() && !isTokenExpired();
+      setIsLoggedIn(authenticated);
+    };
+    
+    checkAuth();
+    // Re-check periodically in case auth state changes
+    const interval = setInterval(checkAuth, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const benefits = [
     {
@@ -155,22 +171,35 @@ const CTASection: React.FC = () => {
               variants={itemVariants}
               className="flex flex-col sm:flex-row gap-4 justify-center items-center"
             >
-              <button
-                onClick={() => navigate('/signup')}
-                className="group bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-10 py-5 rounded-2xl font-bold text-xl shadow-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-3xl flex items-center gap-3"
-              >
-              <Smartphone size={28} />
-              Start ViralBoast
-              <ArrowRight size={28} className="group-hover:translate-x-1 transition-transform" />
-              </button>
-              
-              <button
-                onClick={() => navigate('/login')}
-                className="group bg-gradient-to-r from-bg-tertiary to-bg-secondary hover:from-bg-secondary hover:to-bg-tertiary text-text-primary px-10 py-5 rounded-2xl font-bold text-xl border border-cyan-500/30 shadow-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex items-center gap-3 backdrop-blur-sm"
-              >
-                <CheckCircle size={28} />
-                Already Have Account?
-              </button>
+              {isLoggedIn ? (
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="group bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-10 py-5 rounded-2xl font-bold text-xl shadow-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-3xl flex items-center gap-3"
+                >
+                  <LayoutDashboard size={28} />
+                  Go to Dashboard
+                  <ArrowRight size={28} className="group-hover:translate-x-1 transition-transform" />
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={() => navigate('/signup')}
+                    className="group bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-10 py-5 rounded-2xl font-bold text-xl shadow-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-3xl flex items-center gap-3"
+                  >
+                    <Smartphone size={28} />
+                    Start ViralBoast
+                    <ArrowRight size={28} className="group-hover:translate-x-1 transition-transform" />
+                  </button>
+                  
+                  <button
+                    onClick={() => navigate('/login')}
+                    className="group bg-gradient-to-r from-bg-tertiary to-bg-secondary hover:from-bg-secondary hover:to-bg-tertiary text-text-primary px-10 py-5 rounded-2xl font-bold text-xl border border-cyan-500/30 shadow-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex items-center gap-3 backdrop-blur-sm"
+                  >
+                    <CheckCircle size={28} />
+                    Already Have Account?
+                  </button>
+                </>
+              )}
             </motion.div>
           </motion.div>
 

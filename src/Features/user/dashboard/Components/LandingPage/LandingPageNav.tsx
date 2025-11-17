@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Menu, X, ArrowRight } from 'lucide-react';
+import { Menu, X, ArrowRight, LayoutDashboard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { isAuthenticated, isTokenExpired } from '../../../auth/Utils/authUtils';
 
 const LandingPageNav: React.FC = () => {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,6 +17,19 @@ const LandingPageNav: React.FC = () => {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    // Check authentication status
+    const checkAuth = () => {
+      const authenticated = isAuthenticated() && !isTokenExpired();
+      setIsLoggedIn(authenticated);
+    };
+    
+    checkAuth();
+    // Re-check periodically in case auth state changes
+    const interval = setInterval(checkAuth, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   const navItems = [
@@ -89,19 +104,32 @@ const LandingPageNav: React.FC = () => {
 
           {/* Desktop CTA Buttons */}
           <div className="hidden md:flex items-center gap-4">
-            <button
-              onClick={() => navigate('/login')}
-              className="text-text-muted hover:text-cyan-400 transition-colors duration-300 font-medium"
-            >
-              Sign In
-            </button>
-            <button
-              onClick={() => navigate('/signup')}
-              className="group bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-6 py-2 rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl flex items-center gap-2"
-            >
-              Get Started
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-            </button>
+            {isLoggedIn ? (
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="group bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-6 py-2 rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl flex items-center gap-2"
+              >
+                <LayoutDashboard size={16} />
+                Dashboard
+                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="text-text-muted hover:text-cyan-400 transition-colors duration-300 font-medium"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => navigate('/signup')}
+                  className="group bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-6 py-2 rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl flex items-center gap-2"
+                >
+                  Get Started
+                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                </button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -135,19 +163,41 @@ const LandingPageNav: React.FC = () => {
               </button>
             ))}
             <div className="pt-4 border-t border-gray-700/50 space-y-3">
-              <button
-                onClick={() => navigate('/login')}
-                className="block w-full text-left text-text-muted hover:text-cyan-400 transition-colors duration-300 font-medium py-2"
-              >
-                Sign In
-              </button>
-              <button
-                onClick={() => navigate('/signup')}
-                className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl flex items-center justify-center gap-2"
-              >
-                Get Started
-                <ArrowRight size={16} />
-              </button>
+              {isLoggedIn ? (
+                <button
+                  onClick={() => {
+                    navigate('/dashboard');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl flex items-center justify-center gap-2"
+                >
+                  <LayoutDashboard size={16} />
+                  Dashboard
+                  <ArrowRight size={16} />
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={() => {
+                      navigate('/login');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="block w-full text-left text-text-muted hover:text-cyan-400 transition-colors duration-300 font-medium py-2"
+                  >
+                    Sign In
+                  </button>
+                  <button
+                    onClick={() => {
+                      navigate('/signup');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl flex items-center justify-center gap-2"
+                  >
+                    Get Started
+                    <ArrowRight size={16} />
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </motion.div>

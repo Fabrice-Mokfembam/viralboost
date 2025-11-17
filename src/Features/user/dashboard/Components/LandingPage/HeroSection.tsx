@@ -1,11 +1,26 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Play, Star, Users, DollarSign, Zap } from 'lucide-react';
+import { ArrowRight, Play, Star, Users, DollarSign, Zap, LayoutDashboard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { general } from '../../../../../assets/images';
+import { isAuthenticated, isTokenExpired } from '../../../auth/Utils/authUtils';
 
 const HeroSection: React.FC = () => {
   const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Check authentication status
+    const checkAuth = () => {
+      const authenticated = isAuthenticated() && !isTokenExpired();
+      setIsLoggedIn(authenticated);
+    };
+    
+    checkAuth();
+    // Re-check periodically in case auth state changes
+    const interval = setInterval(checkAuth, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -76,21 +91,34 @@ const HeroSection: React.FC = () => {
             variants={itemVariants}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
           >
-            <button
-              onClick={() => navigate('/signup')}
-              className="group bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-3xl flex items-center gap-3"
-            >
-              Start ViralBoast
-              <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
-            </button>
-            
-            <button
-              onClick={() => navigate('/login')}
-              className="group bg-gradient-to-r from-bg-secondary to-bg-tertiary hover:from-bg-tertiary hover:to-bg-secondary text-text-primary px-8 py-4 rounded-2xl font-bold text-lg border border-cyan-500/30 shadow-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex items-center gap-3 backdrop-blur-sm"
-            >
-              <Play size={24} className="group-hover:scale-110 transition-transform" />
-              Watch Demo
-            </button>
+            {isLoggedIn ? (
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="group bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-3xl flex items-center gap-3"
+              >
+                <LayoutDashboard size={24} />
+                Go to Dashboard
+                <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={() => navigate('/signup')}
+                  className="group bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-3xl flex items-center gap-3"
+                >
+                  Start ViralBoast
+                  <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
+                </button>
+                
+                <button
+                  onClick={() => navigate('/login')}
+                  className="group bg-gradient-to-r from-bg-secondary to-bg-tertiary hover:from-bg-tertiary hover:to-bg-secondary text-text-primary px-8 py-4 rounded-2xl font-bold text-lg border border-cyan-500/30 shadow-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex items-center gap-3 backdrop-blur-sm"
+                >
+                  <Play size={24} className="group-hover:scale-110 transition-transform" />
+                  Watch Demo
+                </button>
+              </>
+            )}
           </motion.div>
 
           {/* Stats */}

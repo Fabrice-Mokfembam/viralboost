@@ -74,7 +74,7 @@ const EmailVerification: React.FC = () => {
       {
         onSuccess: (data) => {
           toast.success(data.message || 'Email verified successfully!');
-          navigate('/');
+          navigate('/login');
         },
         onError: (error: unknown) => {
           const errorMessage = getAuthErrorMessage(error);
